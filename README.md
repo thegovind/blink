@@ -8,6 +8,8 @@
 [![Models](https://img.shields.io/badge/Hugging%20Face-models-yellow.svg)](https://huggingface.co/thegovind)
 [![Space](https://img.shields.io/badge/demo-Space-orange.svg)](https://huggingface.co/spaces/thegovind/blink)
 
+**Docs:** [thegovind.github.io/blink](https://thegovind.github.io/blink/)
+
 Three open models are tagged `v1.0`: `thegovind/blink-4b`,
 `thegovind/blink-27b`, and `thegovind/blink-mimo-9b`.
 

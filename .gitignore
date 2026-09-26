@@ -9,3 +9,4 @@ _tmp_*.jsonl
 dist/
 build/
 htmlcov/
+_site/

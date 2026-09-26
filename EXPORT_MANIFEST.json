@@ -1059,7 +1059,7 @@
   {
     "dest": ".gitignore",
     "reason": "repository scaffold",
-    "sha256": "398c1cf2900f78cfc4c313981ebc67598ac350e84901aeffe8c795614e6c13c6",
+    "sha256": "97605b0133973642198a4b6743f003f0015140dfa2ed25e2ed4ab5d289c7cbd5",
     "src": "<generated>",
     "transform": "generate"
   },
@@ -1080,7 +1080,7 @@
   {
     "dest": "README.md",
     "reason": "repository scaffold",
-    "sha256": "d39532386642601d42c625c362dff5e946e87ba72e2addc66248e50e0d6b8097",
+    "sha256": "a9e6c66b131e0fb53998da8d43ff0f6cc01d71b705fc5e1d010c4c1bce30aebd",
     "src": "<generated>",
     "transform": "generate"
   },
@@ -1094,7 +1094,7 @@
   {
     "dest": "Makefile",
     "reason": "repository scaffold",
-    "sha256": "77a9eba8b3cda46ef5d9bfbe23d6fed2e87c19edf5fa998d3b5ca113df781e32",
+    "sha256": "11ea7e3ac6a46c18dc9c08ca4a8f357eba7dc371abf71adc4e9ecb338e8865af",
     "src": "<generated>",
     "transform": "generate"
   },
@@ -1136,7 +1136,14 @@
   {
     "dest": ".github/workflows/ci.yml",
     "reason": "repository scaffold",
-    "sha256": "145a0b4f3d1b1426b9b2045afc18c8e3467563ab5aee4a79c8c6a5681cb5a951",
+    "sha256": "a101e9319d47939b2b9988bb4f21faf15b9cbb250fa00f44432239a837c8a331",
+    "src": "<generated>",
+    "transform": "generate"
+  },
+  {
+    "dest": ".github/workflows/pages.yml",
+    "reason": "repository scaffold",
+    "sha256": "f63948729740046a0cd167a121cb4149074f76a71ac8f223aec19d08a9d2b950",
     "src": "<generated>",
     "transform": "generate"
   },
@@ -1272,5 +1279,411 @@
     "sha256": "c9d84e1de4812d0ea5a77474af10584433f90423673d82e2c1adde52663c87fa",
     "src": "<generated>",
     "transform": "generate"
+  },
+  {
+    "dest": "site/build.py",
+    "reason": "docs site",
+    "sha256": "82db8d5a5d40ef1e2cd340d9fb39821cb7b63af3c0e408efc7ae87cf66b34e11",
+    "src": "<site>",
+    "transform": "copy"
+  },
+  {
+    "dest": "site/check.py",
+    "reason": "docs site",
+    "sha256": "1e5613d7c4e63bb0311e1830bfd87173a10e1068daccd4c86265f55a9cd1f94e",
+    "src": "<site>",
+    "transform": "copy"
+  },
+  {
+    "dest": "site/config.json",
+    "reason": "docs site",
+    "sha256": "ccb78dc6992dbd7f1c1497dcd18e1d7e77aa0c97cd5d018d201432015a3311ee",
+    "src": "<site>",
+    "transform": "copy"
+  },
+  {
+    "dest": "site/diagrams/103562624aba88af.svg",
+    "reason": "docs site",
+    "sha256": "11b3547846d7012c5e8ecb0f55cb264d5b1915a135e402e33f15408958525fa0",
+    "src": "<site>",
+    "transform": "copy"
+  },
+  {
+    "dest": "site/diagrams/1dd3e87e941dcbd8.svg",
+    "reason": "docs site",
+    "sha256": "2fd3768ccc91335997ca790bcc87081332993f878edb36439c960194e672117f",
+    "src": "<site>",
+    "transform": "copy"
+  },
+  {
+    "dest": "site/diagrams/21679bdb3a4f8b05.svg",
+    "reason": "docs site",
+    "sha256": "7dbe6e5e919082cf794531b6e0d691cae00ebc6713b02e84b2bbaa788a59bcf7",
+    "src": "<site>",
+    "transform": "copy"
+  },
+  {
+    "dest": "site/diagrams/2187fe3a8adfb5e1.svg",
+    "reason": "docs site",
+    "sha256": "a46c79adf7cd7cf2a9b976b1427f19407e6444d10f0caab8811ad41a2e11f21f",
+    "src": "<site>",
+    "transform": "copy"
+  },
+  {
+    "dest": "site/diagrams/2c5e8805147c38b4.svg",
+    "reason": "docs site",
+    "sha256": "7c5f102a5934ef580d7ffb194f73327cdce2b67ba0e0dd03059ec0780d244c24",
+    "src": "<site>",
+    "transform": "copy"
+  },
+  {
+    "dest": "site/diagrams/2f7fd75aac652db6.svg",
+    "reason": "docs site",
+    "sha256": "ee2a73af6641c55e246255f23de997d3c7c2dd98a0f0f83f0e0f951db0fc0d94",
+    "src": "<site>",
+    "transform": "copy"
+  },
+  {
+    "dest": "site/diagrams/30266db271ecee5c.svg",
+    "reason": "docs site",
+    "sha256": "7a8f32ab3d76b50a0dd1fbfa8121d3ca0173e882a37c1cebb200a575d48e9250",
+    "src": "<site>",
+    "transform": "copy"
+  },
+  {
+    "dest": "site/diagrams/3bd42398615273e6.svg",
+    "reason": "docs site",
+    "sha256": "e966f3428447d209ed962ea1c09c2d67559bb130a045a8cb25c6c45221bf633f",
+    "src": "<site>",
+    "transform": "copy"
+  },
+  {
+    "dest": "site/diagrams/48cc1961e1c54866.svg",
+    "reason": "docs site",
+    "sha256": "1996f0d151e783a0887e920c72c94999b8e5c2dc0c859d34959a69959cd8196f",
+    "src": "<site>",
+    "transform": "copy"
+  },
+  {
+    "dest": "site/diagrams/4b8eb20dd7221969.svg",
+    "reason": "docs site",
+    "sha256": "3c036279780255c632d8c5fb3ab04d62f208c817f05f1aacd4aefa6c6a2d76bd",
+    "src": "<site>",
+    "transform": "copy"
+  },
+  {
+    "dest": "site/diagrams/4c0822bbfea3981e.svg",
+    "reason": "docs site",
+    "sha256": "ccee0dcd8a47b43614b6398fb3f510e2bb3838835448be692d928f5644e37cf4",
+    "src": "<site>",
+    "transform": "copy"
+  },
+  {
+    "dest": "site/diagrams/4c42d9bd2bb7ef87.svg",
+    "reason": "docs site",
+    "sha256": "5d77bcdca3ad2342536de9b7f22b01be448bceb96904dc0d74bb32df6fafc297",
+    "src": "<site>",
+    "transform": "copy"
+  },
+  {
+    "dest": "site/diagrams/521c61499c08c71e.svg",
+    "reason": "docs site",
+    "sha256": "9a96c6e7d9caa5cca3886e4efbbafb5c07047d788820139349c0389f6d828e9d",
+    "src": "<site>",
+    "transform": "copy"
+  },
+  {
+    "dest": "site/diagrams/55989009ba289615.svg",
+    "reason": "docs site",
+    "sha256": "8e521a2edbfe5051dc316e7363929a1ac1eaa4c2ad9dd3aaeabf86112a2f76a4",
+    "src": "<site>",
+    "transform": "copy"
+  },
+  {
+    "dest": "site/diagrams/5b1cb829ad70b11f.svg",
+    "reason": "docs site",
+    "sha256": "2e8b824242dbcd61fbd24cfbefd3c6d631e89e90f0612c148ef9220eee8dc209",
+    "src": "<site>",
+    "transform": "copy"
+  },
+  {
+    "dest": "site/diagrams/6090845c211ebecb.svg",
+    "reason": "docs site",
+    "sha256": "c8095e93464816f0a91473923e11cf19bbccf9187c2139fb7cd81b2575fa034d",
+    "src": "<site>",
+    "transform": "copy"
+  },
+  {
+    "dest": "site/diagrams/60b5a1030a9776e4.svg",
+    "reason": "docs site",
+    "sha256": "b2c2812346564fdc7d44572ca8796dee8035d3857549bac3702c8d6f938b7d96",
+    "src": "<site>",
+    "transform": "copy"
+  },
+  {
+    "dest": "site/diagrams/63b43a1a78d77f8c.svg",
+    "reason": "docs site",
+    "sha256": "9b224881bfc1250d9fb586d7e6be388cbf1ae5e11e7cb6a9ed49225e8aa1b725",
+    "src": "<site>",
+    "transform": "copy"
+  },
+  {
+    "dest": "site/diagrams/6f87dd3d95e783ba.svg",
+    "reason": "docs site",
+    "sha256": "a55944df603bb8ee464949257955c55d694be81b9dfe7d7c8b8bdb228179e440",
+    "src": "<site>",
+    "transform": "copy"
+  },
+  {
+    "dest": "site/diagrams/794342c557c95562.svg",
+    "reason": "docs site",
+    "sha256": "38f131b31833dcb718f7a0553c61ad3b6140a7a28c77b7bc1decb5ffad66a255",
+    "src": "<site>",
+    "transform": "copy"
+  },
+  {
+    "dest": "site/diagrams/7dc086a6adeaad5a.svg",
+    "reason": "docs site",
+    "sha256": "ce71a3857d70bc508bcf07ce16e9033b7522ab18e6dbf5781954463f89455611",
+    "src": "<site>",
+    "transform": "copy"
+  },
+  {
+    "dest": "site/diagrams/7e77c30e6210e0d5.svg",
+    "reason": "docs site",
+    "sha256": "bbae70989660c4c559d64f7e210077dcae2fac5d9e40fc4b19f2a71605cf0461",
+    "src": "<site>",
+    "transform": "copy"
+  },
+  {
+    "dest": "site/diagrams/836ce9ac38139c03.svg",
+    "reason": "docs site",
+    "sha256": "a6c67cd3df4f6d091db606acde591909b7a28070af1188b8613ef1be5ba49c0c",
+    "src": "<site>",
+    "transform": "copy"
+  },
+  {
+    "dest": "site/diagrams/8c8b51647f928bd1.svg",
+    "reason": "docs site",
+    "sha256": "3c03d7e133432e058afd7068fbba079e0b051aef6d7407c3ba827f61bcc18146",
+    "src": "<site>",
+    "transform": "copy"
+  },
+  {
+    "dest": "site/diagrams/8e264bbfc7e7c1f3.svg",
+    "reason": "docs site",
+    "sha256": "110c6569bf0c7fdcbc2261702c9f141185090ee946562a402a28dd696ac40323",
+    "src": "<site>",
+    "transform": "copy"
+  },
+  {
+    "dest": "site/diagrams/8e6960d684d0cc24.svg",
+    "reason": "docs site",
+    "sha256": "c825aab74b644a8a0041145e2743c79460c6208887b4a7e668a589c02bf742ca",
+    "src": "<site>",
+    "transform": "copy"
+  },
+  {
+    "dest": "site/diagrams/95e5eec00383ee5e.svg",
+    "reason": "docs site",
+    "sha256": "34be55193be5599211fa83d186f292743e16e713a77e5325c6ab83f8e6c342b2",
+    "src": "<site>",
+    "transform": "copy"
+  },
+  {
+    "dest": "site/diagrams/97894ffdde281cec.svg",
+    "reason": "docs site",
+    "sha256": "6c7b09dd5386da3ac31fdc8d431a98a7bb07986a08722828660261e6c3d05926",
+    "src": "<site>",
+    "transform": "copy"
+  },
+  {
+    "dest": "site/diagrams/9b053bba06035642.svg",
+    "reason": "docs site",
+    "sha256": "8531d17167cad79acf748f7b4fc4e4ac0ce70fc814bcc43bcd19f7edf0923269",
+    "src": "<site>",
+    "transform": "copy"
+  },
+  {
+    "dest": "site/diagrams/9eb7f635caa47d04.svg",
+    "reason": "docs site",
+    "sha256": "d7ca1cee004cf2e76444bbf9d2b6ac64094ad6503ab1ee73fc6a9ed98f8d8d2c",
+    "src": "<site>",
+    "transform": "copy"
+  },
+  {
+    "dest": "site/diagrams/9f92d5da6dab0c1e.svg",
+    "reason": "docs site",
+    "sha256": "8dda04a28c1f7d04b594d11dbc41b93873a6294e3ca4256c49d4ac6076c54ffc",
+    "src": "<site>",
+    "transform": "copy"
+  },
+  {
+    "dest": "site/diagrams/a1ccf8f64ddcae59.svg",
+    "reason": "docs site",
+    "sha256": "1314e91502a917d1200800f9c27df86d5a5ad901708d0617361dcb113e7cc416",
+    "src": "<site>",
+    "transform": "copy"
+  },
+  {
+    "dest": "site/diagrams/af579be5c9a41108.svg",
+    "reason": "docs site",
+    "sha256": "40cfc1069a9f87c5d3faf91b36bfde9e4a8a953f746072105e855ece60f83d64",
+    "src": "<site>",
+    "transform": "copy"
+  },
+  {
+    "dest": "site/diagrams/b8584dc54b65ce66.svg",
+    "reason": "docs site",
+    "sha256": "f8adfb32a1a1b9ae7b9a8bdc421ec600eeec2da6e444254a11635ad5882b630f",
+    "src": "<site>",
+    "transform": "copy"
+  },
+  {
+    "dest": "site/diagrams/b95c4beec743b220.svg",
+    "reason": "docs site",
+    "sha256": "57f328ea201f4711fec5135b3c744625824c9b7e56c0037407ede3d3eccb688d",
+    "src": "<site>",
+    "transform": "copy"
+  },
+  {
+    "dest": "site/diagrams/c6624135a41335b7.svg",
+    "reason": "docs site",
+    "sha256": "3ae900f4c495381eb0b68c27472d944242e2870ff34c364c4d97cd7d424f3f13",
+    "src": "<site>",
+    "transform": "copy"
+  },
+  {
+    "dest": "site/diagrams/c85f58d2b0655726.svg",
+    "reason": "docs site",
+    "sha256": "371dc72e14dc3e2058930e90c3d823854411fa29ca40c2a4ab0a803e4098eb6a",
+    "src": "<site>",
+    "transform": "copy"
+  },
+  {
+    "dest": "site/diagrams/c90702dc9d5ae6e3.svg",
+    "reason": "docs site",
+    "sha256": "3955716cfe126e4e6e8ce5059c2008761fa0c8deda4e9e8bc82580aa5c4ad748",
+    "src": "<site>",
+    "transform": "copy"
+  },
+  {
+    "dest": "site/diagrams/d2483ee5d5eb9a40.svg",
+    "reason": "docs site",
+    "sha256": "8ad217d65aad7697130780a81aa7fc025581c4f1aceda133e10384345c6054f4",
+    "src": "<site>",
+    "transform": "copy"
+  },
+  {
+    "dest": "site/diagrams/e7909e04282f3f6f.svg",
+    "reason": "docs site",
+    "sha256": "1a3329894bdefb092bd17ccb8a85509c2939957a67823a1582f333aae78ce53a",
+    "src": "<site>",
+    "transform": "copy"
+  },
+  {
+    "dest": "site/diagrams/e884ca16c7f47dc3.svg",
+    "reason": "docs site",
+    "sha256": "4ea490fa2ed4ec82552cb7a4402c9b2957dc57aaed1a4b01f9751efc9e4fcce2",
+    "src": "<site>",
+    "transform": "copy"
+  },
+  {
+    "dest": "site/diagrams/ed43273ac29e4a4a.svg",
+    "reason": "docs site",
+    "sha256": "1513f5b0b68740d1287a7174d354bd1a8fc9a9cec0d1d2858bd433328b44f0f9",
+    "src": "<site>",
+    "transform": "copy"
+  },
+  {
+    "dest": "site/diagrams/f7efce8057a1eb3d.svg",
+    "reason": "docs site",
+    "sha256": "445e48183c915de7a1b26f00d480289ab646bbd7d7f6325b78f8ac611491a645",
+    "src": "<site>",
+    "transform": "copy"
+  },
+  {
+    "dest": "site/diagrams/fa4c04b19a8798bd.svg",
+    "reason": "docs site",
+    "sha256": "274697891e37ace36f543502f0d17e420597d2bb4c40ad505ca41de3d3540a6f",
+    "src": "<site>",
+    "transform": "copy"
+  },
+  {
+    "dest": "site/render_diagrams.py",
+    "reason": "docs site",
+    "sha256": "c0e61d260c81fa07eaa73d9d4a675965bffb611e419ab2cd294ba1f66ed0c21c",
+    "src": "<site>",
+    "transform": "copy"
+  },
+  {
+    "dest": "site/requirements.txt",
+    "reason": "docs site",
+    "sha256": "710e71d24de60eb852f9d8e6c022b3210a52e1ce05adc98a1159484c10e7dc09",
+    "src": "<site>",
+    "transform": "copy"
+  },
+  {
+    "dest": "site/static/favicon.svg",
+    "reason": "docs site",
+    "sha256": "699691bad20576fd7d03e67972c12517f9290136968cd37a991e90d1ec0c2e2e",
+    "src": "<site>",
+    "transform": "copy"
+  },
+  {
+    "dest": "site/static/site.css",
+    "reason": "docs site",
+    "sha256": "2966ea326f26bb969375d483beb928ae29c65a6f0d4a6f3d333d3165aa969b93",
+    "src": "<site>",
+    "transform": "copy"
+  },
+  {
+    "dest": "site/static/site.js",
+    "reason": "docs site",
+    "sha256": "a66097a005deddf8f70e9acb03c35c82b7b920d767e248cf8176f61c80ea46c2",
+    "src": "<site>",
+    "transform": "copy"
+  },
+  {
+    "dest": "site/strings.json",
+    "reason": "docs site",
+    "sha256": "4d10145f1331f8a273e4a0cf2f5fa0357c0bdbebea9459b5a00fd7594db7af08",
+    "src": "<site>",
+    "transform": "copy"
+  },
+  {
+    "dest": "site/templates/404.html",
+    "reason": "docs site",
+    "sha256": "7e0c1cc6e59a6183eba29ab3bf9304b6dba06818068270a0c7116b13fc6d4e2d",
+    "src": "<site>",
+    "transform": "copy"
+  },
+  {
+    "dest": "site/templates/base.html",
+    "reason": "docs site",
+    "sha256": "c697c7b58303a8e8a893c018413ad0bde60222dedd14e182a94dbaf0c34d392f",
+    "src": "<site>",
+    "transform": "copy"
+  },
+  {
+    "dest": "site/templates/docs.html",
+    "reason": "docs site",
+    "sha256": "22600248a7c0e4fb1be72893ca42fdf0b263fc7e6ba7cb7e5d9a93b3f2283beb",
+    "src": "<site>",
+    "transform": "copy"
+  },
+  {
+    "dest": "site/templates/home.html",
+    "reason": "docs site",
+    "sha256": "36cc778d085fe266fdb6306524cad1b673d4e61c6a6c084da893815fd75c043b",
+    "src": "<site>",
+    "transform": "copy"
+  },
+  {
+    "dest": "site/test_build.py",
+    "reason": "docs site",
+    "sha256": "0a9b1df9dc9b255caf8b0f87a9a34d1331a861826c23511a9a69141e1981b067",
+    "src": "<site>",
+    "transform": "copy"
   }
 ]
