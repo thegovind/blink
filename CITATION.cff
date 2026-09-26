@@ -1,0 +1,8 @@
+cff-version: 1.2.0
+title: "blink: One-pass typed-decision models"
+authors:
+  - family-names: Kamtamneni
+    given-names: Govind
+year: 2026
+version: 1.1.0
+message: "If you use blink, please cite this repository and the model card for the specific model."

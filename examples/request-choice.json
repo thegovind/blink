@@ -1,0 +1,14 @@
+{
+  "state": "Order 4411 arrived with a cracked screen. The customer wants a refund.",
+  "questions": {
+    "route": {
+      "type": "choice",
+      "instructions": "Which team should handle this?",
+      "criteria": {
+        "returns": "Damaged or wrong items",
+        "billing": "Charges and refunds",
+        "shipping": "Late or lost parcels"
+      }
+    }
+  }
+}

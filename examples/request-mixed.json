@@ -1,0 +1,27 @@
+{
+  "state": "Order 4471 arrived with a cracked screen. The customer attached photos and wants a replacement.",
+  "questions": {
+    "route": {
+      "type": "choice",
+      "instructions": "Which team should handle this?",
+      "criteria": {
+        "returns": "Damaged or wrong items",
+        "billing": "Charges and refunds",
+        "shipping": "Late or lost parcels"
+      }
+    },
+    "urgent": {
+      "type": "noul",
+      "instructions": "Does this need a reply today?"
+    },
+    "severity": {
+      "type": "score",
+      "instructions": "How severe is the issue?",
+      "criteria": [
+        "minor",
+        "moderate",
+        "major"
+      ]
+    }
+  }
+}

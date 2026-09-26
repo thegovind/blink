@@ -1,0 +1,2893 @@
+/* blink — frosted paper, one cobalt for blink, one flash for the instant. Figures first.
+   Geist loads from app.py's head; the static build falls back to Inter or the system face. */
+
+:root {
+  /* neutrals, from the style reference */
+  --color-canvas: #f5f5f5;
+  --color-paper: #ffffff;
+  --color-surface-alt: #fafafa;
+  --color-ink: #0a0a0a;
+  --color-ink-soft: #171717;
+  --color-mid-gray: #737373;
+  --color-mid-gray-canvas: #666666;
+  --color-hairline: #e5e5e5;
+  /* blink: the brand, the model in use, what it outputs, and the action that runs it */
+  --color-blink: #2447f5;
+  --color-blink-hover: #1c38d0;
+  --color-blink-deep: #15237a;
+  --color-blink-light: #6a82f8;
+  --color-blink-tint: #eef1fe;
+  --color-blink-ink: #1c38d0;
+  /* flash: the instant, where one pass lands */
+  --color-flash: #d4f55c;
+  --color-flash-ink: #0a0a0a;
+  /* every other system stays gray, so the colours above carry meaning */
+  --color-ref: #6b6b6b;
+  --color-other: #8c8c8c;
+  /* red is for errors only */
+  --color-error: #b91c1c;
+  --color-error-bg: #fef2f2;
+  --color-error-line: #fecaca;
+
+  --canvas: var(--color-canvas);
+  --paper: var(--color-paper);
+  --alt: var(--color-surface-alt);
+  --ink: var(--color-ink);
+  --ink-soft: var(--color-ink-soft);
+  --mid: var(--color-mid-gray);
+  --mid-c: var(--color-mid-gray-canvas);
+  --line: var(--color-hairline);
+  --line-strong: #d4d4d4;
+  --track: #f5f5f5;
+  --grid: #ededed;
+  --blink: var(--color-blink);
+  --blink-light: var(--color-blink-light);
+  --blink-tint: var(--color-blink-tint);
+  --blink-ink: var(--color-blink-ink);
+  --flash: var(--color-flash);
+
+  --font-geist: Geist, Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+  --font-geist-mono: "Geist Mono", ui-monospace, "SF Mono", Menlo, Consolas, "Liberation Mono", monospace;
+  --text-caption: 12px;
+  --text-body: 14px;
+  --text-body-lg: 16px;
+  --text-heading-sm: 24px;
+  --text-heading: 30px;
+  --text-display: 48px;
+
+  --radius-cards: 24px;
+  --radius-pill: 18px;
+  --radius-nested: 10px;
+  --radius-small: 6px;
+  --shadow-subtle: 0 0 0 1px rgba(23, 23, 23, 0.05), 0 1px 3px rgba(0, 0, 0, 0.1), 0 1px 2px -1px rgba(0, 0, 0, 0.1);
+  --ring: 0 0 0 2px var(--color-paper), 0 0 0 4px var(--color-blink);
+  --ease: cubic-bezier(0.22, 0.8, 0.3, 1);
+}
+
+/* --- shell --------------------------------------------------------------------- */
+
+html,
+body,
+gradio-app {
+  background: var(--canvas) !important;
+  color-scheme: light !important;
+}
+
+/* one centred column, one gutter; every block inside aligns to its edges */
+gradio-app {
+  display: block;
+}
+
+.gradio-container {
+  max-width: 1280px !important;
+  width: 100% !important;
+  margin-left: auto !important;
+  margin-right: auto !important;
+  padding: 0 clamp(16px, 4vw, 32px) 8px !important;
+  box-sizing: border-box !important;
+  background: transparent !important;
+  color: var(--ink);
+  font-family: var(--font-geist) !important;
+  font-size: var(--text-body);
+  font-feature-settings: "ss01" on, "cv11" on;
+  -webkit-font-smoothing: antialiased;
+}
+
+.gradio-container .prose :is(h1, h2, h3, h4, p, li) {
+  color: var(--ink);
+}
+
+.gradio-container .prose a {
+  color: var(--blink);
+  text-decoration: underline;
+  text-decoration-thickness: 1px;
+  text-underline-offset: 3px;
+}
+
+.gradio-container .prose a:hover {
+  color: var(--blink-ink);
+}
+
+footer {
+  display: none !important;
+}
+
+/* one ring for everything a keyboard can reach, scrolling figures on a phone included;
+   text fields draw theirs as a border (below) */
+.gradio-container :focus-visible {
+  outline: 2px solid var(--blink) !important;
+  outline-offset: 2px !important;
+}
+
+/* --- masthead ------------------------------------------------------------------ */
+
+.blk-top {
+  padding: 32px 0 0;
+}
+
+.blk-top h1 {
+  font-family: var(--font-geist);
+  font-weight: 600;
+  font-size: var(--text-display);
+  line-height: 1.1;
+  letter-spacing: -0.05em;
+  color: var(--ink);
+  margin: 0;
+}
+
+/* the name, and after it one cobalt dot that blinks once when the page opens */
+.blk-top h1 .blk-word {
+  position: relative;
+  display: inline-block;
+  padding-right: 0.28em;
+}
+
+.blk-top h1 em.blk-mark {
+  position: absolute;
+  right: 0.02em;
+  bottom: 0.25em;
+  width: 0.19em;
+  height: 0.19em;
+  border-radius: 50%;
+  background: var(--blink);
+  transform-origin: 50% 50%;
+  animation: blk-lid 0.42s ease-in-out 0.55s 1 both;
+}
+
+.blk-top .blk-lede {
+  font-size: var(--text-body-lg);
+  line-height: 1.5;
+  color: var(--mid-c);
+  max-width: 720px;
+  margin: 8px 0 0;
+}
+
+.blk-meta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin-top: 16px;
+  font-size: var(--text-caption);
+  font-weight: 500;
+  line-height: 1.33;
+  color: var(--ink-soft);
+}
+
+.blk-meta span {
+  border: 1px solid var(--line);
+  border-radius: var(--radius-pill);
+  padding: 3px 10px;
+  background: var(--paper);
+}
+
+/* which blink is answering */
+.blk-meta span.key {
+  background: var(--blink-tint);
+  border-color: transparent;
+  color: var(--blink-ink);
+  font-family: var(--font-geist-mono);
+  font-weight: 500;
+  animation: blk-pop 0.4s var(--ease) both;
+}
+
+/* the claim that makes it a blink: one pass, nothing generated */
+.blk-meta span:last-child {
+  background: var(--flash);
+  border-color: transparent;
+  color: var(--color-flash-ink);
+}
+
+.blk-rule {
+  height: 1px;
+  background: var(--line);
+  margin: 24px 0 16px;
+}
+
+/* --- tabs: pills on the canvas; the one you are on is filled ------------------- */
+
+/* gradio measures a hidden copy of these buttons to decide what fits, so both copies
+   get the same size, and nothing adds space it cannot see (no gap, no margin) */
+.gradio-container .tab-wrapper {
+  height: auto !important;
+  padding-bottom: 0 !important;
+  margin-bottom: 20px !important;
+}
+
+.gradio-container .tab-container {
+  height: 32px !important;
+  border: 0 !important;
+  background: transparent !important;
+}
+
+.gradio-container .tab-container::after,
+.gradio-container .tab-container button.selected::after {
+  display: none !important;
+}
+
+.gradio-container .tab-container button {
+  height: 32px !important;
+  padding: 0 14px !important;
+  border: 0 !important;
+  border-radius: var(--radius-pill) !important;
+  background: transparent !important;
+  color: var(--mid-c) !important;
+  font-family: var(--font-geist) !important;
+  font-size: var(--text-body) !important;
+  font-weight: 500 !important;
+  letter-spacing: 0 !important;
+  transition: background-color 0.15s ease, color 0.15s ease;
+}
+
+.gradio-container .tab-container button:hover:not(.selected) {
+  background: rgba(10, 10, 10, 0.05) !important;
+  color: var(--ink) !important;
+}
+
+.gradio-container .tab-container button.selected {
+  background: var(--paper) !important;
+  color: var(--ink) !important;
+  box-shadow: inset 0 0 0 1px var(--line) !important;
+}
+
+/* the strip clips what spills past it, so a tab wears its ring inside the pill */
+.gradio-container .tab-container button:focus-visible {
+  outline-offset: -2px !important;
+}
+
+.gradio-container .overflow-menu > button {
+  height: 32px !important;
+  min-width: 40px !important;
+  border: 1px solid var(--line) !important;
+  border-radius: var(--radius-pill) !important;
+  background: var(--paper) !important;
+  color: var(--ink) !important;
+}
+
+.gradio-container .overflow-menu > button:hover {
+  background: var(--alt) !important;
+}
+
+.gradio-container .overflow-dropdown {
+  border: 1px solid var(--line) !important;
+  border-radius: var(--radius-pill) !important;
+  background: var(--paper) !important;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.08), 0 1px 3px rgba(0, 0, 0, 0.08) !important;
+  padding: 6px !important;
+}
+
+.gradio-container .overflow-dropdown button {
+  border-radius: 12px !important;
+  padding: 8px 12px !important;
+  font-family: var(--font-geist) !important;
+  font-size: var(--text-body) !important;
+  font-weight: 500 !important;
+  color: var(--ink) !important;
+}
+
+.gradio-container .overflow-dropdown button:hover {
+  background: var(--canvas) !important;
+}
+
+/* a tab strip inside a tab (the use cases) reads as a sub-level: text and a rule */
+.gradio-container .tabitem .tab-container button {
+  height: 32px !important;
+  padding: 0 12px !important;
+  border-radius: 0 !important;
+  font-size: 13px !important;
+  box-shadow: inset 0 -2px 0 transparent;
+}
+
+.gradio-container .tabitem .tab-container button:hover:not(.selected) {
+  background: transparent !important;
+}
+
+.gradio-container .tabitem .tab-container button.selected,
+.gradio-container .tabitem .tab-container button.selected:focus-visible {
+  background: transparent !important;
+  color: var(--ink) !important;
+  box-shadow: inset 0 -2px 0 var(--blink) !important;
+}
+
+.gradio-container .tabitem .tab-wrapper {
+  border-bottom: 1px solid var(--line);
+  margin-bottom: 16px !important;
+}
+
+/* --- inputs -------------------------------------------------------------------- */
+
+.gradio-container .block,
+.gradio-container .form,
+.gradio-container .html-container {
+  background: transparent !important;
+  border: 0 !important;
+  box-shadow: none !important;
+  padding-left: 0 !important;
+  padding-right: 0 !important;
+}
+
+.gradio-container label > span,
+.gradio-container .block > label > span,
+.gradio-container span[data-testid="block-info"] {
+  font-family: var(--font-geist) !important;
+  font-size: var(--text-caption) !important;
+  font-weight: 500 !important;
+  letter-spacing: 0 !important;
+  text-transform: none !important;
+  color: var(--mid-c) !important;
+}
+
+.gradio-container textarea,
+.gradio-container input[type="text"],
+.gradio-container input[type="number"] {
+  background: var(--paper) !important;
+  border: 1px solid var(--line) !important;
+  border-radius: var(--radius-pill) !important;
+  box-shadow: none !important;
+  color: var(--ink) !important;
+  font-family: var(--font-geist) !important;
+  font-size: var(--text-body) !important;
+  line-height: 1.5 !important;
+  transition: border-color 0.15s ease, box-shadow 0.15s ease, background-color 0.15s ease;
+}
+
+.gradio-container textarea {
+  padding: 10px 14px !important;
+}
+
+.gradio-container input[type="text"],
+.gradio-container input[type="number"] {
+  padding: 8px 14px !important;
+}
+
+.gradio-container textarea::placeholder,
+.gradio-container input::placeholder {
+  color: var(--mid) !important;
+}
+
+.gradio-container textarea:hover,
+.gradio-container input[type="text"]:hover {
+  border-color: var(--line-strong) !important;
+}
+
+.gradio-container textarea:focus,
+.gradio-container input:focus {
+  border-color: var(--blink) !important;
+  box-shadow: 0 0 0 1px var(--blink) !important;
+  outline: none !important;
+}
+
+.gradio-container textarea:disabled,
+.gradio-container input:disabled {
+  color: var(--mid) !important;
+  background: var(--alt) !important;
+}
+
+.gradio-container ul.options {
+  border: 1px solid var(--line) !important;
+  border-radius: 14px !important;
+  background: var(--paper) !important;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.08), 0 1px 3px rgba(0, 0, 0, 0.08) !important;
+  padding: 4px !important;
+}
+
+.gradio-container ul.options li {
+  border-radius: 10px !important;
+  font-size: 13px !important;
+  white-space: nowrap;
+}
+
+/* the type menu opens wider than its pill */
+.gradio-container ul.options {
+  min-width: 128px !important;
+  width: max-content !important;
+}
+
+.gradio-container .cm-editor .cm-content {
+  font-family: var(--font-geist-mono) !important;
+  font-size: 12.5px !important;
+}
+
+.gradio-container .cm-editor {
+  background: var(--paper) !important;
+  border: 1px solid var(--line) !important;
+  border-radius: var(--radius-pill);
+  overflow: hidden;
+  font-size: 12.5px;
+}
+
+.gradio-container .cm-editor.cm-focused {
+  border-color: var(--blink) !important;
+  box-shadow: 0 0 0 1px var(--blink);
+  outline: none !important;
+}
+
+/* one ink for the JSON, in either colour scheme: the editor's own palettes are too pale
+   on paper to read */
+.gradio-container .cm-content,
+.gradio-container .cm-content span {
+  color: var(--ink-soft) !important;
+  caret-color: var(--ink);
+}
+
+.gradio-container .cm-cursor {
+  border-left-color: var(--ink) !important;
+}
+
+.gradio-container .cm-selectionBackground,
+.gradio-container .cm-focused .cm-selectionBackground {
+  background: var(--blink-tint) !important;
+}
+
+.gradio-container .cm-gutters {
+  background: var(--alt) !important;
+  border-right: 1px solid var(--line) !important;
+  color: var(--mid) !important;
+}
+
+.gradio-container .cm-activeLine,
+.gradio-container .cm-activeLineGutter {
+  background: transparent !important;
+}
+
+/* --- buttons ------------------------------------------------------------------- */
+
+.gradio-container button.lg,
+.gradio-container button.md,
+.gradio-container button.sm,
+.gradio-container button.primary,
+.gradio-container button.secondary {
+  font-family: var(--font-geist) !important;
+  font-size: var(--text-body) !important;
+  font-weight: 500 !important;
+  letter-spacing: 0 !important;
+  text-transform: none !important;
+  border-radius: var(--radius-pill) !important;
+  border: 1px solid var(--line) !important;
+  background: var(--paper) !important;
+  color: var(--ink) !important;
+  box-shadow: none !important;
+  transition: background-color 0.15s ease, border-color 0.15s ease, color 0.15s ease;
+}
+
+.gradio-container button.lg {
+  min-height: 40px;
+  padding: 0 18px !important;
+}
+
+.gradio-container button.sm {
+  min-height: 32px;
+  padding: 0 12px !important;
+  font-size: 13px !important;
+}
+
+.gradio-container button.secondary:hover:not(:disabled) {
+  background: var(--alt) !important;
+  border-color: var(--line-strong) !important;
+}
+
+/* the one filled colour on a page is the action that runs blink */
+.gradio-container button.primary {
+  background: var(--blink) !important;
+  border-color: var(--blink) !important;
+  color: #ffffff !important;
+}
+
+.gradio-container button.primary:hover:not(:disabled) {
+  background: var(--color-blink-hover) !important;
+  border-color: var(--color-blink-hover) !important;
+}
+
+.gradio-container button.primary:active:not(:disabled) {
+  background: var(--color-blink-deep) !important;
+}
+
+.gradio-container button:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.blk-chips button {
+  white-space: nowrap;
+  min-width: 0 !important;
+}
+
+/* the row wraps as a whole; a label never breaks inside its own pill */
+.blk-chips {
+  flex-wrap: wrap !important;
+  gap: 6px !important;
+}
+
+.blk-chips > * {
+  flex: 0 0 auto !important;
+  min-width: 0 !important;
+}
+
+/* --- model switcher (a gradio radio, worn as a segmented control) --------------- */
+
+.blk-seg {
+  border: 0 !important;
+  background: transparent !important;
+  padding: 0 !important;
+  margin: 0 0 12px !important;
+  min-width: 0 !important;
+  width: auto !important;
+  overflow: visible !important;
+}
+
+.blk-seg .wrap {
+  display: inline-flex !important;
+  flex-wrap: wrap;
+  gap: 2px !important;
+  padding: 3px;
+  border: 1px solid var(--line);
+  border-radius: var(--radius-pill);
+  background: var(--paper);
+}
+
+.blk-seg label {
+  display: inline-flex;
+  align-items: center;
+  margin: 0 !important;
+  padding: 4px 12px !important;
+  border: 1px solid transparent !important;
+  border-radius: 14px !important;
+  background: transparent !important;
+  color: var(--mid) !important;
+  font-family: var(--font-geist) !important;
+  font-size: 13px !important;
+  line-height: 20px;
+  cursor: pointer;
+  transition: background-color 0.15s ease, color 0.15s ease, border-color 0.15s ease;
+}
+
+.blk-seg label input {
+  position: absolute;
+  width: 0;
+  height: 0;
+  opacity: 0;
+  pointer-events: none;
+}
+
+.blk-seg label span {
+  font-family: var(--font-geist) !important;
+  font-size: 13px !important;
+  font-weight: 500 !important;
+  letter-spacing: 0 !important;
+  text-transform: none !important;
+  color: inherit !important;
+}
+
+.blk-seg label:hover {
+  color: var(--ink) !important;
+}
+
+/* the blink in use wears blink's colour, as the model tag in the masthead does */
+.blk-seg label.selected {
+  background: var(--blink-tint) !important;
+  border-color: var(--blink) !important;
+  color: var(--blink-ink) !important;
+}
+
+/* keyboard focus only: a click on a segment is not a reason to ring it */
+.blk-seg label:has(input:focus-visible) {
+  outline: 2px solid var(--blink);
+  outline-offset: 2px;
+}
+
+/* --- panels -------------------------------------------------------------------- */
+
+.blk-panel {
+  background: var(--paper);
+  border: 1px solid var(--line);
+  border-radius: var(--radius-cards);
+  box-shadow: var(--shadow-subtle);
+  padding: 20px;
+}
+
+.blk-note {
+  font-size: var(--text-body);
+  line-height: 1.55;
+  color: var(--mid-c);
+  max-width: 660px;
+  margin: 0 0 4px;
+}
+
+.blk-eyebrow {
+  font-size: var(--text-caption);
+  font-weight: 500;
+  line-height: 1.33;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  color: var(--mid-c);
+  margin: 0 0 10px;
+}
+
+.blk-h2 {
+  font-family: var(--font-geist);
+  font-weight: 600;
+  font-size: var(--text-heading-sm);
+  line-height: 1.33;
+  letter-spacing: -0.025em;
+  color: var(--ink);
+  margin: 0 0 8px;
+}
+
+/* an error, and only an error, is red */
+.blk-warn {
+  font-size: 13px;
+  line-height: 1.5;
+  background: var(--color-error-bg);
+  border: 1px solid var(--color-error-line);
+  color: var(--color-error);
+  border-radius: var(--radius-pill);
+  padding: 8px 14px;
+  margin: 0 0 12px;
+}
+
+/* mock mode is a fact about the numbers, not a failure */
+.blk-warn.blk-mock,
+.blk-warn.blk-synthetic {
+  background: var(--alt);
+  border-color: var(--line);
+  color: var(--ink-soft);
+}
+
+/* --- answers ------------------------------------------------------------------- */
+
+.blk-answers {
+  display: grid;
+  gap: 12px;
+}
+
+.blk-q {
+  background: var(--paper);
+  border: 1px solid var(--line);
+  border-radius: var(--radius-cards);
+  box-shadow: var(--shadow-subtle);
+  padding: 20px;
+  animation: blk-rise 0.42s var(--ease) both;
+  animation-delay: var(--d, 0ms);
+}
+
+/* a question reads as a question: what it asks first, its name and type quietly under it */
+.blk-q-head {
+  display: grid;
+  gap: 6px;
+}
+
+.blk-q-head p {
+  margin: 0;
+  font-size: 15px;
+  font-weight: 500;
+  line-height: 1.45;
+  letter-spacing: -0.01em;
+  color: var(--ink);
+  overflow-wrap: anywhere;
+}
+
+.blk-q-head p:empty {
+  display: none;
+}
+
+.blk-q-meta {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.blk-q-head h4 {
+  font-family: var(--font-geist-mono);
+  font-size: var(--text-caption);
+  font-weight: 500;
+  margin: 0;
+  color: var(--mid-c);
+}
+
+.blk-kind {
+  font-size: var(--text-caption);
+  font-style: normal;
+  font-weight: 500;
+  line-height: 1.5;
+  border-radius: var(--radius-pill);
+  padding: 0 8px;
+  color: var(--ink-soft);
+  background: var(--canvas);
+}
+
+/* the answer as a stat: the value large, what it means small beside it */
+.blk-headline {
+  display: flex;
+  align-items: baseline;
+  gap: 10px;
+  margin: 12px 0 0;
+  flex-wrap: wrap;
+}
+
+.blk-headline b {
+  font-weight: 600;
+  font-size: var(--text-heading);
+  line-height: 1.2;
+  letter-spacing: -0.025em;
+  color: var(--ink);
+  overflow-wrap: anywhere;
+}
+
+.blk-headline .blk-sub {
+  font-size: 13px;
+  color: var(--mid);
+  font-variant-numeric: tabular-nums;
+}
+
+.blk-opts {
+  list-style: none;
+  margin: 16px 0 0 !important;
+  padding: 0 !important;
+  display: grid;
+  gap: 8px;
+}
+
+.blk-opt {
+  display: grid;
+  grid-template-columns: minmax(0, 188px) 1fr 64px;
+  align-items: center;
+  gap: 12px;
+  margin: 0 !important;
+  font-size: 13px;
+}
+
+.blk-opt .k {
+  color: var(--mid);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.blk-opt.win .k {
+  color: var(--ink);
+  font-weight: 500;
+}
+
+.blk-opt .track {
+  height: 8px;
+  background: var(--track);
+  border-radius: 999px;
+  overflow: hidden;
+}
+
+/* every bar is blink's own probability; the one it picked is the full cobalt */
+.blk-opt .track i {
+  display: block;
+  height: 100%;
+  border-radius: 999px;
+  background: var(--blink-light);
+  transform-origin: left center;
+  animation: blk-wipe 0.5s var(--ease) both;
+  animation-delay: calc(var(--d, 0ms) + var(--i, 0) * 40ms);
+}
+
+.blk-opt.win .track i {
+  background: var(--blink);
+}
+
+.blk-opt .v {
+  font-size: 13px;
+  color: var(--mid);
+  text-align: right;
+  font-variant-numeric: tabular-nums;
+}
+
+/* the instant: where the one pass lands, flashed on once */
+.blk-opt.win .v {
+  justify-self: end;
+  color: var(--color-flash-ink);
+  font-weight: 600;
+  background: var(--flash);
+  border-radius: var(--radius-pill);
+  padding: 0 8px;
+  line-height: 20px;
+  animation: blk-flash 0.5s ease-out both;
+  animation-delay: calc(var(--d, 0ms) + 380ms);
+}
+
+/* --- verdict ------------------------------------------------------------------- */
+
+.blk-verdict {
+  display: flex;
+  align-items: flex-start;
+  gap: 14px;
+  background: var(--paper);
+  border: 1px solid var(--line);
+  border-radius: var(--radius-cards);
+  box-shadow: var(--shadow-subtle);
+  padding: 20px;
+  margin-bottom: 12px;
+  animation: blk-rise 0.4s var(--ease) both;
+}
+
+/* go is blink's cobalt; hold is an open ring; stop is a filled square */
+.blk-verdict .blk-dotmark {
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  background: var(--color-mid-gray);
+  margin-top: 11px;
+  flex: none;
+  animation: blk-lid 0.42s ease-in-out 0.35s 1 both;
+}
+
+.blk-verdict.go .blk-dotmark {
+  background: var(--blink);
+}
+
+.blk-verdict.hold .blk-dotmark {
+  background: transparent;
+  box-shadow: inset 0 0 0 2px var(--ink-soft);
+}
+
+.blk-verdict.stop .blk-dotmark {
+  background: var(--ink-soft);
+  border-radius: 2px;
+}
+
+.blk-verdict h3 {
+  font-family: var(--font-geist);
+  font-weight: 600;
+  font-size: var(--text-heading-sm);
+  line-height: 1.33;
+  letter-spacing: -0.025em;
+  margin: 0;
+}
+
+.blk-verdict p {
+  margin: 4px 0 0;
+  font-size: var(--text-body);
+  color: var(--mid);
+}
+
+.blk-stats {
+  display: flex;
+  gap: 16px;
+  flex-wrap: wrap;
+  font-size: var(--text-caption);
+  color: var(--mid-c);
+  font-variant-numeric: tabular-nums;
+  margin: 12px 0 0;
+}
+
+.blk-stats b {
+  color: var(--ink);
+  font-weight: 600;
+}
+
+/* --- quiet notice (replay has nothing recorded for an edited input) ------------- */
+
+.blk-notice {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+  background: var(--alt);
+  border: 1px solid var(--line);
+  border-radius: var(--radius-cards);
+  padding: 16px 20px;
+  animation: blk-rise 0.4s var(--ease) both;
+}
+
+.blk-notice .blk-dotmark,
+.blk-empty .blk-dotmark {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: var(--color-mid-gray);
+  margin-top: 7px;
+  flex: none;
+  animation: blk-lid 0.42s ease-in-out 0.2s 1 both;
+}
+
+.blk-notice p {
+  margin: 0;
+  font-size: var(--text-body);
+  line-height: 1.55;
+  color: var(--ink-soft);
+  max-width: 62ch;
+}
+
+.blk-hint {
+  color: var(--mid-c);
+}
+
+.blk-demo {
+  font-size: var(--text-caption);
+  line-height: 1.5;
+  color: var(--mid-c);
+  margin: 2px 0 12px;
+  max-width: 62ch;
+}
+
+.blk-foot {
+  font-size: var(--text-caption);
+  line-height: 1.6;
+  color: var(--mid-c);
+  border-top: 1px solid var(--line);
+  margin: 48px 0 0;
+  padding-top: 16px;
+}
+
+.blk-verdict h3 .blk-tag {
+  margin-left: 10px;
+  vertical-align: middle;
+}
+
+/* --- waiting on the model ------------------------------------------------------- */
+
+.blk-sk-card {
+  animation: blk-rise 0.35s var(--ease) both;
+  animation-delay: var(--d, 0ms);
+}
+
+/* a flat tone that breathes while the model runs; no gradient */
+.blk-sk {
+  background: #efefef;
+  border-radius: var(--radius-small);
+  animation: blk-shimmer 1.4s ease-in-out infinite;
+}
+
+.blk-sk-kicker {
+  width: 34%;
+  height: 12px;
+  margin-bottom: 14px;
+}
+
+.blk-sk-head {
+  width: 52%;
+  height: 28px;
+  margin-bottom: 18px;
+  border-radius: var(--radius-nested);
+}
+
+.blk-sk-row {
+  height: 10px;
+  margin-bottom: 10px;
+  border-radius: 999px;
+  animation-delay: calc(var(--i, 0) * 120ms);
+}
+
+.blk-sk-row:nth-child(3) {
+  width: 92%;
+}
+.blk-sk-row:nth-child(4) {
+  width: 78%;
+}
+.blk-sk-row:nth-child(5) {
+  width: 85%;
+  margin-bottom: 0;
+}
+
+.blk-run::before {
+  content: "";
+  display: inline-block;
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: var(--blink);
+  margin-right: 8px;
+  vertical-align: 1px;
+  animation: blk-pulse 1.2s ease-in-out infinite;
+}
+
+/* --- disclosure ---------------------------------------------------------------- */
+
+.blk-more {
+  margin-top: 12px;
+}
+
+.blk-more summary,
+details.blk-d summary {
+  cursor: pointer;
+  list-style: none;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-size: var(--text-body);
+  font-weight: 500;
+  color: var(--ink-soft);
+  padding: 12px 0;
+  border-radius: var(--radius-small);
+  transition: color 0.15s ease;
+}
+
+.blk-more summary {
+  font-size: 13px;
+  color: var(--mid-c);
+  padding: 6px 0;
+}
+
+.blk-more summary::-webkit-details-marker,
+details.blk-d summary::-webkit-details-marker {
+  display: none;
+}
+
+/* a thin chevron that turns when the fold opens */
+.blk-more summary::before,
+details.blk-d summary::before {
+  content: "";
+  width: 6px;
+  height: 6px;
+  flex: none;
+  border-right: 1.5px solid currentColor;
+  border-bottom: 1.5px solid currentColor;
+  transform: rotate(-45deg);
+  transition: transform 0.2s var(--ease);
+}
+
+.blk-more[open] summary::before,
+details.blk-d[open] summary::before {
+  transform: rotate(45deg);
+}
+
+.blk-more summary:hover,
+details.blk-d summary:hover {
+  color: var(--ink);
+}
+
+details.blk-d {
+  border-bottom: 1px solid var(--line);
+}
+
+details.blk-d p {
+  margin: 0 0 14px 16px;
+  font-size: var(--text-body);
+  line-height: 1.6;
+  color: var(--mid-c);
+  max-width: 680px;
+}
+
+.blk-pre {
+  font-family: var(--font-geist-mono);
+  font-size: 12px;
+  line-height: 1.6;
+  background: var(--paper);
+  border: 1px solid var(--line);
+  border-radius: var(--radius-nested);
+  padding: 12px 14px;
+  overflow-x: auto;
+  color: var(--ink-soft);
+  margin: 4px 0 12px;
+  white-space: pre-wrap;
+  overflow-wrap: break-word;
+  tab-size: 4;
+}
+
+.blk-pre b {
+  color: var(--ink);
+  font-weight: 600;
+}
+
+/* --- figures: each one a card -------------------------------------------------- */
+
+.blk-figure {
+  margin: 0 0 24px;
+  background: var(--paper);
+  border: 1px solid var(--line);
+  border-radius: var(--radius-cards);
+  box-shadow: var(--shadow-subtle);
+  padding: 20px;
+  animation: blk-rise 0.45s var(--ease) both;
+}
+
+.blk-figure.blk-bare {
+  background: transparent;
+  border: 0;
+  box-shadow: none;
+  padding: 0;
+}
+
+.blk-figure figcaption {
+  font-size: 13px;
+  font-weight: 500;
+  line-height: 1.4;
+  color: var(--mid);
+  margin-bottom: 12px;
+}
+
+.blk-fig {
+  display: block;
+  overflow: visible;
+  font-family: var(--font-geist);
+}
+
+.blk-grid {
+  stroke: var(--grid);
+  stroke-width: 1;
+}
+
+.blk-ref {
+  stroke: var(--color-ref);
+  stroke-width: 1.2;
+  stroke-dasharray: 3 4;
+}
+
+.blk-ax {
+  font-family: var(--font-geist);
+  font-size: 10.5px;
+  font-variant-numeric: tabular-nums;
+  fill: var(--mid);
+}
+
+.blk-cap {
+  font-family: var(--font-geist);
+  font-size: 11px;
+  font-weight: 500;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  fill: var(--mid);
+}
+
+.blk-name {
+  font-family: var(--font-geist);
+  font-size: 13px;
+  fill: var(--mid);
+}
+
+.blk-name.on {
+  fill: var(--ink);
+  font-weight: 600;
+}
+
+.blk-val {
+  font-family: var(--font-geist);
+  font-size: 12px;
+  font-weight: 500;
+  font-variant-numeric: tabular-nums;
+  fill: var(--mid);
+  stroke: var(--paper);
+  stroke-width: 3px;
+  stroke-linejoin: round;
+  paint-order: stroke fill;
+}
+
+.blk-ring-lab {
+  font-family: var(--font-geist);
+  font-size: 10px;
+  fill: var(--mid);
+  stroke: var(--paper);
+  stroke-width: 3px;
+  stroke-linejoin: round;
+  paint-order: stroke fill;
+}
+
+.blk-val.on {
+  fill: var(--ink);
+  font-weight: 600;
+}
+
+.blk-grow {
+  transform-box: fill-box;
+  transform-origin: left center;
+  animation: blk-wipe 0.6s var(--ease) both;
+}
+
+.blk-ring {
+  fill: none;
+  stroke: var(--grid);
+  stroke-width: 1;
+}
+
+.blk-spoke {
+  stroke: var(--line);
+  stroke-width: 1;
+}
+
+.blk-radar {
+  transform-box: fill-box;
+  transform-origin: center;
+  animation: blk-pop 0.55s var(--ease) both;
+}
+
+.blk-dot,
+.blk-pt {
+  animation: blk-pop 0.45s var(--ease) both;
+}
+
+/* the frontier is a fact about every system, so it is drawn in neutral ink */
+.blk-halo {
+  fill: var(--ink);
+  fill-opacity: 0.06;
+  animation: blk-pop 0.5s var(--ease) both;
+}
+
+.blk-front {
+  fill: none;
+  stroke: var(--color-ref);
+  stroke-width: 1.5;
+  stroke-linejoin: round;
+  stroke-dasharray: 2400;
+  stroke-dashoffset: 2400;
+  animation: blk-draw 1.4s cubic-bezier(0.3, 0.7, 0.3, 1) 0.15s forwards;
+}
+
+/* 11px keeps Geist's taller line box inside the room results.py leaves around a label
+   (11 above the baseline, 4 below); the figure scales it to about 12px on screen */
+.blk-pt-lab {
+  font-family: var(--font-geist);
+  font-size: 11px;
+  fill: var(--mid);
+  stroke: var(--paper);
+  stroke-width: 3.5px;
+  stroke-linejoin: round;
+  paint-order: stroke fill;
+}
+
+.blk-pt-lab.on {
+  fill: var(--ink);
+  font-weight: 600;
+}
+
+.blk-lead {
+  fill: none;
+  stroke: var(--color-other);
+  stroke-width: 1;
+}
+
+.blk-rows {
+  list-style: none;
+  margin: 0 !important;
+  padding: 0 !important;
+  display: grid;
+  gap: 6px;
+}
+
+.blk-row {
+  display: grid;
+  grid-template-columns: 1fr auto;
+  align-items: baseline;
+  gap: 6px 14px;
+  margin: 0 !important;
+  padding: 12px 16px;
+  border: 1px solid var(--line);
+  border-radius: var(--radius-pill);
+  background: var(--paper);
+}
+
+.blk-row.on {
+  border-color: var(--blink);
+  background: var(--blink-tint);
+}
+
+.blk-row b {
+  font-weight: 500;
+  font-size: var(--text-body);
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.blk-row b::before {
+  content: "";
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: var(--c);
+  flex: none;
+}
+
+.blk-row strong {
+  font-weight: 600;
+  font-size: var(--text-heading-sm);
+  line-height: 1.1;
+  letter-spacing: -0.025em;
+  font-variant-numeric: tabular-nums;
+}
+
+.blk-row .blk-axvals {
+  grid-column: 1 / -1;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px 16px;
+  font-size: var(--text-caption);
+  font-variant-numeric: tabular-nums;
+  color: var(--ink-soft);
+}
+
+.blk-row .blk-axvals i {
+  font-style: normal;
+  color: var(--mid-c);
+  margin-right: 6px;
+}
+
+.blk-tag {
+  font-style: normal;
+  font-size: var(--text-caption);
+  font-weight: 500;
+  line-height: 1.5;
+  letter-spacing: 0;
+  color: var(--mid);
+  border: 1px solid var(--line);
+  border-radius: var(--radius-pill);
+  padding: 0 8px;
+  background: var(--paper);
+}
+
+/* --- two groups that must never be read as one scale --------------------------- */
+
+.blk-duo {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 16px;
+  align-items: start;
+  margin-bottom: 20px;
+}
+
+@media (max-width: 900px) {
+  .blk-duo {
+    grid-template-columns: 1fr;
+  }
+}
+
+.blk-group {
+  border: 1px solid var(--line);
+  border-radius: var(--radius-cards);
+  background: var(--paper);
+  box-shadow: var(--shadow-subtle);
+  padding: 20px;
+}
+
+.blk-group-t {
+  font-size: var(--text-body);
+  font-weight: 600;
+  line-height: 1.43;
+  letter-spacing: 0;
+  text-transform: none;
+  color: var(--ink);
+  margin: 0;
+}
+
+.blk-group-s {
+  font-size: 13px;
+  line-height: 1.5;
+  color: var(--mid);
+  margin: 4px 0 8px;
+  min-height: 3em;
+}
+
+.blk-group .blk-figure {
+  margin: 0 0 8px;
+}
+
+.blk-row.quiet {
+  background: transparent;
+  border-style: dashed;
+  border-color: var(--line-strong);
+}
+
+.blk-row.quiet b,
+.blk-row.quiet strong {
+  color: var(--mid);
+}
+
+/* --- tables -------------------------------------------------------------------- */
+
+.blk-tablewrap {
+  overflow-x: auto;
+  border: 1px solid var(--line);
+  border-radius: var(--radius-pill);
+  background: var(--paper);
+}
+
+.blk-mini {
+  max-width: 660px;
+  margin: 0 0 6px;
+}
+
+.blk-undertable {
+  font-size: 13px;
+  margin: 8px 0 22px;
+}
+
+table.blk-table {
+  border-collapse: collapse;
+  width: 100%;
+  font-size: 13px;
+  font-variant-numeric: tabular-nums;
+}
+
+table.blk-table th,
+table.blk-table td {
+  text-align: right;
+  padding: 8px 14px;
+  border: 0;
+  border-bottom: 1px solid var(--line);
+  white-space: nowrap;
+}
+
+table.blk-table th:first-child,
+table.blk-table td:first-child {
+  text-align: left;
+}
+
+table.blk-table.ranked th:nth-child(2),
+table.blk-table.ranked td:nth-child(2) {
+  text-align: left;
+}
+
+table.blk-table th {
+  font-size: var(--text-caption);
+  font-weight: 500;
+  letter-spacing: 0;
+  text-transform: none;
+  color: var(--mid);
+  background: var(--alt);
+}
+
+table.blk-table td {
+  color: var(--ink-soft);
+}
+
+table.blk-table tbody tr:last-child td {
+  border-bottom: 0;
+}
+
+/* blink's own rows wear its tint */
+table.blk-table tr.on td {
+  color: var(--ink);
+  font-weight: 500;
+  background: var(--blink-tint);
+}
+
+/* --- pipeline figure ----------------------------------------------------------- */
+
+.blk-card {
+  fill: var(--paper);
+  stroke: var(--line);
+  stroke-width: 1;
+}
+
+.blk-stage {
+  animation: blk-rise 0.5s var(--ease) both;
+}
+
+.blk-stage-n {
+  font-family: var(--font-geist);
+  font-size: 12px;
+  font-weight: 600;
+  fill: var(--blink);
+}
+
+.blk-stage-t {
+  font-family: var(--font-geist);
+  font-size: 20px;
+  font-weight: 600;
+  letter-spacing: -0.02em;
+  fill: var(--ink);
+}
+
+.blk-stage-s {
+  font-family: var(--font-geist);
+  font-size: 12.5px;
+  fill: var(--mid-c);
+}
+
+/* the pipeline sits on the canvas, where the paper's mid gray is too light */
+.blk-bare .blk-ax {
+  fill: var(--mid-c);
+}
+
+.blk-flow {
+  fill: none;
+  stroke: var(--color-other);
+  stroke-width: 1.5;
+  stroke-dasharray: 200;
+  stroke-dashoffset: 200;
+  animation: blk-draw 0.5s ease-out both;
+}
+
+.blk-flow-head {
+  fill: none;
+  stroke: var(--color-other);
+  stroke-width: 1.5;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  animation: blk-fade 0.35s ease-out both;
+}
+
+/* --- static shell (build_static.py; the gradio app supplies its own) ------------ */
+
+body {
+  margin: 0;
+}
+
+.blk-shell {
+  max-width: 1280px;
+  margin: 0 auto;
+  padding: 0 clamp(16px, 4vw, 32px) 64px;
+  box-sizing: border-box;
+  color: var(--ink);
+  font-family: var(--font-geist);
+  font-size: var(--text-body);
+  -webkit-font-smoothing: antialiased;
+}
+
+.blk-shell .blk-tabs {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 2px;
+  margin-bottom: 4px;
+}
+
+.blk-shell .blk-tabs.sub {
+  gap: 0;
+  border-bottom: 1px solid var(--line);
+  margin: 4px 0 2px;
+}
+
+.blk-tabs button {
+  font-family: var(--font-geist);
+  font-size: var(--text-body);
+  font-weight: 500;
+  color: var(--mid-c);
+  border: 0;
+  border-radius: var(--radius-pill);
+  background: transparent;
+  height: 32px;
+  padding: 0 14px;
+  cursor: pointer;
+  transition: background-color 0.15s ease, color 0.15s ease;
+}
+
+.blk-tabs button:hover {
+  color: var(--ink);
+  background: rgba(10, 10, 10, 0.05);
+}
+
+.blk-tabs button[aria-selected="true"] {
+  color: var(--ink);
+  background: var(--paper);
+  box-shadow: inset 0 0 0 1px var(--line);
+}
+
+.blk-tabs.sub button {
+  border-radius: 0;
+  font-size: 13px;
+  padding: 0 12px;
+}
+
+.blk-tabs.sub button:hover {
+  background: transparent;
+}
+
+.blk-tabs.sub button[aria-selected="true"] {
+  color: var(--ink);
+  background: transparent;
+  box-shadow: inset 0 -2px 0 var(--blink);
+}
+
+.blk-tabs button:focus-visible,
+.blk-chip:focus-visible,
+.blk-go:focus-visible {
+  outline: 2px solid var(--blink);
+  outline-offset: 2px;
+}
+
+.blk-pane {
+  display: none;
+  padding-top: 20px;
+}
+
+.blk-pane.on {
+  display: block;
+}
+
+.blk-cols {
+  display: grid;
+  grid-template-columns: 5fr 7fr;
+  gap: 24px;
+  align-items: start;
+}
+
+@media (max-width: 900px) {
+  .blk-cols {
+    grid-template-columns: 1fr;
+  }
+}
+
+.blk-chiprow {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin-bottom: 14px;
+}
+
+.blk-chip {
+  font-family: var(--font-geist);
+  font-size: 13px;
+  font-weight: 500;
+  height: 32px;
+  border-radius: var(--radius-pill);
+  border: 1px solid var(--line);
+  background: var(--paper);
+  color: var(--ink);
+  padding: 0 12px;
+  cursor: pointer;
+  transition: background-color 0.15s ease, border-color 0.15s ease;
+}
+
+.blk-chip:hover {
+  background: var(--alt);
+  border-color: var(--line-strong);
+}
+
+.blk-chip.on {
+  border-color: var(--ink-soft);
+}
+
+.blk-field {
+  margin-bottom: 14px;
+}
+
+.blk-label {
+  display: block;
+  font-size: var(--text-body);
+  font-weight: 600;
+  letter-spacing: 0;
+  text-transform: none;
+  color: var(--ink);
+  margin-bottom: 6px;
+}
+
+.blk-field textarea {
+  width: 100%;
+  box-sizing: border-box;
+  background: var(--paper);
+  border: 1px solid var(--line);
+  border-radius: var(--radius-pill);
+  color: var(--ink);
+  font-family: var(--font-geist);
+  font-size: var(--text-body);
+  line-height: 1.5;
+  padding: 10px 14px;
+  resize: vertical;
+  transition: border-color 0.15s ease, box-shadow 0.15s ease;
+}
+
+.blk-field textarea:focus {
+  border-color: var(--blink);
+  box-shadow: 0 0 0 1px var(--blink);
+  outline: none;
+}
+
+.blk-field textarea.blk-mono {
+  font-family: var(--font-geist-mono);
+  font-size: 12.5px;
+}
+
+.blk-go {
+  font-family: var(--font-geist);
+  font-size: var(--text-body);
+  font-weight: 500;
+  border-radius: var(--radius-pill);
+  border: 1px solid var(--blink);
+  background: var(--blink);
+  color: #ffffff;
+  height: 40px;
+  padding: 0 18px;
+  width: 100%;
+  cursor: pointer;
+  transition: background-color 0.15s ease;
+}
+
+.blk-go:hover {
+  background: var(--color-blink-hover);
+}
+
+.blk-out {
+  display: none;
+}
+
+.blk-out.on {
+  display: block;
+}
+
+/* the gradio app gets this spacing from its block wrappers */
+.blk-shell .blk-pane > h2.blk-h2 {
+  margin-top: 36px;
+}
+
+.blk-shell .blk-pane > h2.blk-h2:first-child,
+.blk-shell .blk-pane > p.blk-eyebrow + h2.blk-h2 {
+  margin-top: 0;
+}
+
+.blk-synthetic {
+  margin: 14px 0 0;
+}
+
+/* --- one grid for the input column ---------------------------------------------- */
+
+.gradio-container .blk-side > * {
+  margin-left: 0 !important;
+  margin-right: 0 !important;
+}
+
+.gradio-container .blk-side {
+  gap: 12px;
+}
+
+/* a label belongs to the field under it, not to the gap above it */
+.gradio-container .blk-head {
+  padding: 0 !important;
+  border: 0;
+  background: none;
+  min-height: 0;
+  margin-bottom: -4px !important;
+}
+
+.gradio-container .blk-head .blk-label {
+  margin-bottom: 0;
+}
+
+/* the questions editor, folded away until it is wanted */
+.blk-acc {
+  border: 0 !important;
+  background: transparent !important;
+  margin: 0 0 4px !important;
+}
+
+.blk-acc > button,
+.blk-acc .label-wrap {
+  font-family: var(--font-geist) !important;
+  font-size: var(--text-body) !important;
+  font-weight: 500 !important;
+  letter-spacing: 0 !important;
+  text-transform: none !important;
+  color: var(--ink-soft) !important;
+  padding: 12px 0 !important;
+  border-top: 1px solid var(--line) !important;
+  border-radius: 0 !important;
+}
+
+.blk-acc .cm-editor {
+  max-height: 360px;
+}
+
+/* the same thin chevron the other folds use */
+.blk-acc .label-wrap {
+  display: flex !important;
+  justify-content: flex-start !important;
+  align-items: center;
+  gap: 10px;
+}
+
+.blk-acc .label-wrap .icon {
+  display: none !important;
+}
+
+.blk-acc .label-wrap::before {
+  content: "";
+  width: 6px;
+  height: 6px;
+  flex: none;
+  border-right: 1.5px solid currentColor;
+  border-bottom: 1.5px solid currentColor;
+  transform: rotate(45deg);
+  transition: transform 0.2s var(--ease);
+}
+
+.blk-acc:has([data-testid="accordion-content"][style*="none"]) .label-wrap::before {
+  transform: rotate(-45deg);
+}
+
+/* --- home ----------------------------------------------------------------------- */
+
+.blk-home-lede {
+  font-size: 18px !important;
+  line-height: 1.56 !important;
+  color: var(--ink) !important;
+  margin: 4px 0 28px !important;
+  max-width: 44ch;
+}
+
+/* two headline figures side by side, stacking when there is no room */
+.blk-pair {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(min(330px, 100%), 1fr));
+  gap: 12px 20px;
+  align-items: start;
+}
+
+.blk-pair .blk-half > .blk-note {
+  margin-bottom: 0;
+  font-size: 13px;
+}
+
+.blk-half .blk-figure {
+  margin-bottom: 12px;
+}
+
+.blk-narrowfig {
+  max-width: 560px;
+}
+
+/* the public-item proxies as stat blocks: the name small, the number large */
+.blk-headline-rows {
+  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+  gap: 12px !important;
+  max-width: 560px;
+  margin-bottom: 12px !important;
+}
+
+.blk-headline-rows .blk-row {
+  grid-template-columns: 1fr;
+  gap: 8px;
+  padding: 16px 20px;
+  border-radius: var(--radius-cards);
+  box-shadow: var(--shadow-subtle);
+}
+
+.blk-headline-rows .blk-row b {
+  font-size: 13px;
+  color: var(--ink-soft);
+}
+
+.blk-headline-rows .blk-row strong {
+  font-size: 36px;
+  line-height: 1.11;
+  letter-spacing: -0.025em;
+}
+
+/* an interval is drawn twice: a dark outline that reads on the card, a light core
+   that reads on the bar */
+.blk-whisk-edge {
+  stroke: var(--ink);
+  stroke-width: 3.6;
+  stroke-linecap: round;
+}
+
+.blk-whisk {
+  stroke: var(--paper);
+  stroke-width: 1.5;
+  stroke-linecap: round;
+}
+
+/* the same numbers as text: the figure leads, the table takes over on a phone */
+.blk-narrow {
+  display: none;
+}
+
+.blk-nums {
+  border-collapse: separate;
+  border-spacing: 0;
+  width: 100%;
+  max-width: 660px;
+  margin: 0 0 4px;
+  font-size: 13px;
+  font-variant-numeric: tabular-nums;
+  background: var(--paper);
+  border: 1px solid var(--line);
+  border-radius: var(--radius-pill);
+  box-shadow: var(--shadow-subtle);
+}
+
+.blk-nums thead th:first-child {
+  border-top-left-radius: 17px;
+}
+
+.blk-nums thead th:last-child {
+  border-top-right-radius: 17px;
+}
+
+.blk-nums caption {
+  caption-side: bottom;
+  text-align: left;
+  font-size: var(--text-caption);
+  line-height: 1.5;
+  color: var(--mid-c);
+  padding-top: 8px;
+}
+
+.blk-nums th,
+.blk-nums td {
+  text-align: right;
+  padding: 8px 12px;
+  border: 0;
+  border-bottom: 1px solid var(--line);
+  white-space: nowrap;
+}
+
+.blk-nums tbody tr:last-child th,
+.blk-nums tbody tr:last-child td {
+  border-bottom: 0;
+}
+
+.blk-nums thead th {
+  font-size: var(--text-caption);
+  font-weight: 500;
+  letter-spacing: 0;
+  text-transform: none;
+  color: var(--mid);
+  background: var(--alt);
+}
+
+.blk-nums thead th:first-child,
+.blk-nums tbody th {
+  text-align: left;
+}
+
+.blk-nums tbody th {
+  font-weight: 600;
+  font-size: 13px;
+  color: var(--ink);
+}
+
+.blk-nums tbody td {
+  font-size: 13px;
+  color: var(--ink-soft);
+}
+
+.blk-locked {
+  font-size: var(--text-caption);
+  color: var(--mid-c);
+  margin: 6px 0 0;
+}
+
+.blk-empty {
+  display: flex;
+  align-items: baseline;
+  gap: 10px;
+  border: 1px dashed var(--line-strong);
+  border-radius: var(--radius-cards);
+  padding: 16px 20px;
+  color: var(--mid-c);
+  font-size: var(--text-body);
+}
+
+.blk-empty .blk-dotmark {
+  margin-top: 0;
+}
+
+.blk-empty p {
+  margin: 0;
+}
+
+.blk-cards {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(184px, 1fr));
+  gap: 12px;
+  margin: 32px 0 0;
+}
+
+.blk-cards.out {
+  margin-top: 12px;
+}
+
+.blk-tile,
+.blk-face {
+  display: grid;
+  grid-template-columns: 1fr auto;
+  align-items: baseline;
+  gap: 4px 12px;
+  border: 1px solid var(--line);
+  border-radius: var(--radius-cards);
+  background: var(--paper);
+  box-shadow: var(--shadow-subtle);
+  padding: 16px 20px;
+  text-align: left;
+  text-decoration: none !important;
+  color: var(--ink) !important;
+  transition: border-color 0.15s ease, background-color 0.15s ease;
+}
+
+.blk-tile:hover,
+.gradio-container .blk-tilewrap:hover .blk-face {
+  border-color: var(--line-strong);
+}
+
+/* an in-app card is a real button wearing the card: the click is a gradio event, so it
+   works the same at every width */
+.gradio-container .blk-tilewrap {
+  position: relative;
+  border: 0 !important;
+  background: none !important;
+  padding: 0 !important;
+  min-width: 0;
+  gap: 0;
+}
+
+.gradio-container .blk-tilewrap > .styler,
+.gradio-container .blk-tilewrap .html-container,
+.gradio-container .blk-tilewrap .block {
+  padding: 0 !important;
+  background: none !important;
+  border: 0 !important;
+}
+
+.gradio-container .blk-tilewrap .blk-face {
+  height: 100%;
+  align-content: start;
+}
+
+.gradio-container button.blk-tile-hit {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  opacity: 0;
+  padding: 0;
+  margin: 0;
+  border-radius: var(--radius-cards) !important;
+  cursor: pointer;
+}
+
+.gradio-container .blk-tilewrap:focus-within .blk-face {
+  box-shadow: var(--ring);
+}
+
+.gradio-container .blk-cards {
+  gap: 12px;
+  flex-wrap: wrap;
+  margin-top: 32px;
+}
+
+.blk-tile b,
+.blk-face b {
+  font-size: var(--text-body);
+  font-weight: 600;
+}
+
+.blk-tile span,
+.blk-face > span {
+  grid-column: 1;
+  font-size: 13px;
+  line-height: 1.5;
+  color: var(--mid);
+}
+
+.blk-tile em,
+.blk-face em {
+  grid-row: 1;
+  grid-column: 2;
+  font-style: normal;
+  font-size: var(--text-caption);
+  font-weight: 500;
+  line-height: 1.5;
+  color: var(--ink-soft);
+  background: var(--canvas);
+  border-radius: var(--radius-pill);
+  padding: 0 8px;
+  white-space: nowrap;
+}
+
+/* outside links are the quieter variant: no lift, the alternate surface */
+.blk-cards.out .blk-tile {
+  background: var(--alt);
+  box-shadow: none;
+  padding: 14px 18px;
+}
+
+.blk-cards.out .blk-tile em {
+  background: var(--paper);
+  border: 1px solid var(--line);
+}
+
+.blk-cards.out .blk-tile:focus-visible {
+  outline: 2px solid var(--blink);
+  outline-offset: 2px;
+}
+
+/* --- the drafted question, read only -------------------------------------------- */
+
+.blk-draft {
+  list-style: none;
+  margin: 12px 0 0 !important;
+  padding: 0 !important;
+  display: grid;
+  gap: 8px;
+}
+
+.blk-draft-q {
+  border: 1px solid var(--line);
+  border-radius: var(--radius-cards);
+  background: var(--paper);
+  box-shadow: var(--shadow-subtle);
+  padding: 16px 20px;
+  margin: 0 !important;
+  animation: blk-rise 0.4s var(--ease) both;
+}
+
+.blk-draft-q .blk-q-meta b {
+  font-family: var(--font-geist-mono);
+  font-size: var(--text-caption);
+  font-weight: 500;
+  color: var(--mid-c);
+}
+
+/* the drafted options, read at a glance */
+.blk-draft-q ul {
+  list-style: none;
+  margin: 12px 0 0 !important;
+  padding: 0 !important;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+
+.blk-draft-q ul li {
+  margin: 0 !important;
+  font-family: var(--font-geist-mono);
+  font-size: var(--text-caption);
+  line-height: 20px;
+  color: var(--ink-soft);
+  background: var(--canvas);
+  border-radius: var(--radius-pill);
+  padding: 2px 10px;
+}
+
+.gradio-container button.blk-handoff {
+  margin-top: 12px !important;
+}
+
+/* the fold that holds the options and the remove button */
+.gradio-container .blk-qmore {
+  border: 0 !important;
+  background: transparent !important;
+  margin: 2px 0 0 !important;
+}
+
+.gradio-container .blk-qmore > button.label-wrap {
+  font-family: var(--font-geist) !important;
+  font-size: var(--text-caption) !important;
+  font-weight: 500 !important;
+  letter-spacing: 0 !important;
+  text-transform: none !important;
+  color: var(--mid) !important;
+  padding: 6px 0 !important;
+  border: 0 !important;
+  display: flex !important;
+  justify-content: flex-start !important;
+  align-items: center !important;
+  gap: 8px;
+}
+
+.gradio-container .blk-qmore > button.label-wrap span,
+.gradio-container .blk-acc .label-wrap span {
+  font-size: inherit !important;
+  font-weight: inherit !important;
+  color: inherit !important;
+}
+
+.gradio-container .blk-qmore > button.label-wrap:hover {
+  color: var(--ink) !important;
+}
+
+.gradio-container .blk-qmore .label-wrap .icon {
+  display: none !important;
+}
+
+.gradio-container .blk-qmore .label-wrap::before {
+  content: "";
+  width: 5px;
+  height: 5px;
+  flex: none;
+  border-right: 1.5px solid currentColor;
+  border-bottom: 1.5px solid currentColor;
+  transform: rotate(-45deg);
+  transition: transform 0.2s var(--ease);
+}
+
+.gradio-container .blk-qmore .label-wrap.open::before {
+  transform: rotate(45deg);
+}
+
+/* --- ask ------------------------------------------------------------------------ */
+
+.blk-askrow {
+  align-items: stretch !important;
+  gap: 8px !important;
+  flex-wrap: nowrap !important;
+  max-width: 640px;
+}
+
+.gradio-container .blk-askout {
+  margin-top: 4px;
+}
+
+.gradio-container .blk-askrow > * {
+  min-width: 0 !important;
+}
+
+.gradio-container .blk-askrow > button.blk-askgo {
+  flex: 0 0 88px !important;
+  min-width: 88px !important;
+  align-self: center !important;
+}
+
+.gradio-container .blk-ask input,
+.gradio-container .blk-ask textarea {
+  font-size: 15px !important;
+  min-height: 40px;
+}
+
+/* the note keeps one line of room so the drafting state does not shift the page */
+.gradio-container .blk-asknote {
+  padding: 0 !important;
+  min-height: 0 !important;
+}
+
+.blk-ask-note {
+  font-size: var(--text-caption);
+  color: var(--mid-c);
+  margin: 6px 0 0;
+  min-height: 1.1em;
+}
+
+.blk-ask-note .blk-run::before {
+  vertical-align: 0;
+}
+
+.blk-ask-bad {
+  font-size: 13px;
+  line-height: 1.55;
+  color: var(--color-error);
+  background: var(--color-error-bg);
+  border: 1px solid var(--color-error-line);
+  border-radius: var(--radius-pill);
+  padding: 8px 14px;
+  max-width: 640px;
+  box-sizing: border-box;
+}
+
+.blk-drafted {
+  font-size: var(--text-caption);
+  color: var(--mid-c);
+  margin: 10px 2px 0;
+}
+
+/* --- the question form ---------------------------------------------------------- */
+
+.blk-form-head {
+  display: flex;
+  align-items: baseline;
+  gap: 8px;
+  margin: 16px 0 8px;
+}
+
+.blk-form-head span {
+  font-size: 13px;
+  font-weight: 400;
+  color: var(--mid-c);
+}
+
+.gradio-container .blk-qblock {
+  border: 1px solid var(--line) !important;
+  border-radius: var(--radius-cards) !important;
+  background: var(--paper) !important;
+  box-shadow: var(--shadow-subtle) !important;
+  padding: 4px 20px !important;
+  overflow: visible !important;
+}
+
+.gradio-container .blk-qrow {
+  border: 0 !important;
+  border-top: 1px solid var(--line) !important;
+  border-radius: 0 !important;
+  background: transparent !important;
+  padding: 14px 0 8px !important;
+  overflow: visible !important;
+}
+
+/* gradio renders a Group as two nested divs that both carry the class; style the outer
+   one and flatten the inner copy so borders and padding are not doubled */
+.gradio-container .blk-qblock .blk-qblock,
+.gradio-container .blk-qrow .blk-qrow {
+  border: 0 !important;
+  padding: 0 !important;
+  background: transparent !important;
+  border-radius: 0 !important;
+  box-shadow: none !important;
+}
+
+.gradio-container .blk-qrow:first-of-type {
+  border-top: 0 !important;
+}
+
+/* gradio's group wrapper paints itself; the row supplies its own surface */
+.gradio-container .blk-qblock .styler,
+.gradio-container .blk-qrow .styler {
+  background: transparent !important;
+}
+
+/* one question, stacked tight: gradio's own gaps and block paddings go */
+.gradio-container .blk-qrow .styler,
+.gradio-container .blk-qhead,
+.gradio-container .blk-qhead .form {
+  gap: 2px !important;
+}
+
+.gradio-container .blk-qrow .block {
+  padding: 0 !important;
+  min-height: 0 !important;
+}
+
+.gradio-container .blk-qhead > * {
+  min-width: 0 !important;
+}
+
+/* the question itself: words first, a field only once you edit it. The field reaches
+   past the text by its own padding so the words line up with everything under them */
+.gradio-container .blk-qask,
+.gradio-container .blk-qname {
+  overflow: visible !important;
+}
+
+.gradio-container .blk-qask textarea {
+  font-size: 15px !important;
+  font-weight: 500 !important;
+  line-height: 1.45 !important;
+  letter-spacing: -0.01em;
+  color: var(--ink) !important;
+  background: transparent !important;
+  border: 1px solid transparent !important;
+  border-radius: 12px !important;
+  box-shadow: none !important;
+  padding: 4px 8px !important;
+  margin: 0 -9px !important;
+  width: calc(100% + 18px) !important;
+  max-width: none !important;
+  resize: none !important;
+}
+
+.gradio-container .blk-qask textarea:hover:not(:disabled),
+.gradio-container .blk-qname input:hover:not(:disabled) {
+  background: var(--canvas) !important;
+}
+
+.gradio-container .blk-qask textarea:focus,
+.gradio-container .blk-qname input:focus,
+.gradio-container .blk-qopts textarea:focus {
+  background: var(--paper) !important;
+  border-color: var(--blink) !important;
+  box-shadow: 0 0 0 1px var(--blink) !important;
+}
+
+/* its name and type: quiet metadata on one line */
+.gradio-container .blk-qmeta {
+  flex-wrap: nowrap !important;
+  align-items: center !important;
+  gap: 8px !important;
+}
+
+/* gradio sizes these blocks as a scale-0 flex of zero; they take their content's width */
+.gradio-container .blk-qmeta > *,
+.gradio-container .blk-qmeta .form,
+.gradio-container .blk-qmeta .form > .block {
+  flex: 0 0 auto !important;
+  width: auto !important;
+  min-width: 0 !important;
+  overflow: visible !important;
+}
+
+.gradio-container .blk-qmeta .form {
+  display: flex !important;
+  flex-direction: row !important;
+  align-items: center !important;
+  gap: 8px !important;
+}
+
+.gradio-container .blk-qname input {
+  font-family: var(--font-geist-mono) !important;
+  font-size: var(--text-caption) !important;
+  font-weight: 500 !important;
+  line-height: 1.33 !important;
+  color: var(--mid-c) !important;
+  background: transparent !important;
+  border: 1px solid transparent !important;
+  border-radius: 10px !important;
+  box-shadow: none !important;
+  height: 26px;
+  padding: 0 8px !important;
+  margin-left: -9px !important;
+  min-width: 6ch;
+  max-width: 24ch;
+}
+
+/* the name's wrappers take the field's width, not the other way round */
+.gradio-container .blk-qname label,
+.gradio-container .blk-qname .input-container {
+  width: max-content !important;
+  max-width: 100%;
+}
+
+/* the type: a soft badge that opens the three kinds */
+.gradio-container .blk-qtype div.wrap {
+  background: var(--canvas) !important;
+  border: 1px solid transparent !important;
+  border-radius: 13px !important;
+  box-shadow: none !important;
+  transition: border-color 0.15s ease;
+}
+
+.gradio-container .blk-qtype div.wrap:hover {
+  border-color: var(--line-strong) !important;
+}
+
+.gradio-container .blk-qtype div.wrap:focus-within {
+  border-color: var(--blink) !important;
+  box-shadow: 0 0 0 1px var(--blink) !important;
+}
+
+.gradio-container .blk-qtype .wrap-inner,
+.gradio-container .blk-qtype .secondary-wrap {
+  padding: 0 !important;
+  border-radius: 13px !important;
+}
+
+.gradio-container .blk-qtype input {
+  height: 24px;
+  width: 76px !important;
+  margin: 0 !important;
+  padding: 0 22px 0 10px !important;
+  box-sizing: border-box;
+  font-size: var(--text-caption) !important;
+  font-weight: 500 !important;
+  color: var(--ink-soft) !important;
+  cursor: pointer;
+}
+
+.gradio-container .blk-qtype .icon-wrap {
+  right: 7px !important;
+  width: 12px !important;
+  color: var(--mid) !important;
+}
+
+.gradio-container .blk-qtype .icon-wrap svg {
+  width: 12px;
+  height: 12px;
+}
+
+/* the options, at a glance, before anything is opened */
+.gradio-container .blk-chipslot,
+.gradio-container .blk-chipslot .html-container {
+  padding: 0 !important;
+  min-height: 0 !important;
+}
+
+.blk-optchips {
+  list-style: none;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin: 8px 0 0 !important;
+  padding: 0 !important;
+}
+
+.blk-optchips:empty {
+  display: none;
+}
+
+.blk-optchips li {
+  margin: 0 !important;
+  padding: 2px 10px !important;
+  font-family: var(--font-geist-mono);
+  font-size: var(--text-caption);
+  line-height: 20px;
+  color: var(--ink-soft);
+  background: var(--canvas);
+  border-radius: var(--radius-pill);
+  overflow-wrap: anywhere;
+  animation: blk-fade 0.3s ease-out both;
+}
+
+/* a score's levels carry their number */
+.blk-optchips li i {
+  font-style: normal;
+  color: var(--mid-c);
+  margin-right: 6px;
+}
+
+/* editing the options is one step further in: the box and its Remove button show
+   while the fold above them is open */
+.gradio-container .blk-qrow .blk-qopts,
+.gradio-container .blk-qrow .blk-qdrop {
+  display: none !important;
+}
+
+.gradio-container .blk-qrow:has(.blk-qmore button.label-wrap.open) .blk-qopts,
+.gradio-container .blk-qrow:has(.blk-qmore button.label-wrap.open) .blk-qdrop {
+  display: block !important;
+}
+
+.gradio-container .blk-qmore [data-testid="accordion-content"] {
+  display: none !important;
+}
+
+.gradio-container .blk-qopts textarea {
+  font-family: var(--font-geist-mono) !important;
+  font-size: 12.5px !important;
+  line-height: 1.6 !important;
+  background: var(--canvas) !important;
+  border: 1px solid transparent !important;
+  border-radius: 14px !important;
+  box-shadow: none !important;
+}
+
+.gradio-container .blk-qopts textarea:hover:not(:disabled) {
+  border-color: var(--line-strong) !important;
+}
+
+/* a request the rows cannot hold is shown, not edited */
+.gradio-container .blk-qrow textarea:disabled,
+.gradio-container .blk-qrow input:disabled {
+  background: transparent !important;
+  color: var(--ink-soft) !important;
+  cursor: default;
+}
+
+.gradio-container .blk-qdrop button,
+.gradio-container button.blk-qdrop {
+  font-size: var(--text-caption) !important;
+  min-height: 28px;
+  padding: 0 12px !important;
+  color: var(--mid) !important;
+  background: transparent !important;
+  border-color: var(--line) !important;
+  white-space: nowrap;
+  align-self: flex-start !important;
+  width: auto !important;
+  margin: 8px 0 4px !important;
+}
+
+/* removing a question is the one destructive act here */
+.gradio-container button.blk-qdrop:hover {
+  color: var(--color-error) !important;
+  border-color: var(--color-error-line) !important;
+  background: var(--color-error-bg) !important;
+}
+
+.gradio-container button.blk-qadd {
+  margin-top: 8px !important;
+  border-style: dashed !important;
+  border-color: var(--line-strong) !important;
+  background: transparent !important;
+}
+
+.gradio-container button.blk-qadd:hover:not(:disabled) {
+  background: var(--paper) !important;
+}
+
+.blk-problems {
+  list-style: none;
+  margin: 10px 0 0 !important;
+  padding: 10px 14px !important;
+  border: 1px solid var(--color-error-line);
+  border-radius: var(--radius-pill);
+  background: var(--color-error-bg);
+  color: var(--color-error);
+  font-size: 13px;
+  line-height: 1.6;
+  display: grid;
+  gap: 2px;
+}
+
+.blk-problems li {
+  margin: 0 !important;
+  color: var(--color-error) !important;
+}
+
+.gradio-container button.blk-decide {
+  position: sticky;
+  bottom: 12px;
+  z-index: 4;
+  margin-top: 12px !important;
+}
+
+/* --- the finished edge of an answer --------------------------------------------- */
+
+.blk-answer-foot {
+  margin-top: 16px;
+  padding-top: 0;
+}
+
+.blk-answer-foot .blk-stats {
+  margin: 0;
+  gap: 6px;
+}
+
+.blk-answer-foot .blk-stats span {
+  border: 1px solid var(--line);
+  border-radius: var(--radius-pill);
+  background: var(--paper);
+  color: var(--ink-soft);
+  font-weight: 500;
+  padding: 2px 10px;
+}
+
+/* the blink that answered, tagged as the masthead tags it */
+.blk-answer-foot .blk-stats span.blk-by {
+  background: var(--blink-tint);
+  border-color: transparent;
+}
+
+.blk-answer-foot .blk-stats span.blk-by b {
+  color: var(--blink-ink);
+  font-weight: 500;
+}
+
+.blk-answer-foot .blk-more {
+  margin-top: 8px;
+}
+
+/* latency, where it is shown, reads as a row of stat blocks */
+.blk-figure .blk-stats {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(128px, 1fr));
+  gap: 16px;
+  margin: 0 0 8px;
+  font-size: 13px;
+  color: var(--mid);
+}
+
+.blk-figure .blk-stats b {
+  display: block;
+  font-size: var(--text-heading);
+  font-weight: 600;
+  line-height: 1.2;
+  letter-spacing: -0.025em;
+}
+
+/* --- stacking ------------------------------------------------------------------- */
+
+/* inside a media query gradio scopes every selector to its content wrapper, so rules
+   here name what sits inside it (.row, .tab-container), never .gradio-container */
+@media (max-width: 860px) {
+  .row:has(> .blk-side) {
+    flex-direction: column !important;
+  }
+
+  .row:has(> .blk-side) > .column {
+    width: 100% !important;
+    min-width: 0 !important;
+  }
+
+  /* the name and its number on one line, the bar under them */
+  .blk-opt {
+    grid-template-columns: minmax(0, 1fr) auto !important;
+    grid-auto-flow: row dense;
+    gap: 4px 10px !important;
+  }
+
+  .blk-opt .track {
+    grid-column: 1 / -1;
+  }
+}
+
+/* the figures keep their own width on a phone and scroll inside their card instead of
+   shrinking */
+@media (max-width: 720px) {
+  .tab-container button {
+    padding: 0 11px !important;
+    font-size: 13px !important;
+  }
+
+  .blk-top {
+    padding-top: 24px;
+  }
+
+  .blk-top h1 {
+    font-size: 40px;
+  }
+
+  .blk-rule {
+    margin: 20px 0 12px;
+  }
+
+  .blk-figure,
+  .blk-half,
+  .blk-duo {
+    overflow-x: auto;
+  }
+
+  .blk-figure,
+  .blk-group,
+  .blk-q,
+  .blk-verdict {
+    padding: 16px;
+  }
+
+  .blk-headline b {
+    font-size: var(--text-heading-sm);
+  }
+
+  .blk-wide {
+    display: none;
+  }
+
+  /* the table is the figure here, so it has to fit rather than scroll */
+  .blk-narrow {
+    display: block;
+    overflow: visible;
+  }
+
+  .blk-nums {
+    font-size: 12px;
+  }
+
+  .blk-nums th,
+  .blk-nums td {
+    white-space: normal;
+    padding: 6px 6px;
+  }
+
+  .blk-nums thead th {
+    font-size: 11px;
+  }
+
+  .blk-nums tbody th {
+    font-size: 12.5px;
+    padding-left: 10px;
+    padding-right: 6px;
+    overflow-wrap: anywhere;
+  }
+
+  /* a measurement never breaks across lines */
+  .blk-nums tbody td {
+    font-size: 12px;
+    white-space: nowrap;
+  }
+
+  .blk-nums tbody td:last-child,
+  .blk-nums thead th:last-child {
+    padding-right: 10px;
+  }
+
+  .blk-half {
+    min-width: 0;
+  }
+
+  .blk-fig {
+    min-width: 660px;
+  }
+
+  .blk-duo {
+    grid-template-columns: 1fr;
+  }
+
+  /* a radar scales to its card; the rows under it carry every value as text, and they
+     have to fit the phone rather than hide past its edge */
+  .blk-group .blk-fig {
+    min-width: 0;
+  }
+
+  .blk-headline-rows .blk-row strong {
+    font-size: var(--text-heading);
+  }
+}
+
+/* --- keyframes ----------------------------------------------------------------- */
+
+@keyframes blk-rise {
+  from {
+    opacity: 0;
+    transform: translateY(6px);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+/* the blink: a lid closes over the dot and opens again, once */
+@keyframes blk-lid {
+  0%,
+  100% {
+    transform: scaleY(1);
+  }
+  45%,
+  55% {
+    transform: scaleY(0.1);
+  }
+}
+
+/* the skeleton breathes on a flat tone while the model runs */
+@keyframes blk-shimmer {
+  0%,
+  100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.5;
+  }
+}
+
+@keyframes blk-wipe {
+  from {
+    transform: scaleX(0);
+  }
+  to {
+    transform: scaleX(1);
+  }
+}
+
+@keyframes blk-pop {
+  from {
+    opacity: 0;
+    transform: scale(0.88);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+@keyframes blk-fade {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes blk-draw {
+  to {
+    stroke-dashoffset: 0;
+  }
+}
+
+@keyframes blk-pulse {
+  0%,
+  100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.35;
+  }
+}
+
+/* the picked option's number comes on, blinks, and stays */
+@keyframes blk-flash {
+  0% {
+    opacity: 0;
+  }
+  40% {
+    opacity: 1;
+  }
+  60% {
+    opacity: 0.3;
+  }
+  80%,
+  100% {
+    opacity: 1;
+  }
+}
+
+/* everything lands in its final state at once; nothing repeats */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.001ms !important;
+    animation-delay: 0ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.001ms !important;
+    scroll-behavior: auto !important;
+  }
+}

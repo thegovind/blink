@@ -1,0 +1,1248 @@
+[
+  {
+    "dest": "space/app.py",
+    "reason": "",
+    "sha256": "bb57c90e100c8fa11662ae83fb14339d0b2bb62343e69081d586815cd21f1421",
+    "src": "space/app.py",
+    "transform": "scrub_python"
+  },
+  {
+    "dest": "space/blink.py",
+    "reason": "",
+    "sha256": "da7a4b7356e691c97c3cfdf587a7ec2f88c67dd687b1ee446f718394b40ebebe",
+    "src": "space/blink.py",
+    "transform": "scrub_python"
+  },
+  {
+    "dest": "space/author.py",
+    "reason": "",
+    "sha256": "037400eb6d956a8e1f9f1e107b9ba2e372afe344bb95d6c9a7cc6a7f888ae169",
+    "src": "space/author.py",
+    "transform": "scrub_python"
+  },
+  {
+    "dest": "space/ui.py",
+    "reason": "",
+    "sha256": "79e17502492e6c1e3e6f3f1b14d96443b7de4fe8c346843568fecf14fd601b8a",
+    "src": "space/ui.py",
+    "transform": "scrub_python"
+  },
+  {
+    "dest": "space/results.py",
+    "reason": "",
+    "sha256": "1915e9311e7c9afd65b91ea0f5e507c0b5b810c343b62975d1476bd13cbfd8a4",
+    "src": "space/results.py",
+    "transform": "scrub_python"
+  },
+  {
+    "dest": "space/examples.py",
+    "reason": "",
+    "sha256": "af08e6bf7718c6e5ab24e1662f71ee82edcfb23e90d7f8f3a5e43d9b5c86e3a3",
+    "src": "space/examples.py",
+    "transform": "scrub_python"
+  },
+  {
+    "dest": "space/style.css",
+    "reason": "",
+    "sha256": "448f9d0c91c747da598b5f9a9142b709c286a0ddf30eddd2ea4dd16830be7268",
+    "src": "space/style.css",
+    "transform": "scrub"
+  },
+  {
+    "dest": "space/results.json",
+    "reason": "",
+    "sha256": "791dea9dbf43404506cae93d79d2824fc367b07e2ff3d267b438c54866e03e23",
+    "src": "space/results.json",
+    "transform": "scrub"
+  },
+  {
+    "dest": "space/replay.json",
+    "reason": "",
+    "sha256": "9b389874f475b202f314500ee55d8dec151dc58971e5ff596126af92e24adc8f",
+    "src": "space/replay.json",
+    "transform": "scrub"
+  },
+  {
+    "dest": "space/replay-blink-mimo-9b.json",
+    "reason": "",
+    "sha256": "d03611f48a56e6db094afca8c7a8c68bfd109566337372f2989c291ce357d284",
+    "src": "space/replay-blink-mimo-9b.json",
+    "transform": "scrub"
+  },
+  {
+    "dest": "space/requirements.txt",
+    "reason": "",
+    "sha256": "c77ffd74281f796f5af49bfb73f342ef36343b387c37bf6c709251f7e4264807",
+    "src": "space/requirements.txt",
+    "transform": "scrub"
+  },
+  {
+    "dest": "space/test_author.py",
+    "reason": "",
+    "sha256": "54bd61f86c14fefa0f289181378224f239d26635c07e33d1ef5d5a9c77dd8f23",
+    "src": "space/test_author.py",
+    "transform": "scrub_python"
+  },
+  {
+    "dest": "space/test_blink.py",
+    "reason": "",
+    "sha256": "4ad1b1fadbd28bc2cb9520258225fc9deb1b8298d38306added4f626e199be1c",
+    "src": "space/test_blink.py",
+    "transform": "scrub_python"
+  },
+  {
+    "dest": "space/test_prefix.py",
+    "reason": "",
+    "sha256": "02f612692c661a366bf05221d5d8e954b37dc6e3342eef0c54cc04b48b80cb82",
+    "src": "space/test_prefix.py",
+    "transform": "scrub_python"
+  },
+  {
+    "dest": "space/test_readout.py",
+    "reason": "",
+    "sha256": "df562134f46703714aadc7d46b25a0c5ac93030b9133bfec64488ef574dd1d74",
+    "src": "space/test_readout.py",
+    "transform": "scrub_python"
+  },
+  {
+    "dest": "space/record_replay.py",
+    "reason": "",
+    "sha256": "29f4bd41749d806dab45ddbac2a2173dfe950aef876e44e81a8a7eba6b381b94",
+    "src": "space/record_replay.py",
+    "transform": "scrub_python"
+  },
+  {
+    "dest": "space/build_static.py",
+    "reason": "",
+    "sha256": "ece56e92fb4666c87071b0e2f2d033374c19b7a2c7f3a2847b3fd35851f98def",
+    "src": "space/build_static.py",
+    "transform": "scrub_python"
+  },
+  {
+    "dest": "space/shots/capture.py",
+    "reason": "browser check",
+    "sha256": "58c6eb526f016f3b1987ac1b5d59aac269f97e3fb66e8ed3ae88e8f7c6fcfc41",
+    "src": "space/shots/capture.py",
+    "transform": "scrub_python"
+  },
+  {
+    "dest": "space/shots/capture_layout.py",
+    "reason": "browser check",
+    "sha256": "dcbf7c81ddb0eb004ae778d4973926da948b124d6bde8808496ffd90d960b051",
+    "src": "space/shots/capture_layout.py",
+    "transform": "scrub_python"
+  },
+  {
+    "dest": "space/shots/capture_static.py",
+    "reason": "browser check",
+    "sha256": "62a3405e2fdf62fddb7126d92f652158bb35922cf08970d34c1cdebb727160ae",
+    "src": "space/shots/capture_static.py",
+    "transform": "scrub_python"
+  },
+  {
+    "dest": "space/shots/check_ask.py",
+    "reason": "browser check",
+    "sha256": "b994765f396d3fd08a412997372eb73fc0654beaf9d16f620546640524dc6da0",
+    "src": "space/shots/check_ask.py",
+    "transform": "scrub_python"
+  },
+  {
+    "dest": "space/shots/check_ask_model.py",
+    "reason": "browser check",
+    "sha256": "0fbbe1621342d6d8a3483b531b7a3f39097cfc8823168894f0bd0298d029305d",
+    "src": "space/shots/check_ask_model.py",
+    "transform": "scrub_python"
+  },
+  {
+    "dest": "space/shots/check_authority.py",
+    "reason": "browser check",
+    "sha256": "47b9ca2f581fbf09471111a437fd0938bc5c44d12e8506243ca707d2e81e610d",
+    "src": "space/shots/check_authority.py",
+    "transform": "scrub_python"
+  },
+  {
+    "dest": "space/shots/check_dark.py",
+    "reason": "browser check",
+    "sha256": "8c62e33ee92d0453c39e40db7cac7c17c99f28f00ed26b7aed71f832c0b717f4",
+    "src": "space/shots/check_dark.py",
+    "transform": "scrub_python"
+  },
+  {
+    "dest": "space/shots/check_deeplinks.py",
+    "reason": "browser check",
+    "sha256": "e05cc88d44c985dd65bf8caf37d18fd03fb56a3b0452362c4c6529c0a2ae4999",
+    "src": "space/shots/check_deeplinks.py",
+    "transform": "scrub_python"
+  },
+  {
+    "dest": "space/shots/check_integrity.py",
+    "reason": "browser check",
+    "sha256": "da16ac61b8877fd04b3626444d38eb9eabe3c246ff8abf6e6664a602f93533a1",
+    "src": "space/shots/check_integrity.py",
+    "transform": "scrub_python"
+  },
+  {
+    "dest": "space/shots/check_mobile.py",
+    "reason": "browser check",
+    "sha256": "d984c6c8bf9917bdb58f5f6dd4c08ae0c7de4c01e021effd29c68df8dd333d3a",
+    "src": "space/shots/check_mobile.py",
+    "transform": "scrub_python"
+  },
+  {
+    "dest": "space/shots/check_ordering.py",
+    "reason": "browser check",
+    "sha256": "875d48a29eae19d0af1c30c9c32e4a4ee4d628f0741e8252ab2e1210b885db53",
+    "src": "space/shots/check_ordering.py",
+    "transform": "scrub_python"
+  },
+  {
+    "dest": "space/shots/check_questions.py",
+    "reason": "browser check",
+    "sha256": "60f6f6371937f43b57ea60823fcc01916d19757cf22953c0ae4782ee64160ee2",
+    "src": "space/shots/check_questions.py",
+    "transform": "scrub_python"
+  },
+  {
+    "dest": "space/shots/check_race.py",
+    "reason": "browser check",
+    "sha256": "6e685ab13ae20e8fc236a36dc1119ffb3b1673ec709204084177aa77c0593024",
+    "src": "space/shots/check_race.py",
+    "transform": "scrub_python"
+  },
+  {
+    "dest": "space/shots/check_selection.py",
+    "reason": "browser check",
+    "sha256": "505e76e05ead82fd4733f9ad616efe53cc637a7482a5180cb3952dc9ffce8ae8",
+    "src": "space/shots/check_selection.py",
+    "transform": "scrub_python"
+  },
+  {
+    "dest": "space/shots/hold.py",
+    "reason": "browser check",
+    "sha256": "9d000028c26991dcaf6184fdf99a8c85274ef495105c8118484d68ea037b0af3",
+    "src": "space/shots/hold.py",
+    "transform": "scrub_python"
+  },
+  {
+    "dest": "space/README.md",
+    "reason": "",
+    "sha256": "ff101b9990d673c26243b6b28df6f6b72f8f2b37d02fc09f9c8a06b0343e2584",
+    "src": "space/README.md",
+    "transform": "scrub_docs"
+  },
+  {
+    "dest": "serve.py",
+    "reason": "HTTP server",
+    "sha256": "f578fea0cf6fdb20e3a317aab5a999fc4fac8b05c65569399c6d22bd004e6fe0",
+    "src": "release/serve.py",
+    "transform": "scrub_python"
+  },
+  {
+    "dest": "space/test_serve.py",
+    "reason": "HTTP server test",
+    "sha256": "6d5443819f72a815a4d91d4ebdbbaf2bf041869b1da20ac6375be903051b59d9",
+    "src": "release/test_serve.py",
+    "transform": "scrub_python"
+  },
+  {
+    "dest": "docker/Dockerfile.model",
+    "reason": "model repo Dockerfile",
+    "sha256": "36b6d0c3b61d5ae50b307721b87023308e4e65410646e3a173faacd6cd85db2f",
+    "src": "release/Dockerfile",
+    "transform": "scrub_docs"
+  },
+  {
+    "dest": "docker/.dockerignore",
+    "reason": "",
+    "sha256": "94ef55f7564a2937dbaddd0d2fc76436ee8ee09e5c7387b8cf79eb6866012640",
+    "src": "release/dockerignore",
+    "transform": "copy"
+  },
+  {
+    "dest": "lab/build_results.py",
+    "reason": "generic evaluation tool",
+    "sha256": "045fe3eef532c833feca4844b8921ac1791e7ef6a9b623ccefbf6710aa29df70",
+    "src": "lab/build_results.py",
+    "transform": "scrub_python"
+  },
+  {
+    "dest": "lab/engine_parity.py",
+    "reason": "generic evaluation tool",
+    "sha256": "99c58704a591a8de31b571d1629851af8d833c106e4d75d18e9b8e20382dfb03",
+    "src": "lab/engine_parity.py",
+    "transform": "scrub_python"
+  },
+  {
+    "dest": "lab/fit_temperature.py",
+    "reason": "generic evaluation tool",
+    "sha256": "fe4f11e3c219ed52e6da0be2aed4122a2218921a430ad0011d70ced220f447ee",
+    "src": "lab/fit_temperature.py",
+    "transform": "scrub_python"
+  },
+  {
+    "dest": "lab/fp32_reference.py",
+    "reason": "generic evaluation tool",
+    "sha256": "cdb5d5843133435e45a1f6a9e2709eb202e57d72c5353afd208be515a370a31c",
+    "src": "lab/fp32_reference.py",
+    "transform": "scrub_python"
+  },
+  {
+    "dest": "lab/precision_check.py",
+    "reason": "generic evaluation tool",
+    "sha256": "fb9e429e318ea2f600e8b97ef46fc87c0ad81473a23e751a531b1e218067645b",
+    "src": "lab/precision_check.py",
+    "transform": "scrub_python"
+  },
+  {
+    "dest": "lab/prefix_parity.py",
+    "reason": "generic evaluation tool",
+    "sha256": "2624aff90660cdfcf7d42236d2a75bdee95bb02167a18e1121dd46b85f31a7a0",
+    "src": "lab/prefix_parity.py",
+    "transform": "scrub_python"
+  },
+  {
+    "dest": "lab/publish_models.py",
+    "reason": "generic evaluation tool",
+    "sha256": "fbcbd4be1642b83132211b9b059c5d0b56c4b4e3c6ab78e8dbce4a711a2012e1",
+    "src": "lab/publish_models.py",
+    "transform": "scrub_python"
+  },
+  {
+    "dest": "lab/run_requests.py",
+    "reason": "generic evaluation tool",
+    "sha256": "73f6c551dcffb8a21aabbd5c9570dc2159b73bc93416c4835077ea8f3338540e",
+    "src": "lab/run_requests.py",
+    "transform": "scrub_python"
+  },
+  {
+    "dest": "lab/space_live_check.py",
+    "reason": "generic evaluation tool",
+    "sha256": "18f32472374c022ca569f5f5562fb04a44cd281452fe9e4425f2d6ebd78a3b50",
+    "src": "lab/space_live_check.py",
+    "transform": "scrub_python"
+  },
+  {
+    "dest": "lab/space_ui_check.py",
+    "reason": "generic evaluation tool",
+    "sha256": "0122ebf39934230fd7110f5183f6acb5776447aaced8476e8aa3b1b8eb57ad65",
+    "src": "lab/space_ui_check.py",
+    "transform": "scrub_python"
+  },
+  {
+    "dest": "lab/typed_decisions.py",
+    "reason": "generic evaluation tool",
+    "sha256": "83bfacbdae570303bab3cee2364b1a861cd45088b4a45cf66f8a21fd71fba28b",
+    "src": "lab/typed_decisions.py",
+    "transform": "scrub_python"
+  },
+  {
+    "dest": "lab/vllm_blink.py",
+    "reason": "generic evaluation tool",
+    "sha256": "cdaf07095de648b94753d43467fde1ba68b8231c2edfd320ce5bb369e601cee8",
+    "src": "lab/vllm_blink.py",
+    "transform": "scrub_python"
+  },
+  {
+    "dest": "lab/di_v02_partial.py",
+    "reason": "generic evaluation tool",
+    "sha256": "434b41654fb5e8f025156ef1a54fc072368d5fad5a62390f4979ea6444fa1773",
+    "src": "lab/di_v02_partial.py",
+    "transform": "scrub_python"
+  },
+  {
+    "dest": "lab/serving_bench.py",
+    "reason": "generic evaluation tool",
+    "sha256": "1f60145310976f6397a13cab6f53af2900b709b1024de55571d49d7e0d941b18",
+    "src": "lab/serving_bench.py",
+    "transform": "scrub_python"
+  },
+  {
+    "dest": "lab/payload_check.py",
+    "reason": "generic evaluation tool",
+    "sha256": "007fa1fe3c59e5d4a4b46cce31c7b059797cbf428c93edd50b2ef86e7e7f1109",
+    "src": "lab/payload_check.py",
+    "transform": "scrub_python"
+  },
+  {
+    "dest": "lab/jevlab/__init__.py",
+    "reason": "training/data-generation",
+    "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "src": "lab/jevlab/__init__.py",
+    "transform": "scrub_python"
+  },
+  {
+    "dest": "lab/jevlab/anchor.py",
+    "reason": "training/data-generation",
+    "sha256": "3a03ac14d59a8f9894e9436c8459782709f75a2cbc4dcf70a77f39db109d6adc",
+    "src": "lab/jevlab/anchor.py",
+    "transform": "scrub_python"
+  },
+  {
+    "dest": "lab/jevlab/blink_parity.py",
+    "reason": "training/data-generation",
+    "sha256": "9fc74fc03038bfd03fdd8b5aa85e015160e4837650321203e6e17ec7bba5d5fc",
+    "src": "lab/jevlab/blink_parity.py",
+    "transform": "scrub_python"
+  },
+  {
+    "dest": "lab/jevlab/census.py",
+    "reason": "training/data-generation",
+    "sha256": "9ff13323920ffaaf8fda167e813666bf08126c71541d9ac277b4f8d40ec7c3a6",
+    "src": "lab/jevlab/census.py",
+    "transform": "scrub_python"
+  },
+  {
+    "dest": "lab/jevlab/chess_train.py",
+    "reason": "training/data-generation",
+    "sha256": "6bf4f8573b0219c1549f889a458166e64edf68640d3fedb24956ec4ff2fce0c4",
+    "src": "lab/jevlab/chess_train.py",
+    "transform": "scrub_python"
+  },
+  {
+    "dest": "lab/jevlab/data_gold.py",
+    "reason": "training/data-generation",
+    "sha256": "34e94cd4dd4ebc7e1f017dfb0292f534d57cadf2c126d03796b2bc8fd4f5d239",
+    "src": "lab/jevlab/data_gold.py",
+    "transform": "scrub_python"
+  },
+  {
+    "dest": "lab/jevlab/data_knowledge.py",
+    "reason": "training/data-generation",
+    "sha256": "eed5e7848f7b02f34b4d7855537427e2c2db48f87944860e627223ff644b17ab",
+    "src": "lab/jevlab/data_knowledge.py",
+    "transform": "scrub_python"
+  },
+  {
+    "dest": "lab/jevlab/decide.py",
+    "reason": "training/data-generation",
+    "sha256": "39f14d7569ff82781b8b8a155b44353376f9a3682a1c8b7a89a3bc2a49eabc09",
+    "src": "lab/jevlab/decide.py",
+    "transform": "scrub_python"
+  },
+  {
+    "dest": "lab/jevlab/dedup.py",
+    "reason": "training/data-generation",
+    "sha256": "550dea14a915449cffe63a8b6ace815a3099ce2f89a658e039326e5ff2dce7af",
+    "src": "lab/jevlab/dedup.py",
+    "transform": "scrub_python"
+  },
+  {
+    "dest": "lab/jevlab/dedup_audit.py",
+    "reason": "training/data-generation",
+    "sha256": "af037fc7123c3227f49dfdd96caacdb8b2b9e00b7c7986ae2bd91dab4feb1dda",
+    "src": "lab/jevlab/dedup_audit.py",
+    "transform": "scrub_python"
+  },
+  {
+    "dest": "lab/jevlab/dev_run.py",
+    "reason": "training/data-generation",
+    "sha256": "c6a9faa72cb6a36d8378a16f9ac3ab81647b6a92fddf92adcab1261fa8f02d0b",
+    "src": "lab/jevlab/dev_run.py",
+    "transform": "scrub_python"
+  },
+  {
+    "dest": "lab/jevlab/di_boot.py",
+    "reason": "training/data-generation",
+    "sha256": "56f7b11a3079ea74260c542c8b321b9b897b7b761a69ac9beb3e06d0e5e1a95b",
+    "src": "lab/jevlab/di_boot.py",
+    "transform": "scrub_python"
+  },
+  {
+    "dest": "lab/jevlab/di_run.py",
+    "reason": "training/data-generation",
+    "sha256": "02cf9a7d49176823fab19457e935a5e770daee510cb17a9a9f91fe95e46e20dd",
+    "src": "lab/jevlab/di_run.py",
+    "transform": "scrub_python"
+  },
+  {
+    "dest": "lab/jevlab/fit_temp.py",
+    "reason": "training/data-generation",
+    "sha256": "0bcb42aaf8032ed63e401cbde344dcafd38713b72c17723d31496850b41a2ca2",
+    "src": "lab/jevlab/fit_temp.py",
+    "transform": "scrub_python"
+  },
+  {
+    "dest": "lab/jevlab/graft_vlm.py",
+    "reason": "training/data-generation",
+    "sha256": "e6b9eb663d8cf38f00e91ab5de1a3c1e1ff1ddcd8f90c590fb75ec5947614d42",
+    "src": "lab/jevlab/graft_vlm.py",
+    "transform": "scrub_python"
+  },
+  {
+    "dest": "lab/jevlab/jb_run.py",
+    "reason": "training/data-generation",
+    "sha256": "27665ca547f57581cdde818fcf76cc0b3a1d87f84dbdd899da4bb7ed1e72f070",
+    "src": "lab/jevlab/jb_run.py",
+    "transform": "scrub_python"
+  },
+  {
+    "dest": "lab/jevlab/jb_table.py",
+    "reason": "training/data-generation",
+    "sha256": "1998890c03a5831218e87e22d2aff6c1061c018021c2d5a8a53565bd341b35e2",
+    "src": "lab/jevlab/jb_table.py",
+    "transform": "scrub_python"
+  },
+  {
+    "dest": "lab/jevlab/judge_data.py",
+    "reason": "training/data-generation",
+    "sha256": "a2a2f389c67ba9fce3e14d315e7f0ecda5f0b566407e7ba64456e754870fd39c",
+    "src": "lab/jevlab/judge_data.py",
+    "transform": "scrub_python"
+  },
+  {
+    "dest": "lab/jevlab/latency_sample.py",
+    "reason": "training/data-generation",
+    "sha256": "de7cc73d7abdfa471782fd8306299939e6ba2ca1a2c694dbf630a20752b67750",
+    "src": "lab/jevlab/latency_sample.py",
+    "transform": "scrub_python"
+  },
+  {
+    "dest": "lab/jevlab/merge.py",
+    "reason": "training/data-generation",
+    "sha256": "d84738410a9f845e88fdfe3de6178892c906f724d263ecb43ac38bfca8ffe409",
+    "src": "lab/jevlab/merge.py",
+    "transform": "scrub_python"
+  },
+  {
+    "dest": "lab/jevlab/mix.py",
+    "reason": "training/data-generation",
+    "sha256": "ef84f13136721842c4e5724c03e7fdfe7e71c30b2416214a7d79862bb69e49f8",
+    "src": "lab/jevlab/mix.py",
+    "transform": "scrub_python"
+  },
+  {
+    "dest": "lab/jevlab/pilot_stats.py",
+    "reason": "training/data-generation",
+    "sha256": "451c20d59beaca341b6c889118341fedc217d2ece161d5c99bb9ffa40a2e56c3",
+    "src": "lab/jevlab/pilot_stats.py",
+    "transform": "scrub_python"
+  },
+  {
+    "dest": "lab/jevlab/render.py",
+    "reason": "training/data-generation",
+    "sha256": "00cf41c17cdc5f82558f01b8f46045c1d427c040d415f382f08b17f3a00070b3",
+    "src": "lab/jevlab/render.py",
+    "transform": "scrub_python"
+  },
+  {
+    "dest": "lab/jevlab/scorer.py",
+    "reason": "training/data-generation",
+    "sha256": "edd2da6fa09b9ec9e9f642a084ad70774e2a9902994d74675b7ea858bd2297a6",
+    "src": "lab/jevlab/scorer.py",
+    "transform": "scrub_python"
+  },
+  {
+    "dest": "lab/jevlab/selftest.py",
+    "reason": "training/data-generation",
+    "sha256": "d1aaffa9a5473250c9d82c24db2e1b652e578387626fc66e2e792469d8631904",
+    "src": "lab/jevlab/selftest.py",
+    "transform": "scrub_python"
+  },
+  {
+    "dest": "lab/jevlab/solve.py",
+    "reason": "training/data-generation",
+    "sha256": "83bc946a8a7cc8324f4e664937af58776530b7dec4863cebadb1ae1df23da238",
+    "src": "lab/jevlab/solve.py",
+    "transform": "scrub_python"
+  },
+  {
+    "dest": "lab/jevlab/soup.py",
+    "reason": "training/data-generation",
+    "sha256": "a1834135697f7aa4be87e8eaff069094e3ac0c4851222fd5e9f518066cfdd9a8",
+    "src": "lab/jevlab/soup.py",
+    "transform": "scrub_python"
+  },
+  {
+    "dest": "lab/jevlab/synth_author.py",
+    "reason": "training/data-generation",
+    "sha256": "1bdbed9a4ec4582fdff25b978eb90e7276a8a4f7aefd77132a1955f074e6571a",
+    "src": "lab/jevlab/synth_author.py",
+    "transform": "scrub_python"
+  },
+  {
+    "dest": "lab/jevlab/synth_core.py",
+    "reason": "training/data-generation",
+    "sha256": "d3db3fb1dcf0f89b84cc0476d2cf5c82390489cee0e6946cde756832ea083d84",
+    "src": "lab/jevlab/synth_core.py",
+    "transform": "scrub_python"
+  },
+  {
+    "dest": "lab/jevlab/synth_core_v3.py",
+    "reason": "training/data-generation",
+    "sha256": "39aa6068c68c54f29e647b1bab5ddb0ec4e050847e57f694fb3c32e2938e183f",
+    "src": "lab/jevlab/synth_core_v3.py",
+    "transform": "scrub_python"
+  },
+  {
+    "dest": "lab/jevlab/synth_core_v4.py",
+    "reason": "training/data-generation",
+    "sha256": "31f011fcba8ae199855355ad7fa8783127b3b30310d1e911d81c5f8a0729b28e",
+    "src": "lab/jevlab/synth_core_v4.py",
+    "transform": "scrub_python"
+  },
+  {
+    "dest": "lab/jevlab/synth_core_v5.py",
+    "reason": "training/data-generation",
+    "sha256": "d3db3fb1dcf0f89b84cc0476d2cf5c82390489cee0e6946cde756832ea083d84",
+    "src": "lab/jevlab/synth_core_v5.py",
+    "transform": "scrub_python"
+  },
+  {
+    "dest": "lab/jevlab/synth_items.py",
+    "reason": "training/data-generation",
+    "sha256": "2c8f78ffe64aac54ed1a76ab9c8e534d8aa00866340fff4ebc32abb8c765f976",
+    "src": "lab/jevlab/synth_items.py",
+    "transform": "scrub_python"
+  },
+  {
+    "dest": "lab/jevlab/synth_prob.py",
+    "reason": "training/data-generation",
+    "sha256": "93fbd4fabb74bfa316997cdf335abb2c6a9c6719aa13e77090515d3225b218e9",
+    "src": "lab/jevlab/synth_prob.py",
+    "transform": "scrub_python"
+  },
+  {
+    "dest": "lab/jevlab/synth_reason.py",
+    "reason": "training/data-generation",
+    "sha256": "0a8b09fddca25eceef8e360d65b8966688db1b665088594159d525ba4a6b2ca3",
+    "src": "lab/jevlab/synth_reason.py",
+    "transform": "scrub_python"
+  },
+  {
+    "dest": "lab/jevlab/synth_reason_v3.py",
+    "reason": "training/data-generation",
+    "sha256": "0a8b09fddca25eceef8e360d65b8966688db1b665088594159d525ba4a6b2ca3",
+    "src": "lab/jevlab/synth_reason_v3.py",
+    "transform": "scrub_python"
+  },
+  {
+    "dest": "lab/jevlab/synth_workflow.py",
+    "reason": "training/data-generation",
+    "sha256": "ba9482dde0001d04bc4c8c0095a7630e131ed0f76c68170ad05a6ab45af5e5a8",
+    "src": "lab/jevlab/synth_workflow.py",
+    "transform": "scrub_python"
+  },
+  {
+    "dest": "lab/jevlab/tclient.py",
+    "reason": "training/data-generation",
+    "sha256": "61a530421980a968b82c4c8831568abd7762953f363e6ecb29054a582f8e48b8",
+    "src": "lab/jevlab/tclient.py",
+    "transform": "scrub_python"
+  },
+  {
+    "dest": "lab/jevlab/teacher.py",
+    "reason": "training/data-generation",
+    "sha256": "0497e710ba8d5e3dd401173b51926dcabe802b623890cda4f253e82bec9d2feb",
+    "src": "lab/jevlab/teacher.py",
+    "transform": "scrub_python"
+  },
+  {
+    "dest": "lab/jevlab/train.py",
+    "reason": "training/data-generation",
+    "sha256": "8538f18cd86705debad7fe2bc4edde26ae1f3566dc6d9e48fcdff14ec92d34b1",
+    "src": "lab/jevlab/train.py",
+    "transform": "scrub_python"
+  },
+  {
+    "dest": "lab/jevlab/vllm_score.py",
+    "reason": "training/data-generation",
+    "sha256": "3138edf889abc0a8ee4ad7adc11a9fbc14d9bd2e2583c1f93d6e6ddbb2e899fd",
+    "src": "lab/jevlab/vllm_score.py",
+    "transform": "scrub_python"
+  },
+  {
+    "dest": "lab/tests/test_synth_core.py",
+    "reason": "unit test",
+    "sha256": "b78f6606dd45fceb09c49a050b707507e7f6ce574cd6cb3f7afd1c6b2e48c009",
+    "src": "lab/tests/test_synth_core.py",
+    "transform": "scrub_python"
+  },
+  {
+    "dest": "lab/tests/test_synth_reason.py",
+    "reason": "unit test",
+    "sha256": "f01dd71867a26718d24a69836e1aa151af9671792b3d40aa543bf187afe81b8c",
+    "src": "lab/tests/test_synth_reason.py",
+    "transform": "scrub_python"
+  },
+  {
+    "dest": "lab/tests/test_synth_workflow.py",
+    "reason": "unit test",
+    "sha256": "f2e0223f9248c6e04648c675f44f26cdbdc70a1bb433d9d3e1e74a0f1dab76f8",
+    "src": "lab/tests/test_synth_workflow.py",
+    "transform": "scrub_python"
+  },
+  {
+    "dest": "docs/blink-first-principles.md",
+    "reason": "",
+    "sha256": "10c58566b95e8c4b471c4203381417fb7ce67bd9af49be72dad2696e683fafbe",
+    "src": "docs/blink-first-principles.md",
+    "transform": "scrub_docs"
+  },
+  {
+    "dest": "docs/blink-first-principles.html",
+    "reason": "",
+    "sha256": "841da68459705566cbd4fe0253a4a11afdee26a96d75078e6c2d42dc80c653c9",
+    "src": "docs/blink-first-principles.html",
+    "transform": "scrub_docs"
+  },
+  {
+    "dest": "docs/facts/FACTS.md",
+    "reason": "",
+    "sha256": "ba413cb547fe3cc33d17d6010af0c6e316ebb600ce2d8197ea972fd78e48f335",
+    "src": "docs/facts/FACTS.md",
+    "transform": "facts"
+  },
+  {
+    "dest": "docs/models/blink-4b.md",
+    "reason": "model card",
+    "sha256": "b622c379b45c83bc2520ebdaa6939bcf97088c0c2fcf6444a6c082b8e97e1623",
+    "src": "release/out/blink-4b/README.md",
+    "transform": "scrub_docs"
+  },
+  {
+    "dest": "docs/models/blink-4b/eval/decision-index-0.1-full.json",
+    "reason": "",
+    "sha256": "4751899b1b15af66c555b7a81d2f359e2ad4d87ee7fdbdcf023b39fc9c2c4ded",
+    "src": "release/out/blink-4b/eval/decision-index-0.1-full.json",
+    "transform": "scrub"
+  },
+  {
+    "dest": "docs/models/blink-4b/eval/decision-index-0.1-minus-dis.json",
+    "reason": "",
+    "sha256": "eb385a670474109419c0ffabe64af06243674e7cc868e285031f85f546d7ee74",
+    "src": "release/out/blink-4b/eval/decision-index-0.1-minus-dis.json",
+    "transform": "scrub"
+  },
+  {
+    "dest": "docs/models/blink-4b/eval/jevbench-public-proxy.json",
+    "reason": "",
+    "sha256": "bc89b81df76d334f19f1825caaaa6da283d84ac9030dd86849aae1a400938951",
+    "src": "release/out/blink-4b/eval/jevbench-public-proxy.json",
+    "transform": "scrub"
+  },
+  {
+    "dest": "docs/models/blink-4b/Dockerfile",
+    "reason": "",
+    "sha256": "36b6d0c3b61d5ae50b307721b87023308e4e65410646e3a173faacd6cd85db2f",
+    "src": "release/out/blink-4b/Dockerfile",
+    "transform": "scrub_docs"
+  },
+  {
+    "dest": "docs/models/blink-27b.md",
+    "reason": "model card",
+    "sha256": "8f96bcbe0500d0b5f756d208facbc6a18eb80ea7707c4e8c8342125dcb3773f6",
+    "src": "release/out/blink-27b/README.md",
+    "transform": "scrub_docs"
+  },
+  {
+    "dest": "docs/models/blink-27b/eval/decision-index-0.1-full.json",
+    "reason": "",
+    "sha256": "ed30dbce56f9c2624aa3a5b98b179697d0cf0a8ae65163c7bef93d4a6a0d0054",
+    "src": "release/out/blink-27b/eval/decision-index-0.1-full.json",
+    "transform": "scrub"
+  },
+  {
+    "dest": "docs/models/blink-27b/eval/decision-index-0.1-minus-dis.json",
+    "reason": "",
+    "sha256": "6b8719badc461a6277c27ca0651b02630ce3cc277685225f8b505564c84c3211",
+    "src": "release/out/blink-27b/eval/decision-index-0.1-minus-dis.json",
+    "transform": "scrub"
+  },
+  {
+    "dest": "docs/models/blink-27b/Dockerfile",
+    "reason": "",
+    "sha256": "36b6d0c3b61d5ae50b307721b87023308e4e65410646e3a173faacd6cd85db2f",
+    "src": "release/out/blink-27b/Dockerfile",
+    "transform": "scrub_docs"
+  },
+  {
+    "dest": "docs/models/blink-mimo-9b.md",
+    "reason": "model card",
+    "sha256": "3abaa9f70f36d6866b5557301fd9f920c885dbfa9be7d95553f361f3437679e9",
+    "src": "release/out/blink-mimo-9b/README.md",
+    "transform": "scrub_docs"
+  },
+  {
+    "dest": "docs/models/blink-mimo-9b/eval/decision-index-0.1-full.json",
+    "reason": "",
+    "sha256": "777d181e2a6d661b2de84e07f06d4d2c347ad33a58511e995f33b3c9ee39cb16",
+    "src": "release/out/blink-mimo-9b/eval/decision-index-0.1-full.json",
+    "transform": "scrub"
+  },
+  {
+    "dest": "docs/models/blink-mimo-9b/eval/decision-index-0.1-minus-dis.json",
+    "reason": "",
+    "sha256": "d0ee29536948d5233c81da4247f0fc0dbef6ce4564ffec0c76bfad9cc474f345",
+    "src": "release/out/blink-mimo-9b/eval/decision-index-0.1-minus-dis.json",
+    "transform": "scrub"
+  },
+  {
+    "dest": "docs/models/blink-mimo-9b/eval/jevbench-public-proxy.json",
+    "reason": "",
+    "sha256": "b2689e9e9b3a49d2455e3dbc9958b5cda4842053d990e09d4fb9ca792ec783e5",
+    "src": "release/out/blink-mimo-9b/eval/jevbench-public-proxy.json",
+    "transform": "scrub"
+  },
+  {
+    "dest": "docs/models/blink-mimo-9b/Dockerfile",
+    "reason": "",
+    "sha256": "36b6d0c3b61d5ae50b307721b87023308e4e65410646e3a173faacd6cd85db2f",
+    "src": "release/out/blink-mimo-9b/Dockerfile",
+    "transform": "scrub_docs"
+  },
+  {
+    "dest": "docs/assets/blink-27b/blink-27b-network.png",
+    "reason": "",
+    "sha256": "0c57666081da0cff188004dd932961040e054a8f067f9351c32c95a0b97b3a11",
+    "src": "release/assets/blink-27b/blink-27b-network.png",
+    "transform": "copy"
+  },
+  {
+    "dest": "docs/assets/blink-27b/blink-27b-network.svg",
+    "reason": "",
+    "sha256": "d59a87d0243be48fd1afa7043c71fdfd6abc0653131d19616a75e2183e8863ad",
+    "src": "release/assets/blink-27b/blink-27b-network.svg",
+    "transform": "copy"
+  },
+  {
+    "dest": "docs/assets/blink-27b/blink-27b-post-training.png",
+    "reason": "",
+    "sha256": "8471139aa4a2163dcd972cfcd9b6ff603bf01e867aa6c1c9f5c9c69a9abc9ff8",
+    "src": "release/assets/blink-27b/blink-27b-post-training.png",
+    "transform": "copy"
+  },
+  {
+    "dest": "docs/assets/blink-27b/blink-27b-post-training.svg",
+    "reason": "",
+    "sha256": "b2a0e779692f6d170a5e4a1aa2dfb5d70cd719d722cb554fb05ccc5cde05c8a1",
+    "src": "release/assets/blink-27b/blink-27b-post-training.svg",
+    "transform": "copy"
+  },
+  {
+    "dest": "docs/assets/blink-27b/blink-27b-readout.png",
+    "reason": "",
+    "sha256": "e3236cefccbaaf7c8e97404647420ece32f0cf9dd01b20388b76e5c8edaa3bf2",
+    "src": "release/assets/blink-27b/blink-27b-readout.png",
+    "transform": "copy"
+  },
+  {
+    "dest": "docs/assets/blink-27b/blink-27b-readout.svg",
+    "reason": "",
+    "sha256": "b53560b1cb0883b02a9bfdabeca2210026157802aa18ae3785be580505247be7",
+    "src": "release/assets/blink-27b/blink-27b-readout.svg",
+    "transform": "copy"
+  },
+  {
+    "dest": "docs/assets/blink-27b/figures.json",
+    "reason": "",
+    "sha256": "dcbf75659517d326c9b951ca8ebbf9dccdeaf2eb5b6047aae87e3272a532e851",
+    "src": "release/assets/blink-27b/figures.json",
+    "transform": "copy"
+  },
+  {
+    "dest": "docs/assets/blink-4b/blink-4b-network.png",
+    "reason": "",
+    "sha256": "add78bff3ac32fafdc87c8bfd2db035018bd4729279b1b2497f4eb91c7e69102",
+    "src": "release/assets/blink-4b/blink-4b-network.png",
+    "transform": "copy"
+  },
+  {
+    "dest": "docs/assets/blink-4b/blink-4b-network.svg",
+    "reason": "",
+    "sha256": "7e25d77dce0e9d3b6122c70baf92ef0fce26f6439d0eca3f8278981836a7e880",
+    "src": "release/assets/blink-4b/blink-4b-network.svg",
+    "transform": "copy"
+  },
+  {
+    "dest": "docs/assets/blink-4b/blink-4b-post-training.png",
+    "reason": "",
+    "sha256": "9b29dd9491fa888f65c5878a924a523aeb18bfc06f67912c39822169cf451ffa",
+    "src": "release/assets/blink-4b/blink-4b-post-training.png",
+    "transform": "copy"
+  },
+  {
+    "dest": "docs/assets/blink-4b/blink-4b-post-training.svg",
+    "reason": "",
+    "sha256": "b84c523b2928748bdd6488c503f8a1accb0cbdc23894d6e5990a8952ffd75396",
+    "src": "release/assets/blink-4b/blink-4b-post-training.svg",
+    "transform": "copy"
+  },
+  {
+    "dest": "docs/assets/blink-4b/blink-4b-readout.png",
+    "reason": "",
+    "sha256": "bbde3229c954e52173e584787d93ddfb1414dc5fababa0ede7f8ffef71533828",
+    "src": "release/assets/blink-4b/blink-4b-readout.png",
+    "transform": "copy"
+  },
+  {
+    "dest": "docs/assets/blink-4b/blink-4b-readout.svg",
+    "reason": "",
+    "sha256": "4890a6274a732d232d51c867d743e16b4fb74f69c1f4ad14e1f52edf7019764e",
+    "src": "release/assets/blink-4b/blink-4b-readout.svg",
+    "transform": "copy"
+  },
+  {
+    "dest": "docs/assets/blink-4b/figures.json",
+    "reason": "",
+    "sha256": "514da77dca6b7806a721ad952683fff34d6432ab3ee630c7ae48e2636cf12630",
+    "src": "release/assets/blink-4b/figures.json",
+    "transform": "copy"
+  },
+  {
+    "dest": "docs/assets/blink-mimo-9b/blink-mimo-9b-network.png",
+    "reason": "",
+    "sha256": "483d23ca4937cc574d044ae534099c37d9178473686a982de57b5516a101ef77",
+    "src": "release/assets/blink-mimo-9b/blink-mimo-9b-network.png",
+    "transform": "copy"
+  },
+  {
+    "dest": "docs/assets/blink-mimo-9b/blink-mimo-9b-network.svg",
+    "reason": "",
+    "sha256": "cff968c11f403e294fff2ff09759ee08b80c86efb2f421b8a206835b26fd4ad9",
+    "src": "release/assets/blink-mimo-9b/blink-mimo-9b-network.svg",
+    "transform": "copy"
+  },
+  {
+    "dest": "docs/assets/blink-mimo-9b/blink-mimo-9b-post-training.png",
+    "reason": "",
+    "sha256": "e5114694c42a0995d8006d1d5377dda8a44e0892ed2b61573c0019695daae8eb",
+    "src": "release/assets/blink-mimo-9b/blink-mimo-9b-post-training.png",
+    "transform": "copy"
+  },
+  {
+    "dest": "docs/assets/blink-mimo-9b/blink-mimo-9b-post-training.svg",
+    "reason": "",
+    "sha256": "7d6060a435922fa992d2c70d11d3554ce98a0f2ec545bd87c9222d7b960ce6cd",
+    "src": "release/assets/blink-mimo-9b/blink-mimo-9b-post-training.svg",
+    "transform": "copy"
+  },
+  {
+    "dest": "docs/assets/blink-mimo-9b/blink-mimo-9b-readout.png",
+    "reason": "",
+    "sha256": "ff93624c9d7e84ea5067e03eedcfbf3159dda2a2b185ad92a75e0aff95dd4351",
+    "src": "release/assets/blink-mimo-9b/blink-mimo-9b-readout.png",
+    "transform": "copy"
+  },
+  {
+    "dest": "docs/assets/blink-mimo-9b/blink-mimo-9b-readout.svg",
+    "reason": "",
+    "sha256": "1cc209fefadc0e1b8bf995fd47572d616c1b9c0a5b85df2d56bdcf40c5a3cca2",
+    "src": "release/assets/blink-mimo-9b/blink-mimo-9b-readout.svg",
+    "transform": "copy"
+  },
+  {
+    "dest": "docs/assets/blink-mimo-9b/figures.json",
+    "reason": "",
+    "sha256": "89e65e926292111f249e5067cee4d65e2c263a214715787aa1ad253e48cd0299",
+    "src": "release/assets/blink-mimo-9b/figures.json",
+    "transform": "copy"
+  },
+  {
+    "dest": "docs/diagrams/CHECKS.md",
+    "reason": "",
+    "sha256": "8764607aa691c024b2b4837d0f7bc0149f4793328b4dbdc47240506cc49049df",
+    "src": "release/diagrams/CHECKS.md",
+    "transform": "scrub"
+  },
+  {
+    "dest": "docs/diagrams/configs/blink-27b.config.json",
+    "reason": "",
+    "sha256": "935cfbf5205f9cf1cb13c38f667fd52a52d7336bbcd127dd50088ac173dd0f53",
+    "src": "release/diagrams/configs/blink-27b.config.json",
+    "transform": "scrub"
+  },
+  {
+    "dest": "docs/diagrams/configs/blink-4b.config.json",
+    "reason": "",
+    "sha256": "63f47812d0f11118e4d252d2b3ad488707eb9287a11589f4fd382a1d31182724",
+    "src": "release/diagrams/configs/blink-4b.config.json",
+    "transform": "scrub"
+  },
+  {
+    "dest": "docs/diagrams/configs/blink-mimo-9b.config.json",
+    "reason": "",
+    "sha256": "407c46388b8fa2ae9bf69fe27d40af236d373e86a6b48f5284c86df5cd183633",
+    "src": "release/diagrams/configs/blink-mimo-9b.config.json",
+    "transform": "scrub"
+  },
+  {
+    "dest": "docs/diagrams/facts.py",
+    "reason": "",
+    "sha256": "677ba2c34ef6b8d047af46f914f41d84fc3237348732e660fccd56d292f1f8b5",
+    "src": "release/diagrams/facts.py",
+    "transform": "scrub_python"
+  },
+  {
+    "dest": "docs/diagrams/indexes/blink-27b.index.json",
+    "reason": "",
+    "sha256": "6b70aea64bb78f3627a3a1885e8847b5ad2fa0184237e5086c3d216a71a1f04c",
+    "src": "release/diagrams/indexes/blink-27b.index.json",
+    "transform": "scrub"
+  },
+  {
+    "dest": "docs/diagrams/indexes/blink-4b.index.json",
+    "reason": "",
+    "sha256": "83620b40d724f8b286580b5c7c504222b0bdbdd7dc9f068e565132409c7eec9d",
+    "src": "release/diagrams/indexes/blink-4b.index.json",
+    "transform": "scrub"
+  },
+  {
+    "dest": "docs/diagrams/indexes/blink-mimo-9b.index.json",
+    "reason": "",
+    "sha256": "39fd8a226de2d7e132ef77547c3ec772368f329718da4d4808d4dd7dbe4fbd2e",
+    "src": "release/diagrams/indexes/blink-mimo-9b.index.json",
+    "transform": "scrub"
+  },
+  {
+    "dest": "docs/diagrams/make_diagrams.py",
+    "reason": "",
+    "sha256": "ad387f804cfa5d5e86db625323a9c1e49d948e082727b8445cab2227c8b5ace6",
+    "src": "release/diagrams/make_diagrams.py",
+    "transform": "scrub_python"
+  },
+  {
+    "dest": "docs/diagrams/svgkit.py",
+    "reason": "",
+    "sha256": "491e1b7bf31eedbb205ce81cc7797a78a0d6bc5d9fc2136d2aff23999eede1b6",
+    "src": "release/diagrams/svgkit.py",
+    "transform": "scrub_python"
+  },
+  {
+    "dest": "docs/preregistration/t5-PREREG.md",
+    "reason": "",
+    "sha256": "0bc030c5ea01c3b2a9d1bdf8ec22604204a2019608cd0cc3dbc0db2f2c91c280",
+    "src": "experiments/t5/PREREG.md",
+    "transform": "scrub_docs"
+  },
+  {
+    "dest": "docs/preregistration/heldout-PREREG.md",
+    "reason": "",
+    "sha256": "03378a48292229c9f367a775fd39bedb124c70ff257c31c5be1a521595a459a6",
+    "src": "heldout/PREREG.md",
+    "transform": "scrub_docs"
+  },
+  {
+    "dest": "docs/preregistration/heldout-MANIFEST.json",
+    "reason": "",
+    "sha256": "1a982a26038bdaec6a0c3f50650fe880651c91764f5dc099520c9d778299dc4e",
+    "src": "heldout/MANIFEST.json",
+    "transform": "heldout_manifest"
+  },
+  {
+    "dest": ".gitignore",
+    "reason": "repository scaffold",
+    "sha256": "398c1cf2900f78cfc4c313981ebc67598ac350e84901aeffe8c795614e6c13c6",
+    "src": "<generated>",
+    "transform": "generate"
+  },
+  {
+    "dest": "LICENSE",
+    "reason": "repository scaffold",
+    "sha256": "75c1661676878ef80282cf5deb465164abfdedf5386b9f91875aed361d51e16c",
+    "src": "<generated>",
+    "transform": "generate"
+  },
+  {
+    "dest": "NOTICE",
+    "reason": "repository scaffold",
+    "sha256": "e6af8b539bb2daf82afa5a3987f6640203860deb0dd0b52ec85f5071e43a6125",
+    "src": "<generated>",
+    "transform": "generate"
+  },
+  {
+    "dest": "README.md",
+    "reason": "repository scaffold",
+    "sha256": "2e99c56117d150c0d244d897680daf11cfae8896711849dd1be6c527aa098b9f",
+    "src": "<generated>",
+    "transform": "generate"
+  },
+  {
+    "dest": "pyproject.toml",
+    "reason": "repository scaffold",
+    "sha256": "6c7a47c51cd1cfda6c85feedfd07d3cb14d24699ec48da0c388aad310300563b",
+    "src": "<generated>",
+    "transform": "generate"
+  },
+  {
+    "dest": "Makefile",
+    "reason": "repository scaffold",
+    "sha256": "77a9eba8b3cda46ef5d9bfbe23d6fed2e87c19edf5fa998d3b5ca113df781e32",
+    "src": "<generated>",
+    "transform": "generate"
+  },
+  {
+    "dest": "CONTRIBUTING.md",
+    "reason": "repository scaffold",
+    "sha256": "18366f417ec4284d28ad836c486de2447e42eb87d38b6230d872997ca3304b85",
+    "src": "<generated>",
+    "transform": "generate"
+  },
+  {
+    "dest": "CODE_OF_CONDUCT.md",
+    "reason": "repository scaffold",
+    "sha256": "bfd3a922d83e1a089f7a747982db592474ef9fb680b61de0597c904262036f05",
+    "src": "<generated>",
+    "transform": "generate"
+  },
+  {
+    "dest": "SECURITY.md",
+    "reason": "repository scaffold",
+    "sha256": "2d32f9fa9efb27a15c81e29f0ad165d710711b029d741030e1acc588775025fb",
+    "src": "<generated>",
+    "transform": "generate"
+  },
+  {
+    "dest": "CHANGELOG.md",
+    "reason": "repository scaffold",
+    "sha256": "e1aae08cabcb6fee325d9448e046172b89b5747a1b7964b80987f774221689e9",
+    "src": "<generated>",
+    "transform": "generate"
+  },
+  {
+    "dest": "CITATION.cff",
+    "reason": "repository scaffold",
+    "sha256": "725e8b1d724a489be54883e53fcaf57fedc492f50bfeb72c363cb8f343f93ec1",
+    "src": "<generated>",
+    "transform": "generate"
+  },
+  {
+    "dest": ".github/workflows/ci.yml",
+    "reason": "repository scaffold",
+    "sha256": "145a0b4f3d1b1426b9b2045afc18c8e3467563ab5aee4a79c8c6a5681cb5a951",
+    "src": "<generated>",
+    "transform": "generate"
+  },
+  {
+    "dest": ".github/PULL_REQUEST_TEMPLATE.md",
+    "reason": "repository scaffold",
+    "sha256": "0abefc625a58f98ab835617efc43a22857c87bc8b080ff2d1e548ccb1c541bfa",
+    "src": "<generated>",
+    "transform": "generate"
+  },
+  {
+    "dest": ".github/ISSUE_TEMPLATE/bug_report.md",
+    "reason": "repository scaffold",
+    "sha256": "c24bb1b0758461be7d93b2559b78c7d3854778c063ef0d74f5ec7af37010bf64",
+    "src": "<generated>",
+    "transform": "generate"
+  },
+  {
+    "dest": ".github/ISSUE_TEMPLATE/feature_request.md",
+    "reason": "repository scaffold",
+    "sha256": "e3865c5568b51509be3684e105bea39e97240694fb94aacc57e030b674822d33",
+    "src": "<generated>",
+    "transform": "generate"
+  },
+  {
+    "dest": ".github/ISSUE_TEMPLATE/benchmark_result.md",
+    "reason": "repository scaffold",
+    "sha256": "110280efacc4c944344da78b9359704417027a7b0c31e603d6d8fc685633627b",
+    "src": "<generated>",
+    "transform": "generate"
+  },
+  {
+    "dest": "docs/README.md",
+    "reason": "repository scaffold",
+    "sha256": "9694d601ca2310a48f3de48ea993c9622530bd705385bd117393de7071f37c9a",
+    "src": "<generated>",
+    "transform": "generate"
+  },
+  {
+    "dest": "docs/WIRE_FORMAT.md",
+    "reason": "repository scaffold",
+    "sha256": "689fbc93b2f0b408882c5a6d26c14de93ddf1d49b2a994fc5bd17b126a8be2a6",
+    "src": "<generated>",
+    "transform": "generate"
+  },
+  {
+    "dest": "docs/EVALUATION.md",
+    "reason": "repository scaffold",
+    "sha256": "7fe84e89b7087501ca9c0dff0bb96e6007f78e670c7c601a2d94e5a4aa0d4cfc",
+    "src": "<generated>",
+    "transform": "generate"
+  },
+  {
+    "dest": "docs/RESULTS.md",
+    "reason": "repository scaffold",
+    "sha256": "7b8c97b9ba01911beb4b3aa903530791aca341ea3a965a4fb1c6060f2d813a63",
+    "src": "<generated>",
+    "transform": "generate"
+  },
+  {
+    "dest": "docs/HISTORY.md",
+    "reason": "repository scaffold",
+    "sha256": "1c88f4e2f824f622c3141ad15d25137d4466656f432a94807ffeb98caf055acc",
+    "src": "<generated>",
+    "transform": "generate"
+  },
+  {
+    "dest": "examples/request-choice.json",
+    "reason": "repository scaffold",
+    "sha256": "69637e3fb5e734707053c75d5185d37cd34b2d43a8cb2ecde1e88c51055ff5f8",
+    "src": "<generated>",
+    "transform": "generate"
+  },
+  {
+    "dest": "examples/request-noul.json",
+    "reason": "repository scaffold",
+    "sha256": "ed60bc0e10096f3b0b4ba4e1c0f4f93c1f04f9d945616b061fd502a9cfb69618",
+    "src": "<generated>",
+    "transform": "generate"
+  },
+  {
+    "dest": "examples/request-score.json",
+    "reason": "repository scaffold",
+    "sha256": "f5324b39e42d9dd5bda3297eb417c7f262107d55c099e803c7976162c890f48c",
+    "src": "<generated>",
+    "transform": "generate"
+  },
+  {
+    "dest": "examples/request-mixed.json",
+    "reason": "repository scaffold",
+    "sha256": "dcb2c59f4dedab215bd4ca731f8297225528a4ab0cdd2f1efe5e1f28b48dd3e1",
+    "src": "<generated>",
+    "transform": "generate"
+  },
+  {
+    "dest": "examples/curl.sh",
+    "reason": "repository scaffold",
+    "sha256": "0eb663f2e5d07fa5610b89919911104ecbe571bcaea143c92becf68c0172daac",
+    "src": "<generated>",
+    "transform": "generate"
+  },
+  {
+    "dest": "examples/python_client.py",
+    "reason": "repository scaffold",
+    "sha256": "f27e340f0af762a4f2c71c5b9daf962126a2d97a85c89160dd2d920ec768a13c",
+    "src": "<generated>",
+    "transform": "generate"
+  },
+  {
+    "dest": "scripts/leak_scan.py",
+    "reason": "repository scaffold",
+    "sha256": "4ab77586bba9fc8093c6362a436edd4bba672beba0acd1010240cc1ae518fab6",
+    "src": "<generated>",
+    "transform": "generate"
+  },
+  {
+    "dest": "blink/__init__.py",
+    "reason": "repository scaffold",
+    "sha256": "c05d56eca47a3f680279b64576e4c4363915fa918eee3d063aa961d45016a857",
+    "src": "<generated>",
+    "transform": "generate"
+  },
+  {
+    "dest": "blink/server.py",
+    "reason": "repository scaffold",
+    "sha256": "c825d17e6af877a6848c6ad059c4329632955b94fa35a1275fb4d1d98ec1e076",
+    "src": "<generated>",
+    "transform": "generate"
+  },
+  {
+    "dest": "blink/engine.py",
+    "reason": "repository scaffold",
+    "sha256": "c9d84e1de4812d0ea5a77474af10584433f90423673d82e2c1adde52663c87fa",
+    "src": "<generated>",
+    "transform": "generate"
+  }
+]

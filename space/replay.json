@@ -1,0 +1,630 @@
+{
+ "model": "thegovind/blink-4b",
+ "weights_sha256": "e225a37e700160ae14412fcb5dec778ef26cbb981586fb7b34a93f7a21d940ec",
+ "engine": "TorchEngine (bf16 weights, FP32 label projection)",
+ "recorded_utc": "2026-09-24T14:58:19Z",
+ "requests": {
+  "1084c1658b5fa583afb3cca211a5aa82": {
+   "logits": {
+    "queue": [
+     28.09326,
+     19.95719,
+     17.45043,
+     17.3244
+    ],
+    "urgency": [
+     18.54514,
+     21.62897,
+     23.62445,
+     23.48061,
+     19.26927
+    ],
+    "refund_eligible": [
+     26.24775,
+     21.74553
+    ],
+    "angry": [
+     24.00624,
+     23.28305
+    ]
+   },
+   "input_tokens": 731,
+   "latency_ms": 67.1,
+   "names": [
+    "support/Double charge",
+    "playground/Support ticket"
+   ]
+  },
+  "6a7f6552d1a241ec812d15f920edaa64": {
+   "logits": {
+    "queue": [
+     19.1425,
+     28.32177,
+     19.69904,
+     18.51547
+    ],
+    "urgency": [
+     18.01478,
+     17.59607,
+     22.15809,
+     23.65473,
+     22.85668
+    ],
+    "refund_eligible": [
+     22.13398,
+     25.09098
+    ],
+    "angry": [
+     26.27979,
+     20.99774
+    ]
+   },
+   "input_tokens": 699,
+   "latency_ms": 66.3,
+   "names": [
+    "support/Data loss, about to churn"
+   ]
+  },
+  "fbebf1a563c024c38ad5c6ff9076c279": {
+   "logits": {
+    "queue": [
+     22.97806,
+     18.16291,
+     26.21287,
+     17.4861
+    ],
+    "urgency": [
+     25.20174,
+     23.06618,
+     21.78515,
+     17.58136,
+     17.27949
+    ],
+    "refund_eligible": [
+     21.53661,
+     25.68048
+    ],
+    "angry": [
+     19.53605,
+     26.86487
+    ]
+   },
+   "input_tokens": 667,
+   "latency_ms": 66.3,
+   "names": [
+    "support/Seat request"
+   ]
+  },
+  "4cb975bc14383bf7541123835283f767": {
+   "logits": {
+    "phishing": [
+     24.9443,
+     22.02005
+    ],
+    "intent": [
+     18.00778,
+     24.49774,
+     20.502,
+     22.29148,
+     17.49998
+    ],
+    "impersonates_staff": [
+     23.014,
+     23.79282
+    ],
+    "pressure": [
+     22.05254,
+     22.63826,
+     25.00986,
+     18.97588
+    ]
+   },
+   "input_tokens": 869,
+   "latency_ms": 69.6,
+   "names": [
+    "email/Fake CEO wire"
+   ]
+  },
+  "d3e181eefd117c69484f98bea77fbcb5": {
+   "logits": {
+    "phishing": [
+     22.97562,
+     23.10397
+    ],
+    "intent": [
+     23.6093,
+     18.30254,
+     21.86665,
+     22.49347,
+     23.34562
+    ],
+    "impersonates_staff": [
+     23.42066,
+     23.37879
+    ],
+    "pressure": [
+     20.36551,
+     21.44734,
+     23.814,
+     22.6661
+    ]
+   },
+   "input_tokens": 829,
+   "latency_ms": 67.6,
+   "names": [
+    "email/Internal MFA re-enrolment"
+   ]
+  },
+  "3fe5b31525fee2c66889e137d28f3a2c": {
+   "logits": {
+    "phishing": [
+     21.48644,
+     23.68373
+    ],
+    "intent": [
+     18.26562,
+     16.47478,
+     21.88092,
+     21.63508,
+     24.7003
+    ],
+    "impersonates_staff": [
+     24.83493,
+     22.91776
+    ],
+    "pressure": [
+     24.81009,
+     24.09716,
+     18.87243,
+     16.37162
+    ]
+   },
+   "input_tokens": 749,
+   "latency_ms": 66.5,
+   "names": [
+    "email/Ordinary vendor mail"
+   ]
+  },
+  "68e6d130a173d98ba53e1f238fcf5937": {
+   "logits": {
+    "outcome": [
+     24.10219,
+     23.1377,
+     22.26897,
+     20.73393
+    ],
+    "needs_review": [
+     22.24611,
+     24.2883
+    ],
+    "within_window": [
+     25.8987,
+     21.83474
+    ],
+    "complexity": [
+     22.84906,
+     24.1907,
+     22.52631,
+     20.83269
+    ]
+   },
+   "input_tokens": 1043,
+   "latency_ms": 77.6,
+   "names": [
+    "policy/Laptop, clear approval"
+   ]
+  },
+  "732015e26e363589cb0ce4906e1a4be7": {
+   "logits": {
+    "outcome": [
+     20.56895,
+     22.65385,
+     24.41921,
+     21.48479
+    ],
+    "needs_review": [
+     23.26405,
+     23.3891
+    ],
+    "within_window": [
+     22.61488,
+     24.30488
+    ],
+    "complexity": [
+     22.5222,
+     24.17715,
+     22.56864,
+     21.3723
+    ]
+   },
+   "input_tokens": 1019,
+   "latency_ms": 73.0,
+   "names": [
+    "policy/Filed after the window"
+   ]
+  },
+  "0ca6ca74e1abdc3324a02e90c684a170": {
+   "logits": {
+    "outcome": [
+     22.35137,
+     20.89408,
+     24.48148,
+     22.23064
+    ],
+    "needs_review": [
+     24.46873,
+     22.95193
+    ],
+    "within_window": [
+     23.55465,
+     22.88172
+    ],
+    "complexity": [
+     21.5493,
+     22.54788,
+     23.39377,
+     23.22698
+    ]
+   },
+   "input_tokens": 959,
+   "latency_ms": 71.4,
+   "names": [
+    "policy/Conflicting clauses"
+   ]
+  },
+  "829b43a1f74d99e2248c9b1954c8aa69": {
+   "logits": {
+    "relevant": [
+     26.57314,
+     22.18664
+    ],
+    "answerable": [
+     26.17181,
+     22.24463
+    ],
+    "contradicts": [
+     22.62185,
+     25.5229
+    ],
+    "specificity": [
+     20.53032,
+     21.70082,
+     25.50629
+    ]
+   },
+   "input_tokens": 778,
+   "latency_ms": 66.8,
+   "names": [
+    "rag/Sufficient passage"
+   ]
+  },
+  "b708cb99f461c68808fb0ce4f9fecbeb": {
+   "logits": {
+    "relevant": [
+     22.1133,
+     24.65589
+    ],
+    "answerable": [
+     21.15276,
+     25.8032
+    ],
+    "contradicts": [
+     23.53689,
+     23.77408
+    ],
+    "specificity": [
+     23.67706,
+     23.62576,
+     21.72473
+    ]
+   },
+   "input_tokens": 730,
+   "latency_ms": 66.6,
+   "names": [
+    "rag/Related but not sufficient",
+    "playground/Retrieved passage"
+   ]
+  },
+  "f78c1368e0e6622044cd8c49a0df131a": {
+   "logits": {
+    "relevant": [
+     20.53541,
+     26.50715
+    ],
+    "answerable": [
+     20.89324,
+     25.49735
+    ],
+    "contradicts": [
+     23.86364,
+     23.94129
+    ],
+    "specificity": [
+     23.95422,
+     22.50466,
+     21.74083
+    ]
+   },
+   "input_tokens": 678,
+   "latency_ms": 66.3,
+   "names": [
+    "rag/Off topic"
+   ]
+  },
+  "11fd0ca334a0f638a29e27e47b3c801b": {
+   "logits": {
+    "category": [
+     20.78564,
+     18.37371,
+     26.97482,
+     18.74804,
+     15.98733,
+     17.23945
+    ],
+    "escalate": [
+     27.0407,
+     20.02312
+    ],
+    "severity": [
+     20.86937,
+     21.03969,
+     23.45139,
+     23.79141
+    ],
+    "targets_person": [
+     21.47681,
+     25.3989
+    ]
+   },
+   "input_tokens": 699,
+   "latency_ms": 67.3,
+   "names": [
+    "moderation/Crisis language"
+   ]
+  },
+  "255f410a3fe389e121a5c3eda487f708": {
+   "logits": {
+    "category": [
+     21.96997,
+     25.44804,
+     17.65481,
+     22.60719,
+     16.9821,
+     19.03471
+    ],
+    "escalate": [
+     27.18733,
+     20.9389
+    ],
+    "severity": [
+     20.0046,
+     20.86659,
+     23.22417,
+     23.66588
+    ],
+    "targets_person": [
+     26.37321,
+     22.28377
+    ]
+   },
+   "input_tokens": 647,
+   "latency_ms": 67.3,
+   "names": [
+    "moderation/Targeted abuse"
+   ]
+  },
+  "c3038109ce26ab6c5cdc65877e65b7d6": {
+   "logits": {
+    "category": [
+     24.85359,
+     24.25778,
+     17.72175,
+     18.28327,
+     16.17564,
+     17.28479
+    ],
+    "escalate": [
+     21.03891,
+     25.00748
+    ],
+    "severity": [
+     22.3236,
+     21.50198,
+     23.18689,
+     23.30101
+    ],
+    "targets_person": [
+     23.00406,
+     23.55119
+    ]
+   },
+   "input_tokens": 655,
+   "latency_ms": 66.4,
+   "names": [
+    "moderation/Heated but allowed"
+   ]
+  },
+  "6df0b6679d7d72c21ce951e3f1d0c75c": {
+   "logits": {
+    "task": [
+     18.36336,
+     17.7054,
+     23.74154,
+     17.60827,
+     22.1111,
+     23.15618
+    ],
+    "difficulty": [
+     24.63496,
+     24.30149,
+     21.31217,
+     18.04176,
+     18.08145
+    ],
+    "needs_tools": [
+     22.599,
+     25.3772
+    ],
+    "long_output": [
+     20.92863,
+     25.96927
+    ]
+   },
+   "input_tokens": 606,
+   "latency_ms": 66.6,
+   "names": [
+    "routing/Trivial"
+   ]
+  },
+  "2fcfd1b60f805ec20c20c47a1f4f0b8d": {
+   "logits": {
+    "task": [
+     23.88143,
+     18.68599,
+     23.47109,
+     19.30862,
+     22.60344,
+     17.33445
+    ],
+    "difficulty": [
+     22.05435,
+     23.29615,
+     24.0979,
+     22.12567,
+     21.69383
+    ],
+    "needs_tools": [
+     23.50096,
+     23.69333
+    ],
+    "long_output": [
+     23.63602,
+     23.96899
+    ]
+   },
+   "input_tokens": 758,
+   "latency_ms": 67.1,
+   "names": [
+    "routing/Hard code"
+   ]
+  },
+  "cca3043308722babc4bee37a75e6bb4f": {
+   "logits": {
+    "task": [
+     19.45388,
+     20.43588,
+     21.97456,
+     21.09042,
+     23.96542,
+     19.39703
+    ],
+    "difficulty": [
+     22.61695,
+     22.07006,
+     22.65177,
+     23.10381,
+     22.1913
+    ],
+    "needs_tools": [
+     24.1853,
+     23.5151
+    ],
+    "long_output": [
+     22.17279,
+     24.99829
+    ]
+   },
+   "input_tokens": 634,
+   "latency_ms": 66.6,
+   "names": [
+    "routing/Needs fresh data"
+   ]
+  },
+  "13757d3f5c987324878e2d1483a0fba2": {
+   "logits": {
+    "element": [
+     24.40321,
+     23.02205,
+     21.07056,
+     16.37023,
+     17.31074
+    ],
+    "done": [
+     21.62909,
+     25.32891
+    ]
+   },
+   "input_tokens": 353,
+   "latency_ms": 64.8,
+   "names": [
+    "nextclick/Nothing set yet"
+   ]
+  },
+  "db93e1f2c38f16ef466e273658440db6": {
+   "logits": {
+    "element": [
+     18.69534,
+     19.65953,
+     26.64397,
+     18.63104,
+     19.53893
+    ],
+    "done": [
+     23.61969,
+     23.49329
+    ]
+   },
+   "input_tokens": 413,
+   "latency_ms": 64.6,
+   "names": [
+    "nextclick/Ready to apply"
+   ]
+  },
+  "d3fa47190641fb33a736bffdcea27257": {
+   "logits": {
+    "element": [
+     19.80692,
+     19.52265,
+     22.90491,
+     20.49555,
+     21.7597
+    ],
+    "done": [
+     25.59934,
+     22.93447
+    ]
+   },
+   "input_tokens": 445,
+   "latency_ms": 64.8,
+   "names": [
+    "nextclick/Already filtered"
+   ]
+  },
+  "d14500ae645930eb35663a9cd746dd68": {
+   "logits": {
+    "intent": [
+     27.24339,
+     20.4454,
+     17.71222,
+     19.93683
+    ],
+    "suspicious": [
+     26.26758,
+     21.43994
+    ],
+    "urgency": [
+     18.94799,
+     21.33956,
+     24.27403,
+     22.7977,
+     21.37715
+    ]
+   },
+   "input_tokens": 668,
+   "latency_ms": 65.9,
+   "names": [
+    "playground/Invoice email"
+   ]
+  }
+ }
+}

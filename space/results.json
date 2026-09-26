@@ -1,0 +1,1837 @@
+{
+ "placeholder": false,
+ "generated_utc": "2026-09-25T03:39:16Z",
+ "model": {
+  "small": "blink-4b",
+  "large": "blink-27b",
+  "base_small": "Qwen/Qwen3.5-4B",
+  "base_large": "Qwen/Qwen3.8-27B",
+  "adapter": "LoRA, merged",
+  "bases": {
+   "thegovind/blink-4b": "Qwen/Qwen3.5-4B",
+   "thegovind/blink-27b": "Qwen/Qwen3.8-27B",
+   "thegovind/blink-mimo-9b": "XiaomiMiMo/MiMo-V2.6-Distill-Qwen-9B"
+  }
+ },
+ "decision_index": {
+  "label": "Decision Index 0.1",
+  "edition": "0.1 (archived 19-benchmark edition; leaderboard snapshot 2026-09-22)",
+  "caption": "Complete archived 0.1 suite: 132,422 requests across 37 benchmarks. The headline index averages 19 panel benchmarks. Local official-kit scorer, not leaderboard submissions; unanswered requests count as wrong.",
+  "suite": "132,422 requests · 37 benchmarks",
+  "leaderboard_snapshot": "2026-09-22T11:12:47+00:00",
+  "areas": [
+   {
+    "id": "knowledge",
+    "label": "Knowledge",
+    "color": "#5976bd"
+   },
+   {
+    "id": "language",
+    "label": "Language",
+    "color": "#407e9e"
+   },
+   {
+    "id": "retrieval",
+    "label": "Retrieval",
+    "color": "#3e8e5e"
+   },
+   {
+    "id": "tools",
+    "label": "Tools",
+    "color": "#b77a38"
+   },
+   {
+    "id": "arts",
+    "label": "Arts",
+    "color": "#b6698a"
+   }
+  ],
+  "reference": "jev-1.13.0",
+  "systems": [
+   {
+    "id": "blink-27b",
+    "name": "blink-27b",
+    "kind": "ours",
+    "params": "27B",
+    "served_params": 26895998464,
+    "index": 63.44,
+    "skill": 51.47,
+    "breadth": 49.91,
+    "areas": {
+     "knowledge": 65.3,
+     "language": 77.3,
+     "retrieval": 38.9,
+     "tools": 74.3,
+     "arts": 61.5
+    },
+    "completed": 132422,
+    "latency_ms": {
+     "median": 162.9,
+     "p95": 3698.4,
+     "mean": 817.4
+    },
+    "source": "local full-suite run, kit scorer",
+    "index_language_equalized": 60.44
+   },
+   {
+    "id": "jev-1.13.0",
+    "name": "Jev 1.13.0",
+    "kind": "reference",
+    "params": "closed",
+    "served_params": null,
+    "index": 59.51,
+    "skill": 46.26,
+    "breadth": 44.79,
+    "areas": {
+     "knowledge": 68.8,
+     "language": 62.3,
+     "retrieval": 37.0,
+     "tools": 73.6,
+     "arts": 56.2
+    },
+    "latency_ms": {
+     "median": 252.8,
+     "p95": 436.6
+    },
+    "source": "leaderboard"
+   },
+   {
+    "id": "blink-mimo-9b",
+    "name": "blink-mimo-9b",
+    "kind": "ours",
+    "params": "9B",
+    "served_params": 8953803264,
+    "index": 56.53,
+    "skill": 42.17,
+    "breadth": 40.37,
+    "areas": {
+     "knowledge": 55.1,
+     "language": 70.1,
+     "retrieval": 34.8,
+     "tools": 70.5,
+     "arts": 52.1
+    },
+    "completed": 132422,
+    "latency_ms": {
+     "median": 49.9,
+     "p95": 1129.5,
+     "mean": 251.2
+    },
+    "source": "local full-suite run, kit scorer",
+    "index_language_equalized": 54.96
+   },
+   {
+    "id": "jevfire-uncapped",
+    "name": "Jevfire",
+    "kind": "open",
+    "params": "27B",
+    "served_params": 27781427952,
+    "base_model": "Qwen/Qwen3.8-27B",
+    "index": 55.74,
+    "skill": 40.86,
+    "breadth": 39.45,
+    "areas": {
+     "knowledge": 52.4,
+     "language": 63.2,
+     "retrieval": 36.4,
+     "tools": 73.3,
+     "arts": 53.2
+    },
+    "completed": 132422,
+    "latency_ms": {
+     "median": 82.5,
+     "p95": 1562.9,
+     "mean": 312.5
+    },
+    "source": "leaderboard"
+   },
+   {
+    "id": "joshua-diffusion-full",
+    "name": "JoshuaSP diffusiongemma (open-jev)",
+    "kind": "open",
+    "params": "26B-A4B",
+    "served_params": 25823778864,
+    "base_model": "google/diffusiongemma-26B-A4B-it",
+    "index": 55.56,
+    "skill": 40.84,
+    "breadth": 39.19,
+    "areas": {
+     "knowledge": 53.5,
+     "language": 65.9,
+     "retrieval": 35.0,
+     "tools": 72.3,
+     "arts": 51.1
+    },
+    "completed": 132107,
+    "latency_ms": {
+     "median": 269.1,
+     "p95": 1680.9,
+     "mean": 529.8
+    },
+    "source": "leaderboard"
+   },
+   {
+    "id": "decider-35b-nvfp4",
+    "name": "Decider 35B-A3B",
+    "kind": "open",
+    "params": "35B-A3B",
+    "served_params": 35951822704,
+    "base_model": "Qwen/Qwen3.5-35B-A3B-Base",
+    "index": 54.34,
+    "skill": 39.37,
+    "breadth": 37.99,
+    "areas": {
+     "knowledge": 51.2,
+     "language": 61.4,
+     "retrieval": 33.7,
+     "tools": 71.9,
+     "arts": 53.8
+    },
+    "completed": 132422,
+    "latency_ms": {
+     "median": 99.3,
+     "p95": 366.5,
+     "mean": 138.4
+    },
+    "source": "leaderboard"
+   },
+   {
+    "id": "blink-4b",
+    "name": "blink-4b",
+    "kind": "ours",
+    "params": "4B",
+    "served_params": 4205751296,
+    "index": 52.12,
+    "skill": 36.04,
+    "breadth": 34.18,
+    "areas": {
+     "knowledge": 49.1,
+     "language": 61.0,
+     "retrieval": 30.1,
+     "tools": 70.2,
+     "arts": 50.2
+    },
+    "completed": 132422,
+    "latency_ms": {
+     "median": 33.4,
+     "p95": 765.3,
+     "mean": 169.5
+    },
+    "source": "local full-suite run, kit scorer",
+    "index_language_equalized": 52.38
+   },
+   {
+    "id": "razorback-one-read",
+    "name": "razorback16 openjev diffusiongemma (NVFP4, vLLM)",
+    "kind": "open",
+    "params": "26B-A4B",
+    "served_params": 25823778864,
+    "base_model": "google/diffusiongemma-26B-A4B-it",
+    "index": 51.52,
+    "skill": 35.63,
+    "breadth": 34.37,
+    "areas": null,
+    "completed": 132422,
+    "latency_ms": {
+     "median": 40.6,
+     "p95": 340.8,
+     "mean": 90.4
+    },
+    "source": "leaderboard"
+   },
+   {
+    "id": "kev-9b-raised",
+    "name": "Kev 9B",
+    "kind": "open",
+    "params": "9B",
+    "served_params": 9653104368,
+    "base_model": "Qwen/Qwen3.5-9B-Base",
+    "index": 50.48,
+    "skill": 32.96,
+    "breadth": 30.54,
+    "areas": {
+     "knowledge": 47.9,
+     "language": 53.4,
+     "retrieval": 32.3,
+     "tools": 73.0,
+     "arts": 45.9
+    },
+    "completed": 132422,
+    "latency_ms": {
+     "median": 54.1,
+     "p95": 948.2,
+     "mean": 395.3
+    },
+    "source": "leaderboard"
+   },
+   {
+    "id": "solomon-v11-bf16-encoding",
+    "name": "Solomon v1.1",
+    "kind": "open",
+    "params": "27B",
+    "served_params": 27781427952,
+    "base_model": "Qwen/Qwen3.8-27B",
+    "index": 47.51,
+    "skill": 34.85,
+    "breadth": 33.69,
+    "areas": null,
+    "completed": 132410,
+    "latency_ms": {
+     "median": 223.2,
+     "p95": 5301.0,
+     "mean": 1005.3
+    },
+    "source": "leaderboard"
+   },
+   {
+    "id": "kev-4b-raised",
+    "name": "Kev 4B",
+    "kind": "open",
+    "params": "4B",
+    "served_params": 4659865088,
+    "base_model": "Qwen/Qwen3.5-4B-Base",
+    "index": 47.43,
+    "skill": 28.86,
+    "breadth": 25.67,
+    "areas": {
+     "knowledge": 44.2,
+     "language": 51.8,
+     "retrieval": 27.0,
+     "tools": 71.7,
+     "arts": 42.7
+    },
+    "completed": 132422,
+    "latency_ms": {
+     "median": 53.8,
+     "p95": 627.1,
+     "mean": 314.7
+    },
+    "source": "leaderboard"
+   },
+   {
+    "id": "kev-8b-raised",
+    "name": "Kev 8B",
+    "kind": "open",
+    "params": "8B",
+    "served_params": 8190735360,
+    "base_model": "Qwen/Qwen3-8B-Base",
+    "index": 46.55,
+    "skill": 27.89,
+    "breadth": 25.64,
+    "areas": {
+     "knowledge": 43.1,
+     "language": 44.8,
+     "retrieval": 27.5,
+     "tools": 70.5,
+     "arts": 46.9
+    },
+    "completed": 132422,
+    "latency_ms": {
+     "median": 38.3,
+     "p95": 652.7,
+     "mean": 264.7
+    },
+    "source": "leaderboard"
+   },
+   {
+    "id": "pngwn-space-uncapped-full",
+    "name": "open-jev (pngwn)",
+    "kind": "open",
+    "params": "4B",
+    "served_params": 4659865088,
+    "base_model": "Qwen/Qwen3.5-4B-Base",
+    "index": 46.15,
+    "skill": 27.07,
+    "breadth": 23.84,
+    "areas": {
+     "knowledge": 47.1,
+     "language": 46.5,
+     "retrieval": 23.4,
+     "tools": 70.4,
+     "arts": 42.6
+    },
+    "completed": 132200,
+    "latency_ms": {
+     "median": 138.5,
+     "p95": 2079.3,
+     "mean": 523.5
+    },
+    "source": "leaderboard"
+   },
+   {
+    "id": "openvons",
+    "name": "openvons",
+    "kind": "open",
+    "params": "4B",
+    "served_params": 4022468096,
+    "base_model": "Qwen/Qwen3-4B-Instruct-2507",
+    "index": 45.59,
+    "skill": 26.54,
+    "breadth": 24.27,
+    "areas": {
+     "knowledge": 43.9,
+     "language": 43.1,
+     "retrieval": 24.4,
+     "tools": 68.6,
+     "arts": 48.0
+    },
+    "completed": 132422,
+    "latency_ms": {
+     "median": 18.0,
+     "p95": 295.9,
+     "mean": 69.7
+    },
+    "source": "leaderboard"
+   },
+   {
+    "id": "decision-nox-full",
+    "name": "Decision 1.0 Nox",
+    "kind": "open",
+    "params": "4B",
+    "served_params": 4659865088,
+    "base_model": "Qwen/Qwen3.5-4B-Base",
+    "index": 45.31,
+    "skill": 25.36,
+    "breadth": 22.54,
+    "areas": {
+     "knowledge": 41.6,
+     "language": 49.9,
+     "retrieval": 23.2,
+     "tools": 67.8,
+     "arts": 44.0
+    },
+    "completed": 131980,
+    "latency_ms": {
+     "median": 48.8,
+     "p95": 619.5,
+     "mean": 167.5
+    },
+    "source": "leaderboard"
+   },
+   {
+    "id": "semif",
+    "name": "SemIf",
+    "kind": "open",
+    "params": "4B",
+    "served_params": 4659865088,
+    "base_model": "Qwen/Qwen3.5-4B-Base",
+    "index": 44.77,
+    "skill": 26.01,
+    "breadth": 23.38,
+    "areas": null,
+    "completed": 132422,
+    "latency_ms": {
+     "median": 110.4,
+     "p95": 958.6,
+     "mean": 237.5
+    },
+    "source": "leaderboard"
+   },
+   {
+    "id": "decider-2b-fp8-http",
+    "name": "Decider 2B",
+    "kind": "open",
+    "params": "2B",
+    "served_params": 2274069824,
+    "base_model": "Qwen/Qwen3.5-2B-Base",
+    "index": 44.0,
+    "skill": 24.8,
+    "breadth": 22.12,
+    "areas": {
+     "knowledge": 36.6,
+     "language": 45.6,
+     "retrieval": 24.5,
+     "tools": 68.6,
+     "arts": 44.8
+    },
+    "completed": 132422,
+    "latency_ms": {
+     "median": 49.7,
+     "p95": 1640.9,
+     "mean": 427.8
+    },
+    "source": "leaderboard"
+   },
+   {
+    "id": "mini-jev",
+    "name": "mini-jev",
+    "kind": "open",
+    "params": "4B",
+    "served_params": 4022468096,
+    "base_model": "Qwen/Qwen3-4B-Instruct-2507",
+    "index": 43.48,
+    "skill": 24.31,
+    "breadth": 22.35,
+    "areas": null,
+    "completed": 132422,
+    "latency_ms": {
+     "median": 64.5,
+     "p95": 834.3,
+     "mean": 224.8
+    },
+    "source": "leaderboard"
+   },
+   {
+    "id": "decision-sol",
+    "name": "Decision 1.0 Sol",
+    "kind": "open",
+    "params": "2B",
+    "served_params": 2274069824,
+    "base_model": "Qwen/Qwen3.5-2B-Base",
+    "index": 40.41,
+    "skill": 18.65,
+    "breadth": 15.68,
+    "areas": {
+     "knowledge": 34.7,
+     "language": 41.5,
+     "retrieval": 21.4,
+     "tools": 65.3,
+     "arts": 39.3
+    },
+    "completed": 131980,
+    "latency_ms": {
+     "median": 37.8,
+     "p95": 315.6,
+     "mean": 88.8
+    },
+    "source": "leaderboard"
+   },
+   {
+    "id": "nimble",
+    "name": "Bespoke Nimble 9B",
+    "kind": "open",
+    "params": "9B",
+    "served_params": 9653104368,
+    "base_model": "Qwen/Qwen3.5-9B-Base",
+    "index": 34.21,
+    "skill": 20.39,
+    "breadth": 19.92,
+    "areas": null,
+    "completed": 132422,
+    "latency_ms": {
+     "median": 83.5,
+     "p95": 136.9,
+     "mean": 108.0
+    },
+    "source": "leaderboard"
+   },
+   {
+    "id": "kev-0.6b-raised",
+    "name": "Kev 0.6B",
+    "kind": "open",
+    "params": "0.6B",
+    "served_params": 596049920,
+    "base_model": "Qwen/Qwen3-0.6B-Base",
+    "index": 31.3,
+    "skill": 7.55,
+    "breadth": 6.29,
+    "areas": {
+     "knowledge": 30.2,
+     "language": 25.2,
+     "retrieval": 15.0,
+     "tools": 48.2,
+     "arts": 37.6
+    },
+    "completed": 132422,
+    "latency_ms": {
+     "median": 22.8,
+     "p95": 180.9,
+     "mean": 133.9
+    },
+    "source": "leaderboard"
+   },
+   {
+    "id": "kev-0.5b-raised",
+    "name": "Kev 0.5B",
+    "kind": "open",
+    "params": "0.5B",
+    "served_params": 494032768,
+    "base_model": "Qwen/Qwen2.5-0.5B",
+    "index": 30.34,
+    "skill": 5.22,
+    "breadth": 4.71,
+    "areas": {
+     "knowledge": 28.3,
+     "language": 32.6,
+     "retrieval": 14.3,
+     "tools": 39.8,
+     "arts": 36.2
+    },
+    "completed": 132422,
+    "latency_ms": {
+     "median": 16.8,
+     "p95": 85.6,
+     "mean": 34.4
+    },
+    "source": "leaderboard"
+   },
+   {
+    "id": "harsha",
+    "name": "Qwen-2.5-1B-RLCD",
+    "kind": "open",
+    "params": "1.5B",
+    "served_params": 1543714304,
+    "base_model": "Qwen/Qwen2.5-1.5B",
+    "index": 28.81,
+    "skill": 5.29,
+    "breadth": 4.69,
+    "areas": {
+     "knowledge": 29.6,
+     "language": 27.5,
+     "retrieval": 7.2,
+     "tools": 37.5,
+     "arts": 42.1
+    },
+    "completed": 132422,
+    "latency_ms": {
+     "median": 42.4,
+     "p95": 294.9,
+     "mean": 73.3
+    },
+    "source": "leaderboard"
+   },
+   {
+    "id": "lfm2600",
+    "name": "LFM2.5-2.6B-RLCD",
+    "kind": "open",
+    "params": "2.6B",
+    "served_params": 2697198592,
+    "base_model": "LiquidAI/LFM2.5-2.6B-Base",
+    "index": 27.27,
+    "skill": 4.76,
+    "breadth": 4.53,
+    "areas": null,
+    "completed": 132422,
+    "latency_ms": {
+     "median": 38.7,
+     "p95": 94.1,
+     "mean": 47.2
+    },
+    "source": "leaderboard"
+   },
+   {
+    "id": "jeff-uncapped",
+    "name": "jeff",
+    "kind": "open",
+    "params": "576M",
+    "served_params": 575683963,
+    "base_model": "knowledgator/gliformer-large-v1",
+    "index": 27.23,
+    "skill": 2.37,
+    "breadth": 2.23,
+    "areas": {
+     "knowledge": 28.9,
+     "language": 30.0,
+     "retrieval": 12.1,
+     "tools": 29.6,
+     "arts": 36.0
+    },
+    "completed": 132422,
+    "latency_ms": {
+     "median": 22.4,
+     "p95": 157.9,
+     "mean": 45.1
+    },
+    "source": "leaderboard"
+   },
+   {
+    "id": "nanojev-8k",
+    "name": "NanoJev",
+    "kind": "open",
+    "params": "0.6B",
+    "served_params": 596049920,
+    "base_model": "Qwen/Qwen3-0.6B-Base",
+    "index": 26.19,
+    "skill": 2.28,
+    "breadth": 2.16,
+    "areas": {
+     "knowledge": 26.6,
+     "language": 22.2,
+     "retrieval": 13.9,
+     "tools": 31.9,
+     "arts": 36.6
+    },
+    "completed": 132129,
+    "latency_ms": {
+     "median": 27.6,
+     "p95": 955.7,
+     "mean": 278.4
+    },
+    "source": "leaderboard"
+   },
+   {
+    "id": "lfm350-sdpa",
+    "name": "LFM2.5-350M-RLCD",
+    "kind": "open",
+    "params": "354M",
+    "served_params": 354483968,
+    "base_model": null,
+    "index": 25.79,
+    "skill": 2.33,
+    "breadth": 2.16,
+    "areas": {
+     "knowledge": 26.5,
+     "language": 23.5,
+     "retrieval": 8.4,
+     "tools": 32.4,
+     "arts": 38.3
+    },
+    "completed": 132422,
+    "latency_ms": {
+     "median": 26.4,
+     "p95": 378.6,
+     "mean": 82.5
+    },
+    "source": "leaderboard"
+   },
+   {
+    "id": "gliner-base",
+    "name": "GLiNER 2.5 base",
+    "kind": "open",
+    "params": "194M",
+    "served_params": 193581591,
+    "base_model": null,
+    "index": 24.7,
+    "skill": 3.4,
+    "breadth": 2.77,
+    "areas": null,
+    "completed": 132422,
+    "latency_ms": {
+     "median": 14.4,
+     "p95": 68.2,
+     "mean": 25.5
+    },
+    "source": "leaderboard"
+   },
+   {
+    "id": "gliner-small",
+    "name": "GLiNER 2.5 small",
+    "kind": "open",
+    "params": "74M",
+    "served_params": 73881879,
+    "base_model": null,
+    "index": 23.93,
+    "skill": 2.02,
+    "breadth": 1.82,
+    "areas": null,
+    "completed": 132422,
+    "latency_ms": {
+     "median": 14.5,
+     "p95": 38.4,
+     "mean": 18.9
+    },
+    "source": "leaderboard"
+   },
+   {
+    "id": "gliner-multi",
+    "name": "GLiNER 2.5 multilingual",
+    "kind": "open",
+    "params": "287M",
+    "served_params": 287355159,
+    "base_model": null,
+    "index": 22.42,
+    "skill": 1.61,
+    "breadth": 1.49,
+    "areas": null,
+    "completed": 132422,
+    "latency_ms": {
+     "median": 15.2,
+     "p95": 83.1,
+     "mean": 29.2
+    },
+    "source": "leaderboard"
+   },
+   {
+    "id": "decision-lex",
+    "name": "Decision 1.0 Lex",
+    "kind": "open",
+    "params": "308M",
+    "served_params": 307797035,
+    "base_model": "jhu-clsp/mmBERT-base",
+    "index": 19.57,
+    "skill": 2.61,
+    "breadth": 2.37,
+    "areas": null,
+    "completed": 131980,
+    "latency_ms": {
+     "median": 24.5,
+     "p95": 138.9,
+     "mean": 38.6
+    },
+    "source": "leaderboard"
+   },
+   {
+    "id": "decision-kai",
+    "name": "Decision 1.0 Kai",
+    "kind": "open",
+    "params": "308M",
+    "served_params": 307797035,
+    "base_model": "jhu-clsp/mmBERT-base",
+    "index": 18.37,
+    "skill": 2.64,
+    "breadth": 2.43,
+    "areas": null,
+    "completed": 131980,
+    "latency_ms": {
+     "median": 24.7,
+     "p95": 139.3,
+     "mean": 38.8
+    },
+    "source": "leaderboard"
+   },
+   {
+    "id": "akash-gemma",
+    "name": "system-one-gemma",
+    "kind": "open",
+    "params": "270M",
+    "served_params": 268098176,
+    "base_model": "google/gemma-3-270m",
+    "index": 17.09,
+    "skill": 1.83,
+    "breadth": 1.79,
+    "areas": null,
+    "completed": 132422,
+    "latency_ms": {
+     "median": 32.1,
+     "p95": 1272.8,
+     "mean": 162.3
+    },
+    "source": "leaderboard"
+   },
+   {
+    "id": "laya",
+    "name": "Laya",
+    "kind": "open",
+    "params": "421M",
+    "served_params": 421293830,
+    "base_model": null,
+    "index": 16.39,
+    "skill": 1.46,
+    "breadth": 1.34,
+    "areas": null,
+    "completed": 132422,
+    "latency_ms": {
+     "median": 18.9,
+     "p95": 74.8,
+     "mean": 23.4
+    },
+    "source": "leaderboard"
+   },
+   {
+    "id": "verdict",
+    "name": "Verdict",
+    "kind": "open",
+    "params": "151M",
+    "served_params": 151378176,
+    "base_model": "knowledgator/gliclass-modern-base-v2.0",
+    "index": 13.38,
+    "skill": 1.27,
+    "breadth": 1.06,
+    "areas": null,
+    "completed": 132422,
+    "latency_ms": {
+     "median": 11.8,
+     "p95": 167.8,
+     "mean": 33.3
+    },
+    "source": "leaderboard"
+   }
+  ]
+ },
+ "jevbench": {
+  "label": "JevBench",
+  "caption": "Public items only. Development proxies, not official scores or predictions.",
+  "axes": [
+   {
+    "id": "intelligence",
+    "label": "Intelligence"
+   },
+   {
+    "id": "calibration",
+    "label": "Calibration"
+   },
+   {
+    "id": "speed",
+    "label": "Speed"
+   },
+   {
+    "id": "cost",
+    "label": "Cost"
+   }
+  ],
+  "reference": "jev-1.13.0",
+  "systems": [
+   {
+    "id": "blink-4b",
+    "name": "blink-4b",
+    "kind": "ours",
+    "official": null,
+    "public_estimate": 76.5,
+    "public_axes": {
+     "intelligence": 81.7,
+     "calibration": 82.0,
+     "speed": 88.6,
+     "cost": 60.4
+    },
+    "public": {
+     "standard": 0.9861111111111112,
+     "hard": 0.7207207207207207,
+     "hard_ece": 0.067,
+     "tvd": 0.226
+    }
+   },
+   {
+    "id": "jevk5-0.2.0",
+    "name": "JevK5 v0.2.0",
+    "kind": "open",
+    "official": {
+     "name": "JevK5 v0.2.0",
+     "kind": "open",
+     "score": 62.0,
+     "axes": {
+      "intelligence": 48.9,
+      "calibration": 74.5,
+      "speed": 91.1,
+      "cost": 59.5
+     },
+     "tiers": {
+      "easy": 1.0,
+      "standard": 0.96,
+      "judge": 0.95,
+      "hard": 0.7,
+      "sealed": 0.33
+     }
+    },
+    "public_estimate": 76.1,
+    "public_axes": {
+     "intelligence": 79.5,
+     "calibration": 82.2,
+     "speed": 88.7,
+     "cost": 60.4
+    },
+    "public": {
+     "standard": 0.9583333333333334,
+     "hard": 0.7117117117117117,
+     "hard_ece": 0.068,
+     "tvd": 0.22
+    }
+   },
+   {
+    "id": "jev-1.13.0",
+    "name": "Jev 1.13.0",
+    "kind": "reference",
+    "official": {
+     "name": "Jev 1.13.0",
+     "kind": "reference",
+     "score": 63.3,
+     "axes": {
+      "intelligence": 53.1,
+      "calibration": 76.3,
+      "speed": 83.3,
+      "cost": 52.0
+     },
+     "tiers": {
+      "easy": 1.0,
+      "standard": 0.99,
+      "judge": 0.95,
+      "hard": 0.74,
+      "sealed": 0.37
+     }
+    },
+    "public_estimate": null,
+    "public_axes": null,
+    "public": null
+   }
+  ],
+  "notes": {
+   "hard_correct": {
+    "blink-4b": 80,
+    "jevk5-0.2.0": 79,
+    "jevk5_native_published": 82,
+    "n": 111
+   },
+   "speed_measured": {
+    "blink-4b": 88.6,
+    "jevk5-0.2.0": 88.7
+   },
+   "speed_note": "Speed comes from each row's own serial run over the public items (blink-4b raw p50 64 ms, p95 175 ms). The proxy Speed axes, 88.6 for blink-4b and 88.7 for JevK5, already apply JevBench's self-hosted adjustment: twice raw latency plus 0.15 seconds. Official Speed would depend on the evaluator's own measurements.",
+   "cost_note": "Cost uses JevBench's 4B tariff ($0.03 per million input tokens) times measured tokens per decision; not a production bill.",
+   "selection_note": "The 231 public items and JevK5's 65 hand-written hard items were reused for candidate selection, though never for training. These are development-set results."
+  }
+ },
+ "speed_pareto": {
+  "label": "Speed against quality",
+  "caption": "Decision Index 0.1 vs median time per request.",
+  "x_key": "latency_ms",
+  "x_label": "Median latency per request",
+  "y_label": "Decision Index",
+  "points": [
+   {
+    "id": "blink-27b",
+    "name": "blink-27b",
+    "kind": "ours",
+    "latency_ms": 192.2,
+    "p95_ms": 5980.3,
+    "score": 63.44
+   },
+   {
+    "id": "jev-1.13.0",
+    "name": "Jev 1.13.0",
+    "kind": "reference",
+    "latency_ms": 252.8,
+    "p95_ms": 436.6,
+    "score": 59.51
+   },
+   {
+    "id": "blink-mimo-9b",
+    "name": "blink-mimo-9b",
+    "kind": "ours",
+    "latency_ms": 68.3,
+    "p95_ms": 1895.8,
+    "score": 56.53
+   },
+   {
+    "id": "jevfire-uncapped",
+    "name": "Jevfire",
+    "kind": "open",
+    "latency_ms": 82.5,
+    "p95_ms": 1562.9,
+    "score": 55.74
+   },
+   {
+    "id": "joshua-diffusion-full",
+    "name": "JoshuaSP diffusiongemma (open-jev)",
+    "kind": "open",
+    "latency_ms": 269.1,
+    "p95_ms": 1680.9,
+    "score": 55.56
+   },
+   {
+    "id": "decider-35b-nvfp4",
+    "name": "Decider 35B-A3B",
+    "kind": "open",
+    "latency_ms": 99.3,
+    "p95_ms": 366.5,
+    "score": 54.34
+   },
+   {
+    "id": "blink-4b",
+    "name": "blink-4b",
+    "kind": "ours",
+    "latency_ms": 66.4,
+    "p95_ms": 1241.3,
+    "score": 52.12
+   },
+   {
+    "id": "razorback-one-read",
+    "name": "razorback16 openjev diffusiongemma (NVFP4, vLLM)",
+    "kind": "open",
+    "latency_ms": 40.6,
+    "p95_ms": 340.8,
+    "score": 51.52
+   },
+   {
+    "id": "kev-9b-raised",
+    "name": "Kev 9B",
+    "kind": "open",
+    "latency_ms": 54.1,
+    "p95_ms": 948.2,
+    "score": 50.48
+   },
+   {
+    "id": "solomon-v11-bf16-encoding",
+    "name": "Solomon v1.1",
+    "kind": "open",
+    "latency_ms": 223.2,
+    "p95_ms": 5301.0,
+    "score": 47.51
+   },
+   {
+    "id": "kev-4b-raised",
+    "name": "Kev 4B",
+    "kind": "open",
+    "latency_ms": 53.8,
+    "p95_ms": 627.1,
+    "score": 47.43
+   },
+   {
+    "id": "kev-8b-raised",
+    "name": "Kev 8B",
+    "kind": "open",
+    "latency_ms": 38.3,
+    "p95_ms": 652.7,
+    "score": 46.55
+   },
+   {
+    "id": "pngwn-space-uncapped-full",
+    "name": "open-jev (pngwn)",
+    "kind": "open",
+    "latency_ms": 138.5,
+    "p95_ms": 2079.3,
+    "score": 46.15
+   },
+   {
+    "id": "openvons",
+    "name": "openvons",
+    "kind": "open",
+    "latency_ms": 18.0,
+    "p95_ms": 295.9,
+    "score": 45.59
+   },
+   {
+    "id": "decision-nox-full",
+    "name": "Decision 1.0 Nox",
+    "kind": "open",
+    "latency_ms": 48.8,
+    "p95_ms": 619.5,
+    "score": 45.31
+   },
+   {
+    "id": "semif",
+    "name": "SemIf",
+    "kind": "open",
+    "latency_ms": 110.4,
+    "p95_ms": 958.6,
+    "score": 44.77
+   },
+   {
+    "id": "decider-2b-fp8-http",
+    "name": "Decider 2B",
+    "kind": "open",
+    "latency_ms": 49.7,
+    "p95_ms": 1640.9,
+    "score": 44.0
+   },
+   {
+    "id": "mini-jev",
+    "name": "mini-jev",
+    "kind": "open",
+    "latency_ms": 64.5,
+    "p95_ms": 834.3,
+    "score": 43.48
+   },
+   {
+    "id": "decision-sol",
+    "name": "Decision 1.0 Sol",
+    "kind": "open",
+    "latency_ms": 37.8,
+    "p95_ms": 315.6,
+    "score": 40.41
+   },
+   {
+    "id": "nimble",
+    "name": "Bespoke Nimble 9B",
+    "kind": "open",
+    "latency_ms": 83.5,
+    "p95_ms": 136.9,
+    "score": 34.21
+   },
+   {
+    "id": "kev-0.6b-raised",
+    "name": "Kev 0.6B",
+    "kind": "open",
+    "latency_ms": 22.8,
+    "p95_ms": 180.9,
+    "score": 31.3
+   },
+   {
+    "id": "kev-0.5b-raised",
+    "name": "Kev 0.5B",
+    "kind": "open",
+    "latency_ms": 16.8,
+    "p95_ms": 85.6,
+    "score": 30.34
+   },
+   {
+    "id": "harsha",
+    "name": "Qwen-2.5-1B-RLCD",
+    "kind": "open",
+    "latency_ms": 42.4,
+    "p95_ms": 294.9,
+    "score": 28.81
+   },
+   {
+    "id": "lfm2600",
+    "name": "LFM2.5-2.6B-RLCD",
+    "kind": "open",
+    "latency_ms": 38.7,
+    "p95_ms": 94.1,
+    "score": 27.27
+   },
+   {
+    "id": "jeff-uncapped",
+    "name": "jeff",
+    "kind": "open",
+    "latency_ms": 22.4,
+    "p95_ms": 157.9,
+    "score": 27.23
+   },
+   {
+    "id": "nanojev-8k",
+    "name": "NanoJev",
+    "kind": "open",
+    "latency_ms": 27.6,
+    "p95_ms": 955.7,
+    "score": 26.19
+   },
+   {
+    "id": "lfm350-sdpa",
+    "name": "LFM2.5-350M-RLCD",
+    "kind": "open",
+    "latency_ms": 26.4,
+    "p95_ms": 378.6,
+    "score": 25.79
+   },
+   {
+    "id": "gliner-base",
+    "name": "GLiNER 2.5 base",
+    "kind": "open",
+    "latency_ms": 14.4,
+    "p95_ms": 68.2,
+    "score": 24.7
+   },
+   {
+    "id": "gliner-small",
+    "name": "GLiNER 2.5 small",
+    "kind": "open",
+    "latency_ms": 14.5,
+    "p95_ms": 38.4,
+    "score": 23.93
+   },
+   {
+    "id": "gliner-multi",
+    "name": "GLiNER 2.5 multilingual",
+    "kind": "open",
+    "latency_ms": 15.2,
+    "p95_ms": 83.1,
+    "score": 22.42
+   },
+   {
+    "id": "decision-lex",
+    "name": "Decision 1.0 Lex",
+    "kind": "open",
+    "latency_ms": 24.5,
+    "p95_ms": 138.9,
+    "score": 19.57
+   },
+   {
+    "id": "decision-kai",
+    "name": "Decision 1.0 Kai",
+    "kind": "open",
+    "latency_ms": 24.7,
+    "p95_ms": 139.3,
+    "score": 18.37
+   },
+   {
+    "id": "akash-gemma",
+    "name": "system-one-gemma",
+    "kind": "open",
+    "latency_ms": 32.1,
+    "p95_ms": 1272.8,
+    "score": 17.09
+   },
+   {
+    "id": "laya",
+    "name": "Laya",
+    "kind": "open",
+    "latency_ms": 18.9,
+    "p95_ms": 74.8,
+    "score": 16.39
+   },
+   {
+    "id": "verdict",
+    "name": "Verdict",
+    "kind": "open",
+    "latency_ms": 11.8,
+    "p95_ms": 167.8,
+    "score": 13.38
+   }
+  ],
+  "frontier": [
+   "verdict",
+   "gliner-base",
+   "kev-0.5b-raised",
+   "openvons",
+   "kev-8b-raised",
+   "razorback-one-read",
+   "blink-4b",
+   "blink-mimo-9b",
+   "blink-27b"
+  ],
+  "note": "Each row uses that system's own kit-timer measurement, not one shared machine. Jev is a hosted API over the network; blink uses our HTTP server, one request at a time over 1,000 random suite requests."
+ },
+ "cua_probe": {
+  "label": "Picking the next click",
+  "caption": "500 Multimodal-Mind2Web test steps, five page elements per step. Text sees element attributes; screenshot sees a crop with five boxed elements.",
+  "chance": 20.0,
+  "rows": [
+   {
+    "name": "blink-4b",
+    "input": "text",
+    "kind": "ours",
+    "n": 500,
+    "accuracy": 55.4,
+    "ci95": [
+     51.0,
+     59.8
+    ],
+    "ece": 0.035
+   },
+   {
+    "name": "blink-4b + vision tower",
+    "input": "screenshot",
+    "kind": "ours",
+    "n": 500,
+    "accuracy": 54.6,
+    "ci95": [
+     50.4,
+     59.0
+    ],
+    "ece": 0.053
+   },
+   {
+    "name": "blink-mimo-9b",
+    "input": "text",
+    "kind": "ours",
+    "n": 500,
+    "accuracy": 53.8,
+    "ci95": [
+     49.4,
+     58.2
+    ],
+    "ece": 0.054
+   },
+   {
+    "name": "blink-mimo-9b",
+    "input": "screenshot",
+    "kind": "ours",
+    "n": 500,
+    "accuracy": 48.4,
+    "ci95": [
+     43.8,
+     52.6
+    ],
+    "ece": 0.069
+   },
+   {
+    "name": "Qwen3.5-4B",
+    "input": "text",
+    "kind": "base",
+    "n": 500,
+    "accuracy": 45.8,
+    "ci95": [
+     41.2,
+     50.2
+    ],
+    "ece": 0.052
+   },
+   {
+    "name": "Qwen3.5-4B",
+    "input": "screenshot",
+    "kind": "base",
+    "n": 500,
+    "accuracy": 54.4,
+    "ci95": [
+     50.0,
+     58.8
+    ],
+    "ece": 0.032
+   },
+   {
+    "name": "Qwen3.5-9B",
+    "input": "text",
+    "kind": "base",
+    "n": 500,
+    "accuracy": 53.6,
+    "ci95": [
+     49.4,
+     58.0
+    ],
+    "ece": 0.136
+   },
+   {
+    "name": "Qwen3.5-9B",
+    "input": "screenshot",
+    "kind": "base",
+    "n": 500,
+    "accuracy": 54.6,
+    "ci95": [
+     50.2,
+     59.0
+    ],
+    "ece": 0.113
+   },
+   {
+    "name": "MiMo-V2.6-Distill-Qwen-9B",
+    "input": "text",
+    "kind": "base",
+    "n": 500,
+    "accuracy": 49.0,
+    "ci95": [
+     44.4,
+     53.2
+    ],
+    "ece": 0.056
+   },
+   {
+    "name": "MiMo-V2.6-Distill-Qwen-9B",
+    "input": "screenshot",
+    "kind": "base",
+    "n": 500,
+    "accuracy": 43.0,
+    "ci95": [
+     38.6,
+     47.2
+    ],
+    "ece": 0.052
+   }
+  ],
+  "note": "Our harness and sampling, not the official Mind2Web evaluation. Five choices are easier than ranking a whole page; blink never trained on web actions. With page text, blink-4b beats its base by about 10 points; a screenshot adds nothing after training."
+ },
+ "decision_index_v02_partial": null,
+ "decision_index_v02_note": "No Decision Index 0.2 result is reported for these models. Comparable shared-benchmark results require matched request subsets and the 0.2 metric transformations.",
+ "pareto": {
+  "label": "Size against quality",
+  "caption": "Decision Index 0.1 vs served parameters, not a cost or latency result. The line connects open models that score higher than every smaller model.",
+  "x_label": "Served parameters",
+  "x_key": "params_b",
+  "y_label": "Decision Index",
+  "points": [
+   {
+    "id": "blink-27b",
+    "name": "blink-27b",
+    "kind": "ours",
+    "params_b": 26.896,
+    "score": 63.44
+   },
+   {
+    "id": "blink-mimo-9b",
+    "name": "blink-mimo-9b",
+    "kind": "ours",
+    "params_b": 8.954,
+    "score": 56.53
+   },
+   {
+    "id": "jevfire-uncapped",
+    "name": "Jevfire",
+    "kind": "open",
+    "params_b": 27.781,
+    "score": 55.74
+   },
+   {
+    "id": "joshua-diffusion-full",
+    "name": "JoshuaSP diffusiongemma (open-jev)",
+    "kind": "open",
+    "params_b": 25.824,
+    "score": 55.56
+   },
+   {
+    "id": "decider-35b-nvfp4",
+    "name": "Decider 35B-A3B",
+    "kind": "open",
+    "params_b": 35.952,
+    "score": 54.34
+   },
+   {
+    "id": "blink-4b",
+    "name": "blink-4b",
+    "kind": "ours",
+    "params_b": 4.206,
+    "score": 52.12
+   },
+   {
+    "id": "razorback-one-read",
+    "name": "razorback16 openjev diffusiongemma (NVFP4, vLLM)",
+    "kind": "open",
+    "params_b": 25.824,
+    "score": 51.52
+   },
+   {
+    "id": "kev-9b-raised",
+    "name": "Kev 9B",
+    "kind": "open",
+    "params_b": 9.653,
+    "score": 50.48
+   },
+   {
+    "id": "solomon-v11-bf16-encoding",
+    "name": "Solomon v1.1",
+    "kind": "open",
+    "params_b": 27.781,
+    "score": 47.51
+   },
+   {
+    "id": "kev-4b-raised",
+    "name": "Kev 4B",
+    "kind": "open",
+    "params_b": 4.66,
+    "score": 47.43
+   },
+   {
+    "id": "kev-8b-raised",
+    "name": "Kev 8B",
+    "kind": "open",
+    "params_b": 8.191,
+    "score": 46.55
+   },
+   {
+    "id": "pngwn-space-uncapped-full",
+    "name": "open-jev (pngwn)",
+    "kind": "open",
+    "params_b": 4.66,
+    "score": 46.15
+   },
+   {
+    "id": "openvons",
+    "name": "openvons",
+    "kind": "open",
+    "params_b": 4.022,
+    "score": 45.59
+   },
+   {
+    "id": "decision-nox-full",
+    "name": "Decision 1.0 Nox",
+    "kind": "open",
+    "params_b": 4.66,
+    "score": 45.31
+   },
+   {
+    "id": "semif",
+    "name": "SemIf",
+    "kind": "open",
+    "params_b": 4.66,
+    "score": 44.77
+   },
+   {
+    "id": "decider-2b-fp8-http",
+    "name": "Decider 2B",
+    "kind": "open",
+    "params_b": 2.274,
+    "score": 44.0
+   },
+   {
+    "id": "mini-jev",
+    "name": "mini-jev",
+    "kind": "open",
+    "params_b": 4.022,
+    "score": 43.48
+   },
+   {
+    "id": "decision-sol",
+    "name": "Decision 1.0 Sol",
+    "kind": "open",
+    "params_b": 2.274,
+    "score": 40.41
+   },
+   {
+    "id": "nimble",
+    "name": "Bespoke Nimble 9B",
+    "kind": "open",
+    "params_b": 9.653,
+    "score": 34.21
+   },
+   {
+    "id": "kev-0.6b-raised",
+    "name": "Kev 0.6B",
+    "kind": "open",
+    "params_b": 0.596,
+    "score": 31.3
+   },
+   {
+    "id": "kev-0.5b-raised",
+    "name": "Kev 0.5B",
+    "kind": "open",
+    "params_b": 0.494,
+    "score": 30.34
+   },
+   {
+    "id": "harsha",
+    "name": "Qwen-2.5-1B-RLCD",
+    "kind": "open",
+    "params_b": 1.544,
+    "score": 28.81
+   },
+   {
+    "id": "lfm2600",
+    "name": "LFM2.5-2.6B-RLCD",
+    "kind": "open",
+    "params_b": 2.697,
+    "score": 27.27
+   },
+   {
+    "id": "jeff-uncapped",
+    "name": "jeff",
+    "kind": "open",
+    "params_b": 0.576,
+    "score": 27.23
+   },
+   {
+    "id": "nanojev-8k",
+    "name": "NanoJev",
+    "kind": "open",
+    "params_b": 0.596,
+    "score": 26.19
+   },
+   {
+    "id": "lfm350-sdpa",
+    "name": "LFM2.5-350M-RLCD",
+    "kind": "open",
+    "params_b": 0.354,
+    "score": 25.79
+   },
+   {
+    "id": "gliner-base",
+    "name": "GLiNER 2.5 base",
+    "kind": "open",
+    "params_b": 0.194,
+    "score": 24.7
+   },
+   {
+    "id": "gliner-small",
+    "name": "GLiNER 2.5 small",
+    "kind": "open",
+    "params_b": 0.074,
+    "score": 23.93
+   },
+   {
+    "id": "gliner-multi",
+    "name": "GLiNER 2.5 multilingual",
+    "kind": "open",
+    "params_b": 0.287,
+    "score": 22.42
+   },
+   {
+    "id": "decision-lex",
+    "name": "Decision 1.0 Lex",
+    "kind": "open",
+    "params_b": 0.308,
+    "score": 19.57
+   },
+   {
+    "id": "decision-kai",
+    "name": "Decision 1.0 Kai",
+    "kind": "open",
+    "params_b": 0.308,
+    "score": 18.37
+   },
+   {
+    "id": "akash-gemma",
+    "name": "system-one-gemma",
+    "kind": "open",
+    "params_b": 0.268,
+    "score": 17.09
+   },
+   {
+    "id": "laya",
+    "name": "Laya",
+    "kind": "open",
+    "params_b": 0.421,
+    "score": 16.39
+   },
+   {
+    "id": "verdict",
+    "name": "Verdict",
+    "kind": "open",
+    "params_b": 0.151,
+    "score": 13.38
+   }
+  ],
+  "frontier": [
+   "gliner-small",
+   "gliner-base",
+   "lfm350-sdpa",
+   "kev-0.5b-raised",
+   "kev-0.6b-raised",
+   "decider-2b-fp8-http",
+   "openvons",
+   "blink-4b",
+   "blink-mimo-9b",
+   "blink-27b"
+  ],
+  "reference": {
+   "name": "Jev 1.13.0 (closed)",
+   "score": 59.51
+  }
+ },
+ "latency": {
+  "requests": 22,
+  "p50_ms": 66.6,
+  "max_ms": 77.6,
+  "generated_tokens": 0,
+  "caption": "End to end on bundled examples."
+ },
+ "heldout": {
+  "label": "Held-out tasks",
+  "caption": "Eight public tasks, 250 items each, never used for training or for choosing a model.",
+  "frozen_utc": "2026-09-25T01:50:02+00:00",
+  "items_per_task": 250,
+  "tasks": [
+   {
+    "id": "massive_intent",
+    "label": "Intent routing"
+   },
+   {
+    "id": "enron_spam",
+    "label": "Spam"
+   },
+   {
+    "id": "toxic_chat",
+    "label": "Toxicity"
+   },
+   {
+    "id": "ledgar_clause",
+    "label": "Contract clause"
+   },
+   {
+    "id": "climate_fever",
+    "label": "Claim vs evidence"
+   },
+   {
+    "id": "svamp_numeric",
+    "label": "Word problems"
+   },
+   {
+    "id": "yelp_review_score",
+    "label": "Review stars"
+   },
+   {
+    "id": "ecthr_a_long",
+    "label": "Long case files"
+   }
+  ],
+  "systems": [
+   {
+    "id": "blink-27b",
+    "name": "blink-27b",
+    "accuracy": 0.7834,
+    "ci95": [
+     0.7656,
+     0.8
+    ],
+    "ece": 0.0959,
+    "tasks": {
+     "climate_fever": {
+      "accuracy": 0.536,
+      "ece": 0.1897
+     },
+     "ecthr_a_long": {
+      "accuracy": 0.9396,
+      "ece": 0.0137
+     },
+     "enron_spam": {
+      "accuracy": 0.988,
+      "ece": 0.0382
+     },
+     "ledgar_clause": {
+      "accuracy": 0.696,
+      "ece": 0.0676
+     },
+     "massive_intent": {
+      "accuracy": 0.86,
+      "ece": 0.0559
+     },
+     "svamp_numeric": {
+      "accuracy": 0.956,
+      "ece": 0.03
+     },
+     "toxic_chat": {
+      "accuracy": 0.584,
+      "ece": 0.3312
+     },
+     "yelp_review_score": {
+      "accuracy": 0.708,
+      "ece": 0.0413
+     }
+    }
+   },
+   {
+    "id": "blink-mimo-9b",
+    "name": "blink-mimo-9b",
+    "accuracy": 0.7347,
+    "ci95": [
+     0.7165,
+     0.7524
+    ],
+    "ece": 0.1038,
+    "tasks": {
+     "climate_fever": {
+      "accuracy": 0.524,
+      "ece": 0.1608
+     },
+     "ecthr_a_long": {
+      "accuracy": 0.9056,
+      "ece": 0.013
+     },
+     "enron_spam": {
+      "accuracy": 0.904,
+      "ece": 0.0402
+     },
+     "ledgar_clause": {
+      "accuracy": 0.7,
+      "ece": 0.0955
+     },
+     "massive_intent": {
+      "accuracy": 0.82,
+      "ece": 0.0602
+     },
+     "svamp_numeric": {
+      "accuracy": 0.848,
+      "ece": 0.0515
+     },
+     "toxic_chat": {
+      "accuracy": 0.556,
+      "ece": 0.3543
+     },
+     "yelp_review_score": {
+      "accuracy": 0.62,
+      "ece": 0.0547
+     }
+    }
+   },
+   {
+    "id": "blink-4b",
+    "name": "blink-4b",
+    "accuracy": 0.6849,
+    "ci95": [
+     0.6666,
+     0.7043
+    ],
+    "ece": 0.1188,
+    "tasks": {
+     "climate_fever": {
+      "accuracy": 0.508,
+      "ece": 0.2281
+     },
+     "ecthr_a_long": {
+      "accuracy": 0.7552,
+      "ece": 0.1146
+     },
+     "enron_spam": {
+      "accuracy": 0.932,
+      "ece": 0.0236
+     },
+     "ledgar_clause": {
+      "accuracy": 0.66,
+      "ece": 0.1334
+     },
+     "massive_intent": {
+      "accuracy": 0.82,
+      "ece": 0.0606
+     },
+     "svamp_numeric": {
+      "accuracy": 0.436,
+      "ece": 0.067
+     },
+     "toxic_chat": {
+      "accuracy": 0.68,
+      "ece": 0.223
+     },
+     "yelp_review_score": {
+      "accuracy": 0.688,
+      "ece": 0.1005
+     }
+    }
+   }
+  ]
+ }
+}

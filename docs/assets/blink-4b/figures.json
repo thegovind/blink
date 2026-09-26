@@ -1,0 +1,23 @@
+[
+  {
+    "role": "network",
+    "file": "blink-4b-network.png",
+    "alt": "blink-4b network diagram: 32 decoder layers repeating 3 Gated DeltaNet layers then one full-attention layer (24 and 8 in total, hidden 2560), with full attention at 0-based layers 3, 7, … 31 as in the tensor names; LoRA rank 16 on every attention, Gated DeltaNet and MLP projection (32.5M parameters, merged after training); token embeddings, norms and lm_head frozen, with lm_head tied to the token embeddings, one matrix; the vision encoder and multi-token-prediction head removed; and the answer read from the offered option-letter rows of lm_head.",
+    "width_px": 968,
+    "height_px": 926
+  },
+  {
+    "role": "training",
+    "file": "blink-4b-post-training.png",
+    "alt": "blink-4b post-training diagram: T3 (23,156 rows) and T4 (42,360 rows) broken down by data category feed supervised fine-tuning with cross-entropy over the offered option letters; both runs start from the base, and T3, T4 step 300 and T4 final are merged and averaged into release v1.0. Decision Index 0.1 full suite 52.12.",
+    "width_px": 968,
+    "height_px": 921
+  },
+  {
+    "role": "readout",
+    "file": "blink-4b-readout.png",
+    "alt": "blink-4b one-pass readout diagram: a state and typed choice, noul and score questions are rendered as evidence, criterion and lettered options; questions are batched and each batch is one forward pass, giving next-token logits at the answer position, and an FP32 softmax over the offered letters gives one probability per option. No text is generated.",
+    "width_px": 968,
+    "height_px": 696
+  }
+]

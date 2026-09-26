@@ -1,0 +1,13 @@
+{
+  "state": "A user asks whether eval(input()) is safe in a public web app.",
+  "questions": {
+    "safe": {
+      "type": "noul",
+      "instructions": "Is this safe to recommend?",
+      "criteria": {
+        "true": "Safe to recommend",
+        "false": "Not safe to recommend"
+      }
+    }
+  }
+}

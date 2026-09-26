@@ -1,0 +1,20 @@
+blink
+Copyright 2026 Govind Kamtamneni
+
+This repository contains Apache-2.0 licensed code for the blink runtime,
+demo, training utilities, and evaluation utilities.
+
+The model weights are not included. The public Hugging Face model
+repositories state their own weight license: non-commercial research and
+evaluation.
+
+Attributions:
+- SemIf: blink uses the fixed "semif" JSON prompt format from the open SemIf
+  project for rendering typed decisions.
+- Qwen base models: blink-4b and blink-27b are based on public Qwen models
+  whose model cards declare Apache-2.0 licensing.
+- MiMo base model: blink-mimo-9b is based on XiaomiMiMo/MiMo-V2.6-Distill-Qwen-9B,
+  whose model card declares MIT licensing for the base model.
+- Contributor Covenant: CODE_OF_CONDUCT.md is based on Contributor Covenant 2.1.
+
+Dataset licenses are listed in the model cards under docs/models/.
