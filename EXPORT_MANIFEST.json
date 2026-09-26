@@ -23,7 +23,7 @@
   {
     "dest": "space/ui.py",
     "reason": "",
-    "sha256": "87f26e67b39ce5eab43c9658bf9884a288ce66df916030f9c34bbfa9ae5d8572",
+    "sha256": "3b2ad3a1c39082d7a1caf7c146350ed1a076fcd317079f86bd3f5101f916cb89",
     "src": "space/ui.py",
     "transform": "scrub_python"
   },
@@ -37,7 +37,7 @@
   {
     "dest": "space/results.py",
     "reason": "",
-    "sha256": "1915e9311e7c9afd65b91ea0f5e507c0b5b810c343b62975d1476bd13cbfd8a4",
+    "sha256": "70925457fef5d766ed05c86ad4b4717f24af38b76700ef1d03d7735ad5854695",
     "src": "space/results.py",
     "transform": "scrub_python"
   },
@@ -51,14 +51,14 @@
   {
     "dest": "space/style.css",
     "reason": "",
-    "sha256": "5af44bc51d0d37a07d5966755facdcf3a879265894550dccdd01dbd23a493acf",
+    "sha256": "7995810c42339dbbc37d829750cabc9ea7680a901e0c0092254c0496137a331c",
     "src": "space/style.css",
     "transform": "scrub"
   },
   {
     "dest": "space/results.json",
     "reason": "",
-    "sha256": "791dea9dbf43404506cae93d79d2824fc367b07e2ff3d267b438c54866e03e23",
+    "sha256": "90752d206ffc3111950f29a6e1a10192900feb702f35789fbcb277e820c302bf",
     "src": "space/results.json",
     "transform": "scrub"
   },
@@ -93,7 +93,7 @@
   {
     "dest": "space/test_blink.py",
     "reason": "",
-    "sha256": "3e6f79d97b966209c6d6a1a8c76eac764a55090959d39e06c8ca397d60c8c15a",
+    "sha256": "2e3a144c210da2044e236539fc451cb524a0a07885a617e29ed0ac31ce612b74",
     "src": "space/test_blink.py",
     "transform": "scrub_python"
   },
@@ -198,7 +198,7 @@
   {
     "dest": "space/shots/check_links.py",
     "reason": "browser check",
-    "sha256": "d2f5120355b0ab96f2c898b4a38f1b5407e3b445af8e59e03677ddb1ea5a221d",
+    "sha256": "0073c6b2bceb03bbfc845b3c5315638c714f5a3bd05a7b3d0929580d27f3c8be",
     "src": "space/shots/check_links.py",
     "transform": "scrub_python"
   },
@@ -289,7 +289,7 @@
   {
     "dest": "lab/build_results.py",
     "reason": "generic evaluation tool",
-    "sha256": "045fe3eef532c833feca4844b8921ac1791e7ef6a9b623ccefbf6710aa29df70",
+    "sha256": "7c8ae3634f4926eeb5c6c831119cdfd1f36bc19c8ea04aeb3d328d89deea4eca",
     "src": "lab/build_results.py",
     "transform": "scrub_python"
   },

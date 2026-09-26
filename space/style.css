@@ -1457,6 +1457,11 @@ details.blk-d > .blk-links {
   color: var(--mid);
 }
 
+/* the no-score tag is long: where it can't sit beside the name it takes the next line, whole */
+.blk-row.quiet b {
+  flex-wrap: wrap;
+}
+
 /* --- tables -------------------------------------------------------------------- */
 
 .blk-tablewrap {

@@ -235,7 +235,7 @@ def main():
         "caption": "Decision Index 0.1 vs median time per request.",
         "x_key": "latency_ms", "x_label": "Median latency per request", "y_label": "Decision Index",
         "points": speed_pts, "frontier": speed_front,
-        "note": "Each row uses that system's own kit-timer measurement, not one shared machine. Jev is a hosted API over the network; blink uses our HTTP server, one request at a time over 1,000 random suite requests.",
+        "note": "Each row uses that system's own kit-timer measurement, not one shared machine. Jev is a hosted API over the network; blink uses its own HTTP server, one request at a time over 1,000 random suite requests.",
     }
 
     # computer use, a transfer probe (cua/eval_cua.py): pick the element to act on next, 5 options, one pass
@@ -268,7 +268,7 @@ def main():
             "label": "Picking the next click",
             "caption": "500 Multimodal-Mind2Web test steps, five page elements per step. Text sees element attributes; screenshot sees a crop with five boxed elements.",
             "chance": 20.0, "rows": cua_rows,
-            "note": "Our harness and sampling, not the official Mind2Web evaluation. Five choices are easier than ranking a whole page; blink never trained on web actions. With page text, blink-4b beats its base by about 10 points; a screenshot adds nothing after training.",
+            "note": "A custom harness and sampling, not the official Mind2Web evaluation. Five choices are easier than ranking a whole page; blink never trained on web actions. With page text, blink-4b beats its base by about 10 points; a screenshot adds nothing after training.",
         }
 
     pts = [{"id": s["id"], "name": s["name"], "kind": s["kind"], "params_b": round(s["served_params"] / 1e9, 3),

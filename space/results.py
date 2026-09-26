@@ -392,7 +392,7 @@ def _public_notes(notes: dict) -> str:
     hc = notes.get("hard_correct") or {}
     if hc.get("n"):
         lines.append(
-            f"In our runtime blink-4b answers {hc['blink-4b']}/{hc['n']} public "
+            f"In the runtime used here, blink-4b answers {hc['blink-4b']}/{hc['n']} public "
             f"hard items and JevK5 {hc['jevk5-0.2.0']}/{hc['n']}; JevK5's own runtime reports "
             f"{hc['jevk5_native_published']}/{hc['n']}. No hard-accuracy advantage is claimed."
         )
@@ -456,7 +456,7 @@ def jevbench_chart(data: dict) -> str:
         for s in official
     ]
     off_rows += [
-        _jb_row(s["name"], colour[s["id"]], None, axes, None, "not submitted", s["kind"] == "ours")
+        _jb_row(s["name"], colour[s["id"]], None, axes, None, "no official score published", s["kind"] == "ours")
         for s in missing
     ]
     pub_rows = [
@@ -475,7 +475,7 @@ def jevbench_chart(data: dict) -> str:
         '<div class="blk-duo">'
         + _jb_group(
             JB_OFFICIAL_TITLE,
-            "Full evaluation, including private items. blink has not been submitted.",
+            "Full evaluation, including private items. No official score for blink has been published.",
             off_rows,
             off_radar,
         )

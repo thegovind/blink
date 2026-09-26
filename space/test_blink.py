@@ -843,10 +843,10 @@ class TestJevBenchFigure(unittest.TestCase):
         self.assertIn("proxy", self.results.JB_PUBLIC_TITLE)
         self.assertIn('class="blk-duo"', self.html)
 
-    def test_official_none_is_shown_as_not_submitted_without_a_number(self):
+    def test_official_none_is_shown_as_no_official_score_without_a_number(self):
         ours = next(s for s in self.jb["systems"] if s["kind"] == "ours")
         self.assertIsNone(ours["official"])
-        self.assertIn("not submitted", self.html)
+        self.assertIn("no official score published", self.html)
         head, _, tail = self.html.partition(self.results.JB_PUBLIC_TITLE)
         self.assertIn("\u2014", head)
         self.assertNotIn(f"{ours['public_estimate']:.2f}", head)
@@ -880,7 +880,7 @@ class TestJevBenchFigure(unittest.TestCase):
         systems = [dict(s, official=None) for s in self.jb["systems"]]
         data = dict(self.data, jevbench=dict(self.jb, systems=systems))
         html = self.results.jevbench_chart(data)
-        self.assertIn("not submitted", html)
+        self.assertIn("no official score published", html)
         self.assertIn("<svg", html)
 
 
@@ -3559,7 +3559,7 @@ class TestApiTab(unittest.TestCase):
 
 
 class TestProjectLinks(unittest.TestCase):
-    """The code and the docs one click from every tab, and the wire format's full reference from the API tab."""
+    """The code and the docs one click from every tab, and the API docs from the API tab."""
 
     GITHUB = "https://github.com/thegovind/blink"
     DOCS = "https://thegovind.github.io/blink/"
@@ -3643,7 +3643,7 @@ class TestProjectLinks(unittest.TestCase):
         finally:
             demo.close()
 
-    def test_the_api_tab_links_the_wire_format_by_the_lede(self):
+    def test_the_api_tab_links_the_api_docs_by_the_lede(self):
         first = self.ui.api_blocks()[0]
         self.assertEqual(self.links(first), [("API docs", self.WIRE, "_blank", "noopener")])
         self.assertLess(first.index(self.ui.esc(self.d.COPY["lede"])), first.index(self.WIRE))
@@ -3697,6 +3697,122 @@ class TestProjectLinks(unittest.TestCase):
         self.assertEqual(str(meta["sdk_version"]), "6.28.0")
         self.assertIn("thegovind/blink-4b", meta["models"])
         self.assertIn("thegovind/blink-mimo-9b", meta["models"])
+
+
+class TestCopyRules(unittest.TestCase):
+    """The standing rules for what the Space says: its own voice, its links and its card."""
+
+    # the card's YAML front matter, byte for byte, as deployed; new README prose must leave it untouched
+    FRONT_MATTER_SHA256 = "4e100ce58e0cc36ebf0ef1b491f35ff5befe01579872fd39b9a6b9858aa54606"
+    FIRST_PERSON = re.compile(r"\b(?:we|our|ours|us|ourselves)\b", re.IGNORECASE)
+
+    def setUp(self):
+        import api_doc
+        import results
+        import ui
+
+        self.d, self.results, self.ui = api_doc, results, ui
+        self.here = os.path.dirname(os.path.abspath(__file__))
+        with open(os.path.join(self.here, "README.md"), encoding="utf-8") as fh:
+            self.card = fh.read()
+
+    def pages(self) -> str:
+        data = self.results.load()
+        return (self.ui.masthead() + self.ui.masthead(drafting=True) + "".join(self.ui.home_blocks(data))
+                + self.ui.home_external() + "".join(self.ui.card_face(t, line) for _, t, line in self.ui.HOME_LINKS)
+                + "".join(self.ui.results_blocks(data)) + "".join(self.ui.how_blocks())
+                + "".join(self.ui.api_blocks()) + self.ui.footer())
+
+    def voice(self) -> dict:
+        """Everything written in the Space's own voice. Sample inputs (the states a request sends) are data."""
+        import html as htmllib
+
+        def strings(x):
+            if isinstance(x, str):
+                yield x
+            elif isinstance(x, dict):
+                for k, v in x.items():
+                    if k not in ("state", "kind", "id"):
+                        yield from strings(v)
+            elif isinstance(x, (list, tuple)):
+                for v in x:
+                    yield from strings(v)
+
+        data = self.results.load()
+        page = (self.ui.masthead() + self.ui.masthead(drafting=True) + "".join(self.ui.home_blocks(data))
+                + self.ui.home_external() + "".join(self.ui.card_face(t, line) for _, t, line in self.ui.HOME_LINKS)
+                + "".join(self.ui.results_blocks(data)) + "".join(self.ui.how_blocks()) + self.ui.footer()
+                + self.ui.playground_note() + self.ui.ask_note_line()
+                + "".join(self.ui.use_case_note(c) for c in examples.USE_CASES))
+        return {
+            "the page": htmllib.unescape(re.sub(r"<[^>]+>", " ", page)),
+            "api_doc.COPY": " | ".join(strings(self.d.COPY)) + " | " + " | ".join(strings(self.d.TABLE_ROWS)),
+            "results.json": " | ".join(strings(data)),
+            "README.md": self.card.split("\n---\n", 1)[1],
+            "use cases": " | ".join(s for c in examples.USE_CASES
+                                    for s in (c.title, c.blurb, c.state_label, c.policy_note or "",
+                                              *(ex.label for ex in c.examples))),
+        }
+
+    def test_no_we_our_or_us_in_the_spaces_own_voice(self):
+        for where, text in self.voice().items():
+            with self.subTest(where=where):
+                self.assertEqual(sorted({m.group(0).lower() for m in self.FIRST_PERSON.finditer(text)}), [])
+
+    def test_no_per_model_docs_pages_are_linked(self):
+        try:
+            import stage_space
+        except ImportError:
+            self.skipTest("stage_space.py, the Space upload tool, is not in this repository")
+
+        texts = [self.pages()]
+        for name in stage_space.FILES:
+            with open(os.path.join(self.here, name), encoding="utf-8") as fh:
+                texts.append(fh.read())
+        for text in texts:
+            self.assertNotIn("github.io/blink/models", text)
+
+    def test_how_it_works_links_each_models_card(self):
+        how = "".join(self.ui.how_blocks())
+        cards = {n for n, _ in self.ui.MODEL_CARDS}
+        self.assertEqual(cards, {"blink-4b", "blink-27b", "blink-mimo-9b"})
+        self.assertLessEqual({m.split("/")[-1] for m in blink.models()}, cards)  # every served model included
+        for name, href in self.ui.MODEL_CARDS:
+            with self.subTest(model=name):
+                self.assertEqual(href, f"https://huggingface.co/thegovind/{name}")
+                self.assertIn(f'<a href="{href}" target="_blank" rel="noopener">{name} card</a>', how)
+
+    def test_every_outside_link_opens_in_a_new_tab(self):
+        anchors = re.findall(r"<a\b[^>]*>", self.pages())
+        outside = [a for a in anchors if re.search(r'href="https?://', a)]
+        self.assertGreaterEqual(len(outside), 15)
+        for a in outside:
+            with self.subTest(link=a[:90]):
+                self.assertIn('target="_blank"', a)
+                self.assertIn("noopener", re.search(r'rel="([^"]*)"', a).group(1).split())
+
+    def test_the_card_front_matter_is_byte_identical(self):
+        import hashlib
+
+        self.assertTrue(self.card.startswith("---\n"))
+        front = self.card[: self.card.index("\n---\n", 4) + len("\n---\n")]
+        self.assertEqual(hashlib.sha256(front.encode("utf-8")).hexdigest(), self.FRONT_MATTER_SHA256)
+
+    def test_every_licence_line_says_non_commercial(self):
+        """Wherever the weights' terms are stated they say "non-commercial": footer, card, How it works, static card."""
+        import build_static
+
+        how = "".join(self.ui.how_blocks())
+        run = how[how.index("<summary>Running it yourself</summary>"):]
+        lines = {
+            "footer": self.ui.footer(),
+            "README.md": self.card.rstrip("\n").rsplit("\n---\n", 1)[1],
+            "How it works": run[: run.index("</details>")],
+            "static README": build_static.space_readme(False),
+        }
+        for where, text in lines.items():
+            with self.subTest(where=where):
+                self.assertIn("non-commercial", text)
 
 
 if __name__ == "__main__":

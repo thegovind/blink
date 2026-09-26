@@ -1258,7 +1258,7 @@
    "blink-mimo-9b",
    "blink-27b"
   ],
-  "note": "Each row uses that system's own kit-timer measurement, not one shared machine. Jev is a hosted API over the network; blink uses our HTTP server, one request at a time over 1,000 random suite requests."
+  "note": "Each row uses that system's own kit-timer measurement, not one shared machine. Jev is a hosted API over the network; blink uses its own HTTP server, one request at a time over 1,000 random suite requests."
  },
  "cua_probe": {
   "label": "Picking the next click",
@@ -1386,7 +1386,7 @@
     "ece": 0.052
    }
   ],
-  "note": "Our harness and sampling, not the official Mind2Web evaluation. Five choices are easier than ranking a whole page; blink never trained on web actions. With page text, blink-4b beats its base by about 10 points; a screenshot adds nothing after training."
+  "note": "A custom harness and sampling, not the official Mind2Web evaluation. Five choices are easier than ranking a whole page; blink never trained on web actions. With page text, blink-4b beats its base by about 10 points; a screenshot adds nothing after training."
  },
  "decision_index_v02_partial": null,
  "decision_index_v02_note": "No Decision Index 0.2 result is reported for these models. Comparable shared-benchmark results require matched request subsets and the 0.2 metric transformations.",

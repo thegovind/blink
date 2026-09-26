@@ -80,6 +80,9 @@ def esc(s) -> str:
 GITHUB_URL = "https://github.com/thegovind/blink"
 DOCS_URL = "https://thegovind.github.io/blink/"
 PROJECT_LINKS = (("GitHub", GITHUB_URL), ("Docs", DOCS_URL))
+# each model's own card on the Hub: its weights, their licence and its full story
+MODEL_CARDS = tuple((name, f"https://huggingface.co/thegovind/{name}")
+                    for name in ("blink-4b", "blink-27b", "blink-mimo-9b"))
 
 
 def links_html(links=PROJECT_LINKS, cls: str = "blk-links") -> str:
@@ -592,7 +595,7 @@ HOME_LINKS = (
     ("playground", "Try it", "Enter a state and questions."),
     ("ask", "Ask a question", "A model drafts options; blink scores."),
     ("use-cases", "Use cases", "Sort requests or choose next steps."),
-    ("results", "All results", "Scores and how we got them."),
+    ("results", "All results", "Scores and how they were measured."),
     ("how-it-works", "How it works", "How blink scores each option."),
 )
 
@@ -603,7 +606,7 @@ HOME_EXTERNAL = (
     ("https://huggingface.co/spaces/multimodalart/jev-decision-index",
      "Decision Index", "The benchmark and its live board."),
     ("https://github.com/fstandhartinger/jevbench/issues/81",
-     "JevBench", "Our open request to measure blink-4b."),
+     "JevBench", "The open request to measure blink-4b."),
 )
 
 
@@ -1018,11 +1021,11 @@ def results_blocks(data: dict | None = None) -> list[str]:
         out.append(results.latency_strip(lat))
     out.append(
         '<details class="blk-d"><summary>How these are measured</summary>'
-        f'<p>We ran the complete archived 0.1 suite: {esc(di["suite"])}. The headline index '
+        f'<p>blink was run on the complete archived 0.1 suite: {esc(di["suite"])}. The headline index '
         "averages 19 panel benchmarks within five equal-weight areas. A request the model cannot answer "
         "counts as wrong, so refusing to answer is never free. Skill measures performance "
         "above each metric's chance baseline; breadth is a shifted geometric mean of the five "
-        "area skill scores. Our rows are local runs of the official kit, not submissions; "
+        "area skill scores. blink's rows are local runs of the official kit, not submissions; "
         f'every other 0.1 row is the leaderboard snapshot of {esc(di["leaderboard_snapshot"][:10])}.</p>'
         + (
             f'<p>The 0.2 comparison re-scores {v02["shared"]} of the {v02["panel"]} panel '
@@ -1033,9 +1036,9 @@ def results_blocks(data: dict | None = None) -> list[str]:
         )
         + "<p>JevBench is an equal-weight harmonic mean of Intelligence, Calibration, Speed "
         "and Cost. An official score is computed over held-out, judge and sealed items that "
-        "only a submitted run reaches. We have not submitted, so the figures beside ours are "
-        "the public items only, run through the same harness for both systems and kept on "
-        "their own scale.</p>"
+        "only a submitted run reaches. No official JevBench score for blink has been published. "
+        "For both systems, the figures shown here cover only public items, were produced with "
+        "the same harness, and are kept on their own scale.</p>"
         + (
             f'<p>Latency is {lat["p50_ms"]} ms at the median and {lat["max_ms"]} ms at the '
             f'slowest of {lat["requests"]} bundled requests, '
@@ -1091,9 +1094,11 @@ def how_blocks() -> list[str]:
         "embeddings, norms and the output head stay frozen. blink-4b and blink-27b ship text-only weights. "
         "blink-mimo-9b keeps MiMo's unchanged vision tower; its checkpoint has no MTP tensors. "
         "The app uses its text side only, reading option-letter scores without generating text.</p>",
-        '<p class="blk-note">Jev’s RLCD recipe isn’t public, so we didn’t copy it; this is supervised fine-tuning '
-        'on decision data. Full details: <a href="https://huggingface.co/thegovind/blink-4b">blink-4b card</a> · '
-        '<a href="https://huggingface.co/thegovind/blink-27b">blink-27b card</a>.</p>',
+        '<p class="blk-note">Jev’s RLCD recipe isn’t public, so it wasn’t copied; this is supervised fine-tuning '
+        "on decision data. Full details: "
+        + " · ".join(f'<a href="{esc(href)}" target="_blank" rel="noopener">{esc(name)} card</a>'
+                     for name, href in MODEL_CARDS)
+        + ".</p>",
         '<details class="blk-d"><summary>The three question types</summary>'
         "<p><b>choice</b> takes a map of option keys to descriptions and returns a probability "
         "for each, the top choice and a concentration score.</p>"

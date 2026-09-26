@@ -1,6 +1,7 @@
-"""The project's links: GitHub and Docs beside the name on every tab, the wire format's full reference in the API tab,
+"""The project's links: GitHub and Docs beside the name on every tab, the API docs in the API tab,
 and the source and the docs beside its steps and in How it works. Every one opens in a new tab, fits a phone, reads
-the same when the system is dark, and resolves.
+the same when the system is dark, and resolves. How it works also links each model's card, in ui.MODEL_CARDS order;
+each opens in a new tab and resolves.
 
     BLINK_MOCK=1 BLINK_PORT=7911 uv run --with gradio==6.28.0 python app.py &
     BLINK_URL=http://127.0.0.1:7911/ uv run --with playwright python shots/check_links.py
@@ -14,6 +15,7 @@ import os
 import sys
 import urllib.request
 
+from playwright.async_api import TimeoutError as PlaywrightTimeoutError
 from playwright.async_api import async_playwright
 
 HERE = os.path.dirname(os.path.abspath(__file__))
@@ -28,6 +30,8 @@ TABS = (("home", "Home"), ("playground", "Playground"), ("ask", "Ask"), ("use-ca
         ("results", "Results"), ("how-it-works", "How it works"), ("api", "API"))
 PROJECT = [["GitHub", "https://github.com/thegovind/blink"], ["Docs", "https://thegovind.github.io/blink/"]]
 WIRE = [["API docs", "https://thegovind.github.io/blink/api/"]]
+# How it works' "Full details": each model's card on the Hub, as ui.MODEL_CARDS lists them
+CARDS = [[f"{m} card", f"https://huggingface.co/thegovind/{m}"] for m in ("blink-4b", "blink-27b", "blink-mimo-9b")]
 
 # every link in a row: its label, where it goes, how it opens, and whether it can be seen
 LINKS = """(sel) => Array.from(document.querySelectorAll(sel)).map((a) => {
@@ -56,6 +60,8 @@ PAINT = """() => Array.from(document.querySelectorAll('.blk-toplinks a, .blk-lin
     }
     return [a.textContent.trim(), s.color, bg, s.borderTopColor, s.textDecorationLine, s.fontSize, s.fontWeight];
   })"""
+# the header names the model it was drawn for
+SHOWS_MODEL = "(m) => ((document.querySelector('.blk-meta .key') || {}).textContent || '').includes(m)"
 OPEN_RUN = """() => {
   const d = Array.from(document.querySelectorAll('details.blk-d'))
     .find((x) => x.offsetParent !== null && x.querySelector('.blk-links'));
@@ -156,19 +162,24 @@ async def main() -> int:
             seg = page.locator(".blk-seg label").filter(has_text="blink-mimo-9b")
             if await seg.count():
                 await seg.first.click()
-                await page.wait_for_timeout(1200)
+                # the live Space redraws the header about 1.6 s after the switch; give it up to 10 s
+                try:
+                    await page.wait_for_function(SHOWS_MODEL, arg="blink-mimo-9b", timeout=10_000)
+                    late = ""
+                except PlaywrightTimeoutError:
+                    late = ", not redrawn within 10 s"
                 key = await page.evaluate("() => (document.querySelector('.blk-meta .key') || {}).textContent")
                 found = pairs(await page.evaluate(LINKS, ".blk-toplinks a"))
-                print(f"  {name:5} after tab clicks and a model switch ({key}): {found}")
-                if found != PROJECT or "blink-mimo-9b" not in (key or ""):
-                    problems.append(f"{name} model switch: header {key!r}, links {found}")
+                print(f"  {name:5} after tab clicks and a model switch ({key}): {found}{late}")
+                if found != PROJECT or "blink-mimo-9b" not in (key or "") or late:
+                    problems.append(f"{name} model switch: header {key!r}, links {found}{late}")
             else:
                 print(f"  {name:5} after tab clicks: {found} (one model: no switch)")
             problems += [f"{name} clicks: {e}" for e in errors]
             await ctx.close()
 
         # the API tab: the full reference by the lede, the source and the docs beside the steps
-        # How it works: the source and the docs where it downloads and runs the model
+        # How it works: each model's card, and the source and the docs where it downloads and runs the model
         for size, name in ((DESK, "desk"), (PHONE, "phone")):
             ctx, page, errors = await fresh(browser, size)
             await land(page, "/?tab=api")
@@ -189,6 +200,11 @@ async def main() -> int:
 
             ctx, page, more = await fresh(browser, size)
             await land(page, "/?tab=how-it-works")
+            cards = await page.evaluate(LINKS, "p.blk-note a")
+            listed = pairs(cards) == CARDS and not unsafe(cards) and all(x["shown"] for x in cards)
+            print(f"  {name:5} How it works cards {pairs(cards)} {'ok' if listed else 'WRONG'}")
+            if not listed:
+                problems.append(f"{name} How it works: model cards {cards}")
             closed = await page.evaluate(LINKS, "details.blk-d .blk-links a")
             opened = await page.evaluate(OPEN_RUN)
             await page.wait_for_timeout(300)
@@ -242,7 +258,7 @@ async def main() -> int:
         await browser.close()
 
     # every target answers
-    for label, href in PROJECT + WIRE:
+    for label, href in PROJECT + WIRE + CARDS:
         try:
             req = urllib.request.Request(href, headers={"User-Agent": "blink-check-links"})
             with urllib.request.urlopen(req, timeout=30) as r:
