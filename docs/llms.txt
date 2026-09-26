@@ -1,14 +1,14 @@
 # blink
 
-> Send text or JSON state with typed questions and get probabilities for every option in one forward pass, with no generated text.
+> Send text or JSON state with typed questions. Each question gets a probability for every offered option from one forward pass. No generated text.
 
-blink supports yes/no (`noul`), choice, and ordered score questions. The server is wire-compatible with TypeSafe's API. The Space accepts the same fields through its Gradio API.
+Use blink for yes/no (`noul`), choice, and ordered score questions. Probabilities are over the offered options only, not certified chances of being right. Point a TypeSafe SDK or plain HTTP client at the server, or use `gradio_client` for the Space.
 
 ## Docs
 
-- [API](https://thegovind.github.io/blink/api.md): Endpoints, requests, responses, limits, and clients.
-- [Agent experience](https://thegovind.github.io/blink/agents.md): Skill setup and agent-facing docs.
-- [Models](https://thegovind.github.io/blink/models.md): Available models and model cards.
+- [API](https://thegovind.github.io/blink/api.md): Send requests and read responses.
+- [Agent experience](https://thegovind.github.io/blink/agents.md): Install the skill and find agent-ready docs.
+- [Models](https://thegovind.github.io/blink/models.md): Pick a model and open its card.
 
 ## Models
 

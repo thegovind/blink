@@ -1,7 +1,8 @@
 """The API tab: using blink with code written for the TypeSafe API (Jev), and calling this Space.
 
-Every user-facing string of the tab is in this module (the final copy); ui.api_blocks() only arranges it. DRAFT = True
-shows COPY["draft"] as a tag beside the heading, for while copy is being reworked.
+Every user-facing string of the tab is in this module (the final copy); ui.api_blocks() only arranges it. The GitHub
+and Docs links beside the steps are the ones every tab shows (ui.PROJECT_LINKS). DRAFT = True shows COPY["draft"] as
+a tag beside the heading, for while copy is being reworked.
 
 The examples are exact: test_blink.TestApiTab checks that EXAMPLE_RESPONSE is blink-4b's saved answer to
 EXAMPLE_REQUEST (rounded as shown), that every request is one blink accepts, that the error bodies are the ones blink
@@ -19,6 +20,7 @@ DRAFT = False
 SERVER_URL = "http://127.0.0.1:8000"
 SPACE_ID = "thegovind/blink"
 SPACE_URL = "https://thegovind-blink.hf.space"
+WIRE_FORMAT_URL = "https://thegovind.github.io/blink/api/"  # the docs site's full reference for this tab
 SERVED_AS = "./blink-4b"  # what the answers name as the model after `serve.py --model ./blink-4b`
 CODE_REVISION = "v1.2"  # the model repos' code revision with this serve.py and blink.py
 
@@ -27,6 +29,7 @@ COPY = {
     "draft": "",
     "lede": "Use TypeSafe's Python or JavaScript SDK from server-side code against a blink server. "
             "Core request and answer fields stay the same.",
+    "wire_docs": "API docs",
     "table_label": "TypeSafe API at a glance",
     "legend": (("same", "Same"), ("adds", "Adds fields"), ("differs", "Different"), ("none", "Not offered")),
     "steps_label": "Three steps",

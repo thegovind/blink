@@ -6,7 +6,7 @@
       "from": "space/ui.py, MAST[\"chip\"]"
     },
     "footer.note": {
-      "text": "Personal research release by thegovind. Not an official product of any company, and not affiliated with TypeSafe AI, Xiaomi, Alibaba Cloud or the Qwen team. Weights are for non-commercial research and evaluation; app code is Apache-2.0.",
+      "text": "Weights are for non-commercial research and evaluation; app code is Apache-2.0.",
       "from": "space/ui.py, footer()"
     }
   }

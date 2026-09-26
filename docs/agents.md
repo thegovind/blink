@@ -2,17 +2,17 @@
 
 ## Give your agent the blink skill
 
-The skill tells an agent when and how to use blink for typed decisions with probabilities.
+Use the skill to send typed questions and read `noul`, `choice`, and `score` answers.
 
-Copy `skills/blink/` from the [repo](https://github.com/thegovind/blink) into the agent's skills folder, such as `~/.agents/skills/` or `.claude/skills/`.
+Install with `npx skills add thegovind/blink`, or copy [`skills/blink/`](https://github.com/thegovind/blink/blob/main/skills/blink/SKILL.md) into your agent's skills folder (for example `.agents/skills/blink/`).
 
 ## Docs for agents
 
-[`/llms.txt`](https://thegovind.github.io/blink/llms.txt) is the docs index.
+Start with [`/llms.txt`](https://thegovind.github.io/blink/llms.txt).
 
-Every docs page has a Markdown copy at the same path plus `.md`, such as [the API page](https://thegovind.github.io/blink/api.md).
+Add `.md` to any docs page path for Markdown, such as [the API page](https://thegovind.github.io/blink/api.md).
 
-Coding agents working in the repo should read [`AGENTS.md`](https://github.com/thegovind/blink/blob/main/AGENTS.md).
+Read [`AGENTS.md`](https://github.com/thegovind/blink/blob/main/AGENTS.md) before changing the repo.
 
 ## Write good questions
 

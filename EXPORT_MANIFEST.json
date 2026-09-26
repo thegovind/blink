@@ -23,14 +23,14 @@
   {
     "dest": "space/ui.py",
     "reason": "",
-    "sha256": "87cc06b88bc4df508cf46c7534bd091c5dffe8ff66b00dcb864a8c81cfabfd92",
+    "sha256": "87f26e67b39ce5eab43c9658bf9884a288ce66df916030f9c34bbfa9ae5d8572",
     "src": "space/ui.py",
     "transform": "scrub_python"
   },
   {
     "dest": "space/api_doc.py",
     "reason": "",
-    "sha256": "1f1a110efcfc706ada7e5a16ef15db6c52e0c5ba1cbf6e4cce556c0fb99a8322",
+    "sha256": "7ec821eb245205bd7f49acf5a2efb5419da54bb59593afa7fbb53a7944506d64",
     "src": "space/api_doc.py",
     "transform": "scrub_python"
   },
@@ -51,7 +51,7 @@
   {
     "dest": "space/style.css",
     "reason": "",
-    "sha256": "01a892554ba59f65eec297584bb55f8e36523cd53e7db12e0b81eb39eafb2e02",
+    "sha256": "5af44bc51d0d37a07d5966755facdcf3a879265894550dccdd01dbd23a493acf",
     "src": "space/style.css",
     "transform": "scrub"
   },
@@ -93,7 +93,7 @@
   {
     "dest": "space/test_blink.py",
     "reason": "",
-    "sha256": "493bc0da698afb68357272a28bc1ec30ec24ef7c938d4624d0d2256d98bd11b2",
+    "sha256": "3e6f79d97b966209c6d6a1a8c76eac764a55090959d39e06c8ca397d60c8c15a",
     "src": "space/test_blink.py",
     "transform": "scrub_python"
   },
@@ -121,7 +121,7 @@
   {
     "dest": "space/build_static.py",
     "reason": "",
-    "sha256": "ece56e92fb4666c87071b0e2f2d033374c19b7a2c7f3a2847b3fd35851f98def",
+    "sha256": "5b8189df90a411ab65224792568598d8ce0cc9892188e8419a0090af0330e377",
     "src": "space/build_static.py",
     "transform": "scrub_python"
   },
@@ -196,6 +196,13 @@
     "transform": "scrub_python"
   },
   {
+    "dest": "space/shots/check_links.py",
+    "reason": "browser check",
+    "sha256": "d2f5120355b0ab96f2c898b4a38f1b5407e3b445af8e59e03677ddb1ea5a221d",
+    "src": "space/shots/check_links.py",
+    "transform": "scrub_python"
+  },
+  {
     "dest": "space/shots/check_mobile.py",
     "reason": "browser check",
     "sha256": "d984c6c8bf9917bdb58f5f6dd4c08ae0c7de4c01e021effd29c68df8dd333d3a",
@@ -247,7 +254,7 @@
   {
     "dest": "space/README.md",
     "reason": "",
-    "sha256": "3ffa093b20db94dbeced4ab68b79c531739109f003d4cbaf8b93a93db2765f65",
+    "sha256": "7f32301e7f21a110d72484ece897d93602cbba9723ca1e452c83c4de2180318e",
     "src": "space/README.md",
     "transform": "scrub_docs"
   },
@@ -723,56 +730,56 @@
   {
     "dest": "README.md",
     "reason": "repository scaffold",
-    "sha256": "b2fe5f2b9905147925294798fd400c066f30c80b1028d58761c8adf025a3167e",
+    "sha256": "11f071a9d0a3c24e8c9ee65838fb5f782712a6cb2620004269856918cd999ec0",
     "src": "<generated>",
     "transform": "generate"
   },
   {
     "dest": "AGENTS.md",
     "reason": "repository scaffold",
-    "sha256": "583a516ab8fa6c380e22850474ec9661a486b4002b7d7006068b5370d8912e64",
+    "sha256": "f0bb5e1db376dabc4c556c3add047f93b9372a9fc48ee462680d684c3aff38a7",
     "src": "<generated>",
     "transform": "generate"
   },
   {
     "dest": "skills/blink/SKILL.md",
     "reason": "repository scaffold",
-    "sha256": "5f02f4c7ce788bb2f1c3d3ba9889018837d1a4d34035a9c99c15dd82939931bf",
+    "sha256": "1567dd9e207c588cf38b826326f14d08c40ed5e26a3390045aa8602eac5690ac",
     "src": "<generated>",
     "transform": "generate"
   },
   {
     "dest": "docs/index.md",
     "reason": "repository scaffold",
-    "sha256": "b9e942bb54e6b81fcb19926b4346040e521172200f1681b1b97861df53cc8279",
+    "sha256": "77e06667d456f9c8459a5cc69e54127c8633ba8f28d4eede73112f5fe7dc65fe",
     "src": "<generated>",
     "transform": "generate"
   },
   {
     "dest": "docs/api.md",
     "reason": "repository scaffold",
-    "sha256": "e7dbbe8235daa6846d0959e025934b3189eb70ee67568fc3cc202d5d409ccbd2",
+    "sha256": "309da76ea7f911bae1cb199897ad22b7da0bf3333987e5728df3b9a55347a2c6",
     "src": "<generated>",
     "transform": "generate"
   },
   {
     "dest": "docs/agents.md",
     "reason": "repository scaffold",
-    "sha256": "bc1136fc8b890177eab01ee35ab64d4742445a0f799ed1d0f950c9f902e2f3d4",
+    "sha256": "92350acb20cc6a0b75329992d1a90689db755f76038d60a1665f864795c68ec5",
     "src": "<generated>",
     "transform": "generate"
   },
   {
     "dest": "docs/models.md",
     "reason": "repository scaffold",
-    "sha256": "65174da4818e8852c8ebf3d0f54f6b4d82325bf43208532dcc1ab507973f7878",
+    "sha256": "f30d66f3e0dfd1825c2edb9e91a1af919ec377504d6e67f817feb0d23babd47c",
     "src": "<generated>",
     "transform": "generate"
   },
   {
     "dest": "docs/llms.txt",
     "reason": "repository scaffold",
-    "sha256": "a77bcb276f204d85722968196c4af91facfdf88dd3acfa8c37900c63c87838a0",
+    "sha256": "bf3560f674042361f8f73a9e2dfec1c409f606373660964d34a3df7f87b54a23",
     "src": "<generated>",
     "transform": "generate"
   },
@@ -786,7 +793,7 @@
   {
     "dest": "Makefile",
     "reason": "repository scaffold",
-    "sha256": "7d8311737c0cc3f30c069be27db3c70dbec10f1bddd1083badb23f005bada448",
+    "sha256": "dd7ed789e7d43e05b31b1a9dd4abb7314fcd2fd1d3f25cc66cf813062a78cdbb",
     "src": "<generated>",
     "transform": "generate"
   },
@@ -989,7 +996,7 @@
   {
     "dest": "site/strings-reused.json",
     "reason": "docs site",
-    "sha256": "0f15fc0e790f3ecfb739764593178a0ff5d474ff632580151f019ca59d853320",
+    "sha256": "451a2386504e23a17a3f049ebe9d2c3fcc6ee86fc979898d9bd8ee978a629818",
     "src": "<site>",
     "transform": "copy"
   },

@@ -1,6 +1,6 @@
 # blink
 
-Send text or JSON state plus typed questions. Get a probability for every option in one forward pass, with no generated text.
+Send text or JSON state with typed questions. Each question gets a probability for every offered option from one forward pass. No generated text.
 
 [![License](https://img.shields.io/badge/code-Apache--2.0-blue.svg)](LICENSE)
 [![Models](https://img.shields.io/badge/Hugging%20Face-models-yellow.svg)](https://huggingface.co/thegovind)
@@ -8,13 +8,15 @@ Send text or JSON state plus typed questions. Get a probability for every option
 
 ## What it does
 
-- Accepts state plus questions keyed by name.
-- Supports yes/no (`noul`), choice, and ordered score questions.
-- Returns option probabilities and no generated text.
+- `noul`: probability of yes.
+- `choice`: picked option, probabilities, confidence.
+- `score`: expected level across 2-10 ordered levels, probabilities, confidence.
+
+Probabilities are over the offered options only, not certified chances of being right.
 
 ## Try it
 
-Use the [live Space](https://huggingface.co/spaces/thegovind/blink).
+Open the [Space](https://huggingface.co/spaces/thegovind/blink).
 
 ## Run it
 
@@ -24,15 +26,15 @@ hf download thegovind/blink-4b --revision v1.2 --local-dir blink-4b
 python blink-4b/serve.py --model ./blink-4b --port 8000
 ```
 
-Then check `curl -s http://localhost:8000/healthz`.
+Check `curl -s http://localhost:8000/healthz`.
 
 ## Use it from code
 
-See the [API docs](https://thegovind.github.io/blink/api.md).
+Follow the [API docs](https://thegovind.github.io/blink/api.md).
 
 ## Use it from agents
 
-Give your agent [`skills/blink/SKILL.md`](skills/blink/SKILL.md), then read the [agent experience guide](https://thegovind.github.io/blink/agents.md).
+See [`skills/blink/SKILL.md`](skills/blink/SKILL.md) and the [agent experience guide](https://thegovind.github.io/blink/agents.md).
 
 ## Models
 
@@ -42,7 +44,7 @@ Give your agent [`skills/blink/SKILL.md`](skills/blink/SKILL.md), then read the 
 | [thegovind/blink-mimo-9b](https://huggingface.co/thegovind/blink-mimo-9b) | XiaomiMiMo/MiMo-V2.6-Distill-Qwen-9B | 18.8 GB | yes |
 | [thegovind/blink-27b](https://huggingface.co/thegovind/blink-27b) | Qwen/Qwen3.8-27B | 53.8 GB | no |
 
-Use code revision `v1.2`. Weights are unchanged since `v1.0`.
+Code: Apache-2.0. Weights: non-commercial research and evaluation only; see each model card's license.
 
 ## Links
 

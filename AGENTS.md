@@ -1,13 +1,14 @@
-# Coding agents
+# Coding in this repo
 
-Read this before changing the repo.
+Start here before changing code.
 
 ## Layout
 
 | Path | Use |
 |---|---|
+| `blink/` | Python package: engine and HTTP server |
 | `space/` | Runtime `blink.py` and the Space app |
-| `serve.py` | HTTP server |
+| `serve.py` | Standalone server shipped in each model repo |
 | `lab/` | Training and evaluation tools |
 | `site/` | Docs builder |
 | `skills/blink/` | blink Agent Skill |
@@ -15,15 +16,14 @@ Read this before changing the repo.
 ## Commands
 
 ```sh
-BLINK_MOCK=1 python -m unittest discover -s space -p 'test_*.py'
-BLINK_MOCK=1 python -m unittest discover -s lab/tests -p 'test_*.py'
-ruff check .
+make test
+make lint
 make site
-python scripts/leak_scan.py .
+make leak-scan
 ```
 
 ## Rules
 
-- Do not change answer math, rendering, or the default serving path without parity checks.
-- Keep existing API fields. Only add fields.
+- Run parity checks before changing answer math, rendering, or the default serving path.
+- Keep every existing API field. Only add fields.
 - Run the tests and leak scan before a pull request.

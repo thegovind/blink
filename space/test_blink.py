@@ -805,12 +805,11 @@ class TestClaimsAndLabels(unittest.TestCase):
         self.assertEqual(page.count("Apache-2.0"), 1)
         self.assertIn("non-commercial research use", page)
 
-    def test_footer_disclaims_affiliation(self):
+    def test_footer_is_the_licence_line_only(self):
         foot = self.ui.footer()
-        self.assertIn("Personal research release by thegovind", foot)
-        self.assertIn("Not an official product of any company", foot)
-        self.assertNotIn("an unrelated company", foot)
-        self.assertNotIn("an internal group", foot)
+        self.assertIn("Weights are for non-commercial research and evaluation", foot)
+        self.assertNotIn("Personal research release", foot)
+        self.assertNotIn("affiliated", foot)
 
     def test_verdicts_are_marked_simulated(self):
         html = self.ui.render_verdict("go", "Send to billing", "Because.")
@@ -3176,7 +3175,7 @@ class TestStaticBuild(unittest.TestCase):
         remote += re.findall(r'@import\s+(?:url\()?["\'](https?://[^"\']+)', css)
         self.assertEqual(remote, [])
         for url in re.findall(r"https?://[^\s\"'<)]+", html + css + js):
-            self.assertRegex(url, r"^https://(huggingface\.co|github\.com)/")
+            self.assertRegex(url, r"^https://(huggingface\.co|github\.com|thegovind\.github\.io)/")
 
     def test_demo_label_and_footer_are_on_the_static_page(self):
         import ui
@@ -3186,7 +3185,8 @@ class TestStaticBuild(unittest.TestCase):
             html.count(ui.DEMO_LABEL.split("\u00b7")[0].strip()), 1 + len(examples.USE_CASES)
         )
         self.assertNotIn("GPU", html)
-        self.assertIn("Not an official product of any company", html)
+        self.assertIn("Weights are for non-commercial research and evaluation", html)
+        self.assertNotIn("Personal research release", html)
         self.assertEqual(html.count('class="blk-foot"'), 1)
 
     def test_static_page_carries_the_qualified_claims(self):
@@ -3556,6 +3556,147 @@ class TestApiTab(unittest.TestCase):
                 if os.path.exists(os.path.join(here, f"{name}.py")):
                     with self.subTest(file=f, module=name):
                         self.assertIn(f"{name}.py", stage_space.FILES)
+
+
+class TestProjectLinks(unittest.TestCase):
+    """The code and the docs one click from every tab, and the wire format's full reference from the API tab."""
+
+    GITHUB = "https://github.com/thegovind/blink"
+    DOCS = "https://thegovind.github.io/blink/"
+    WIRE = "https://thegovind.github.io/blink/api/"
+    PAIR = [("GitHub", GITHUB, "_blank", "noopener"), ("Docs", DOCS, "_blank", "noopener")]
+
+    def setUp(self):
+        import api_doc
+        import ui
+
+        self.d, self.ui = api_doc, ui
+
+    @staticmethod
+    def links(html: str) -> list[tuple]:
+        """(label, href, target, rel) for every link, in page order."""
+        from html.parser import HTMLParser
+
+        class Links(HTMLParser):
+            def __init__(self):
+                super().__init__()
+                self.found, self.at, self.text = [], None, ""
+
+            def handle_starttag(self, tag, attrs):
+                if tag == "a":
+                    self.at, self.text = dict(attrs), ""
+
+            def handle_data(self, data):
+                if self.at is not None:
+                    self.text += data
+
+            def handle_endtag(self, tag):
+                if tag == "a" and self.at is not None:
+                    a = self.at
+                    self.found.append((self.text.strip(), a.get("href"), a.get("target"), a.get("rel")))
+                    self.at = None
+
+        parser = Links()
+        parser.feed(html)
+        parser.close()
+        return parser.found
+
+    def fold(self, html: str, summary: str) -> str:
+        start = html.index(f"<summary>{summary}</summary>")
+        return html[start: html.index("</details>", start)]
+
+    def test_the_addresses_and_labels(self):
+        self.assertEqual(self.ui.PROJECT_LINKS, (("GitHub", self.GITHUB), ("Docs", self.DOCS)))
+        self.assertEqual((self.ui.GITHUB_URL, self.ui.DOCS_URL), (self.GITHUB, self.DOCS))
+        self.assertEqual(self.d.WIRE_FORMAT_URL, self.WIRE)
+        self.assertTrue(self.d.WIRE_FORMAT_URL.startswith(self.ui.DOCS_URL))
+        self.assertEqual(self.d.COPY["wire_docs"], "API docs")
+
+    def test_the_masthead_carries_them_for_every_model(self):
+        """The masthead sits above the tabs and is redrawn on every move and model change, always with the pair."""
+        for model in [None, *blink.models(), "someone/else"]:
+            for drafting in (False, True):
+                with self.subTest(model=model, drafting=drafting):
+                    head = self.ui.masthead(model, drafting=drafting)
+                    self.assertEqual(self.links(head), self.PAIR)
+                    row = head[head.index('<div class="blk-toprow">'): head.index('<p class="blk-lede">')]
+                    self.assertIn('<div class="blk-toplinks">', row)
+                    self.assertLess(row.index("<h1>"), row.index("blk-toplinks"))
+
+    def test_the_masthead_is_outside_every_tab(self):
+        gr = need_gradio(self)
+        self.addCleanup(reload_app)
+        app = reload_app()
+        demo = app.build()
+        try:
+            heads = [b for b in demo.blocks.values()
+                     if isinstance(b, gr.HTML) and 'class="blk-toplinks"' in str(b.value or "")]
+            self.assertEqual(len(heads), 1)
+            node, chain = heads[0], []
+            while node is not None:
+                chain.append(type(node).__name__)
+                node = getattr(node, "parent", None)
+            self.assertEqual(chain[-1], "Blocks")
+            self.assertNotIn("Tab", chain)
+            self.assertNotIn("Tabs", chain)
+            self.assertEqual(self.links(heads[0].value), self.PAIR)
+        finally:
+            demo.close()
+
+    def test_the_api_tab_links_the_wire_format_by_the_lede(self):
+        first = self.ui.api_blocks()[0]
+        self.assertEqual(self.links(first), [("API docs", self.WIRE, "_blank", "noopener")])
+        self.assertLess(first.index(self.ui.esc(self.d.COPY["lede"])), first.index(self.WIRE))
+
+    def test_the_api_steps_carry_the_source_and_the_docs(self):
+        steps = self.ui.api_steps()
+        self.assertEqual(self.links(steps), self.PAIR)
+        head = steps[: steps.index('<ol class="blk-steps">')]
+        self.assertIn(self.ui.esc(self.d.COPY["steps_label"]), head)
+        self.assertIn('class="blk-links"', head)
+        self.assertIn(steps, "".join(self.ui.api_blocks()))
+
+    def test_how_it_works_links_them_where_it_runs_the_model(self):
+        how = "".join(self.ui.how_blocks())
+        run = self.fold(how, "Running it yourself")
+        self.assertEqual(self.links(run), self.PAIR)
+        self.assertIn(self.ui.esc(self.ui.API_SNIPPET), run)
+        self.assertLess(run.index("blk-pre"), run.index('class="blk-links"'))
+        rest = how.replace(run, "")
+        self.assertFalse([a for a in self.links(rest) if a[1] in (self.GITHUB, self.DOCS)])
+
+    def test_every_new_link_opens_in_a_new_tab_under_its_own_label(self):
+        page = (self.ui.masthead() + "".join(self.ui.api_blocks()) + "".join(self.ui.how_blocks())
+                + "".join(self.ui.home_blocks()) + self.ui.home_external() + self.ui.footer())
+        ours = [a for a in self.links(page) if a[1] in (self.GITHUB, self.DOCS, self.WIRE)]
+        self.assertEqual(len(ours), 2 + 1 + 2 + 2)  # masthead, API lede, API steps, How it works
+        self.assertEqual({(a[0], a[1]) for a in ours},
+                         {("GitHub", self.GITHUB), ("Docs", self.DOCS), ("API docs", self.WIRE)})
+        for label, _, target, rel in ours:
+            with self.subTest(label=label):
+                self.assertEqual(target, "_blank")
+                self.assertIn("noopener", rel.split())
+
+    def test_the_space_card_links_them(self):
+        here = os.path.dirname(os.path.abspath(__file__))
+        with open(os.path.join(here, "README.md"), encoding="utf-8") as fh:
+            card = fh.read()
+        self.assertTrue(card.startswith("---\n"))
+        front, body = card[4:].split("\n---\n", 1)
+        line = ("**Code:** [GitHub](https://github.com/thegovind/blink) \u00b7 "
+                "**Docs:** [thegovind.github.io/blink](https://thegovind.github.io/blink/)")
+        self.assertEqual(body.count(line), 1)
+        self.assertIn(f"\n{line}\n", body)
+        self.assertNotIn("github", front.lower())
+        try:
+            import yaml
+        except ImportError:  # pragma: no cover - PyYAML comes with gradio
+            self.skipTest("PyYAML is not installed")
+        meta = yaml.safe_load(front)
+        self.assertEqual((meta["title"], meta["sdk"], meta["app_file"]), ("blink", "gradio", "app.py"))
+        self.assertEqual(str(meta["sdk_version"]), "6.28.0")
+        self.assertIn("thegovind/blink-4b", meta["models"])
+        self.assertIn("thegovind/blink-mimo-9b", meta["models"])
 
 
 if __name__ == "__main__":

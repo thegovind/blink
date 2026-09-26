@@ -125,6 +125,15 @@ footer {
   padding: 32px 0 0;
 }
 
+/* the name, and the project's links at the end of its line */
+.blk-toprow {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 4px 16px;
+}
+
 .blk-top h1 {
   font-family: var(--font-geist);
   font-weight: 600;
@@ -160,6 +169,63 @@ footer {
   color: var(--mid-c);
   max-width: 720px;
   margin: 8px 0 0;
+}
+
+/* quiet like the tabs, as in the docs site's own header */
+.blk-toplinks {
+  display: flex;
+  align-items: center;
+  gap: 2px;
+}
+
+.blk-toplinks a {
+  display: inline-flex;
+  align-items: center;
+  height: 32px;
+  padding: 0 12px;
+  border-radius: var(--radius-pill);
+  color: var(--mid-c) !important;
+  font-size: var(--text-body);
+  font-weight: 500;
+  line-height: 1;
+  text-decoration: none !important;
+  white-space: nowrap;
+  transition: background-color 0.15s ease, color 0.15s ease;
+}
+
+.blk-toplinks a:hover {
+  background: rgba(10, 10, 10, 0.05);
+  color: var(--ink) !important;
+}
+
+/* the same links inside a page, as pills */
+.blk-links {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin: 12px 0 0;
+}
+
+.blk-links a {
+  display: inline-flex;
+  align-items: center;
+  min-height: 28px;
+  padding: 0 12px;
+  border: 1px solid var(--line);
+  border-radius: var(--radius-pill);
+  background: var(--paper);
+  color: var(--ink) !important;
+  font-size: 13px;
+  font-weight: 500;
+  line-height: 1;
+  text-decoration: none !important;
+  white-space: nowrap;
+  transition: background-color 0.15s ease, border-color 0.15s ease;
+}
+
+.blk-links a:hover {
+  background: var(--alt);
+  border-color: var(--line-strong);
 }
 
 .blk-meta {
@@ -1060,6 +1126,12 @@ details.blk-d p {
   line-height: 1.6;
   color: var(--mid-c);
   max-width: 680px;
+}
+
+/* the fold's last row: gradio zeroes a last child's bottom margin, so the space is padding */
+details.blk-d > .blk-links {
+  margin: 0 0 0 16px;
+  padding-bottom: 14px;
 }
 
 .blk-pre {
@@ -2695,6 +2767,11 @@ body {
     font-size: 40px;
   }
 
+  .blk-toplinks a {
+    padding: 0 10px;
+    font-size: 13px;
+  }
+
   .blk-rule {
     margin: 20px 0 12px;
   }
@@ -3039,6 +3116,21 @@ body {
   font-size: var(--text-body);
   font-weight: 600;
   color: var(--ink);
+}
+
+/* the steps' label, with the source and the docs at the end of its line */
+.blk-stepshead {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px 12px;
+  margin: 0 0 10px;
+}
+
+.blk-stepshead > .blk-eyebrow,
+.blk-stepshead > .blk-links {
+  margin: 0;
 }
 
 /* inside a fold, code and tables line up with the text under the summary */

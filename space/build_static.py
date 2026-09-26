@@ -318,10 +318,7 @@ def space_readme(synthetic: bool) -> str:
         "`thegovind/blink-4b`. The weights are for non-commercial research use; see the model cards. "
         "The `license` above covers this Space's code. The Results tab shows what the model "
         "scores and on which edition of the benchmark.\n\n"
-        "Built from the app sources with `python build_static.py`.\n\n"
-        "---\n\n"
-        "Personal research release by thegovind. Not an official product of any company, "
-        "and not affiliated with TypeSafe AI or the Qwen team.\n"
+        "Built from the app sources with `python build_static.py`.\n"
     )
     if synthetic:
         body = f"> {SYNTHETIC_NOTE}\n\n" + body

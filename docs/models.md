@@ -6,4 +6,6 @@
 | [thegovind/blink-mimo-9b](https://huggingface.co/thegovind/blink-mimo-9b) | XiaomiMiMo/MiMo-V2.6-Distill-Qwen-9B | 18.8 GB | yes |
 | [thegovind/blink-27b](https://huggingface.co/thegovind/blink-27b) | Qwen/Qwen3.8-27B | 53.8 GB | no |
 
-Use code revision `v1.2`. Weights are unchanged since `v1.0`. Evaluation results are on each model card.
+Use code revision `v1.2`. Weights are unchanged since `v1.0`.
+
+Code: Apache-2.0. Weights: non-commercial research and evaluation only; see each model card's license.

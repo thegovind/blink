@@ -1,18 +1,20 @@
 # blink
 
-Send text or JSON state plus typed questions. Get a probability for every option in one forward pass, with no generated text.
+Send text or JSON state with typed questions. Each question gets a probability for every offered option from one forward pass. No generated text.
+
+Probabilities are over the offered options only, not certified chances of being right.
 
 ## Try it in the Space
 
-Test blink and find the API tab in the [live Space](https://huggingface.co/spaces/thegovind/blink).
+Open the [Space](https://huggingface.co/spaces/thegovind/blink) to try blink or use its API tab.
 
 ## Call the API
 
-Send `noul`, `choice`, and `score` questions with the [API guide](api.md).
+Follow the [API guide](api.md) to send `noul`, `choice`, and `score` questions.
 
 ## Give it to your agent
 
-Add the blink skill from the repo and use the [agent experience guide](agents.md).
+Copy the blink skill, then follow the [agent experience guide](agents.md).
 
 ## Quickstart
 
@@ -21,3 +23,5 @@ pip install "torch==2.13.0" "transformers==5.17.0" "flash-linear-attention==0.5.
 hf download thegovind/blink-4b --revision v1.2 --local-dir blink-4b
 python blink-4b/serve.py --model ./blink-4b --port 8000
 ```
+
+Code: Apache-2.0. Weights: non-commercial research and evaluation only; see each model card's license.

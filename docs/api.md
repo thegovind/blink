@@ -1,6 +1,6 @@
 # API
 
-blink's server is wire-compatible with TypeSafe's API.
+Point a TypeSafe SDK or plain HTTP client at blink's server. It is wire-compatible with TypeSafe's API.
 
 ## Endpoints
 
@@ -10,9 +10,9 @@ blink's server is wire-compatible with TypeSafe's API.
 | `GET` | `/v1/models` | Return the one served model |
 | `GET` | `/healthz` | Check server health |
 
-## Point a TypeSafe SDK at it
+## Point TypeSafe SDKs at blink
 
-Server-side TypeSafe Python and JavaScript SDKs work with:
+Set these variables in server-side Python or JavaScript:
 
 | Variable | Value |
 |---|---|
@@ -119,13 +119,15 @@ EOF
 
 ## Response
 
-Answers are keyed by question name.
+Read answers by question name.
 
 | Type | Answer fields |
 |---|---|
 | `noul` | Probability of yes |
 | `choice` | Picked option, option probabilities, confidence |
 | `score` | Expected level, legend, level probabilities, confidence |
+
+Probabilities are over the offered options only, not certified chances of being right.
 
 ```json
 {
@@ -166,20 +168,20 @@ Answers are keyed by question name.
 
 | Status | Meaning |
 |---|---|
-| `400` | The request is not a JSON object |
-| `401` | A required key is missing |
+| `400` | The body isn't a JSON object (or isn't valid JSON) |
+| `401` | The server has an API key and the request's key is missing or wrong |
 | `404` | Path not found |
 | `422` | Unsupported question or limit exceeded; the reason says which |
 | `500` | Server error |
 | `529` | Batching queue full; check `Retry-After` |
 
-Limits: 255 options, 2-10 score levels, 131,072 tokens per question, and 512 questions per request. Nothing is cut.
+Limits: 255 options per choice, 2-10 score levels, 131,072 tokens per question, and 512 questions per request. Requests over these limits fail; blink does not cut input.
 
-Set a key with `--api-key` or `BLINK_API_KEY`. Opt into batching with `--batch-window-ms 5`.
+Set an optional key with `--api-key` or `BLINK_API_KEY`. Enable batching with `--batch-window-ms 5`.
 
 ## The Space
 
-The Space is not a TypeSafe endpoint. Send the same fields through its Gradio API with `gradio_client`.
+Send the same fields to the Space with `gradio_client`. The Space is not a TypeSafe endpoint.
 
 ```python
 # pip install gradio_client
@@ -197,6 +199,6 @@ print(r["answers"]["urgent"]["noul"])
 
 ## Not supported
 
-- Cross-origin browser calls; there is no CORS support.
-- Rate limits or `429` responses.
+- Cross-origin browser calls (no CORS).
+- Rate limits and `429` responses.
 - One-level scores.

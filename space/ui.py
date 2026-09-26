@@ -74,6 +74,22 @@ def esc(s) -> str:
     return results._e(s)
 
 
+# --- the project outside this Space -------------------------------------------------
+# Every link to the code and the docs is built from here: beside the name on every tab,
+# beside the API tab's steps and in How it works. Each opens in a new tab.
+GITHUB_URL = "https://github.com/thegovind/blink"
+DOCS_URL = "https://thegovind.github.io/blink/"
+PROJECT_LINKS = (("GitHub", GITHUB_URL), ("Docs", DOCS_URL))
+
+
+def links_html(links=PROJECT_LINKS, cls: str = "blk-links") -> str:
+    items = "".join(
+        f'<a href="{esc(href)}" target="_blank" rel="noopener">{esc(label)}</a>'
+        for label, href in links
+    )
+    return f'<div class="{cls}">{items}</div>'
+
+
 # --- engine-dependent chrome --------------------------------------------------------
 
 
@@ -116,11 +132,7 @@ def demo_label() -> str:
 
 
 def footer() -> str:
-    return (
-        '<p class="blk-foot">Personal research release by thegovind. Not an official product '
-        "of any company, and not affiliated with TypeSafe AI, Xiaomi, Alibaba Cloud or the Qwen team. "
-        "Weights are for non-commercial research and evaluation; app code is Apache-2.0.</p>"
-    )
+    return '<p class="blk-foot">Weights are for non-commercial research and evaluation; app code is Apache-2.0.</p>'
 
 
 def error_html(msg: str) -> str:
@@ -847,8 +859,11 @@ def masthead(model: str | None = None, drafting: bool = False) -> str:
     """drafting=True on the tab where another model writes the request first."""
     return (
         '<div class="blk-top">'
+        '<div class="blk-toprow">'
         '<h1><span class="blk-word">blink<em class="blk-mark" aria-hidden="true"></em>'
         "</span></h1>"
+        + links_html(PROJECT_LINKS, "blk-toplinks")
+        + "</div>"
         f'<p class="blk-lede">{esc(MAST["ask_lede"] if drafting else MAST["lede"])}</p>'
         '<div class="blk-meta">'
         f'<span class="key">{esc(model or blink.MODEL_ID)}</span>'
@@ -1110,7 +1125,8 @@ def how_blocks() -> list[str]:
         f'<div class="blk-pre">{esc(API_SNIPPET)}</div>'
         "<p>BLINK_MODEL picks the model, BLINK_TEMPERATURE the readout temperature. The "
         "weights are for non-commercial research use; see the model cards.</p>"
-        "</details>",
+        + links_html()
+        + "</details>",
     ]
 
 
@@ -1163,7 +1179,8 @@ def api_table() -> str:
 def api_steps() -> str:
     c = api_doc.COPY
     items = "".join(f"<li><b>{esc(title)}</b><code>{esc(code)}</code></li>" for title, code in c["steps"])
-    return f'<p class="blk-eyebrow">{esc(c["steps_label"])}</p><ol class="blk-steps">{items}</ol>'
+    return (f'<div class="blk-stepshead"><p class="blk-eyebrow">{esc(c["steps_label"])}</p>{links_html()}</div>'
+            f'<ol class="blk-steps">{items}</ol>')
 
 
 def _api_fold(summary: str, inner: str) -> str:
@@ -1215,7 +1232,8 @@ def api_blocks() -> list[str]:
     )
     diff = "<ul>" + "".join(f"<li>{esc(n)}</li>" for n in c["diff_notes"]) + "</ul>"
     return [
-        f'<h2 class="blk-h2">{esc(c["heading"])}{draft}</h2><p class="blk-note">{esc(c["lede"])}</p>',
+        f'<h2 class="blk-h2">{esc(c["heading"])}{draft}</h2><p class="blk-note">{esc(c["lede"])}</p>'
+        + links_html(((c["wire_docs"], d.WIRE_FORMAT_URL),)),
         api_table(),
         api_steps(),
         '<div class="blk-api">'

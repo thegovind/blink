@@ -8,7 +8,7 @@ lint:
 	python -m ruff check blink examples scripts space lab site
 
 serve:
-	python -m blink.server --model $${BLINK_MODEL:-thegovind/blink-4b} --revision $${BLINK_REVISION:-v1.0} --port $${PORT:-8000}
+	python -m blink.server --model $${BLINK_MODEL:-thegovind/blink-4b} --revision $${BLINK_REVISION:-v1.2} --port $${PORT:-8000}
 
 space:
 	cd space && BLINK_MOCK=1 BLINK_PORT=$${PORT:-7860} python app.py
