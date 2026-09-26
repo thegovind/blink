@@ -9,6 +9,7 @@ import os
 import sys
 
 from playwright.async_api import async_playwright
+import live  # noqa: E402  (live-Space allowances: shots/live.py)
 
 URL = os.environ.get("BLINK_URL", "http://127.0.0.1:7898/").rstrip("/")
 OUT = os.path.dirname(os.path.abspath(__file__))
@@ -47,7 +48,7 @@ async def type_into(page, locator, text: str) -> None:
     await page.wait_for_timeout(500)
 
 
-async def settled(page, timeout: int = 25000) -> None:
+async def settled(page, timeout: int = live.answer_wait(25000)) -> None:
     """Wait out the run itself.
 
     The skeleton is the only honest signal: the card already on screen belongs to the
@@ -77,9 +78,10 @@ async def main() -> int:
     async with async_playwright() as pw:
         browser = await pw.chromium.launch()
         page = await browser.new_page(viewport={"width": 1280, "height": 900}, device_scale_factor=2)
+        await live.sign_in(page)
         page.on("pageerror", lambda e: problems.append(f"pageerror: {e}"))
         page.on("console", lambda m: problems.append(f"console.error: {m.text}")
-                if m.type == "error" else None)
+                if live.app_error(m) else None)
         await page.goto(URL + "/?tab=playground", wait_until="load")
         await page.wait_for_selector(".blk-qrow", timeout=30000)
         await page.wait_for_timeout(1800)

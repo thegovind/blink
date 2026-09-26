@@ -23,14 +23,14 @@
   {
     "dest": "space/ui.py",
     "reason": "",
-    "sha256": "3e71dd17e831a3492099c89a5f0894f0a7b574ad4b400b3d0824eaaff1489f2b",
+    "sha256": "87cc06b88bc4df508cf46c7534bd091c5dffe8ff66b00dcb864a8c81cfabfd92",
     "src": "space/ui.py",
     "transform": "scrub_python"
   },
   {
     "dest": "space/api_doc.py",
     "reason": "",
-    "sha256": "a3dc6b3adf6b49fd87dfeb4110a5b9af31f6a1fad585e660195ef76d4b4570e0",
+    "sha256": "1f1a110efcfc706ada7e5a16ef15db6c52e0c5ba1cbf6e4cce556c0fb99a8322",
     "src": "space/api_doc.py",
     "transform": "scrub_python"
   },
@@ -93,7 +93,7 @@
   {
     "dest": "space/test_blink.py",
     "reason": "",
-    "sha256": "05f3d3b2e459cd04ff23fe2a8d2332d0052c6d862027404e4606bc244e103f8a",
+    "sha256": "493bc0da698afb68357272a28bc1ec30ec24ef7c938d4624d0d2256d98bd11b2",
     "src": "space/test_blink.py",
     "transform": "scrub_python"
   },
@@ -149,7 +149,7 @@
   {
     "dest": "space/shots/check_api.py",
     "reason": "browser check",
-    "sha256": "bbe8359d4b357cb7f42a4c346233a5b58910a9d314d48152461432da0158f97b",
+    "sha256": "41697c6139c7d054842db640363ce10deedd7c072fbc92e0b2b2d5d2460a5c9d",
     "src": "space/shots/check_api.py",
     "transform": "scrub_python"
   },
@@ -184,14 +184,14 @@
   {
     "dest": "space/shots/check_deeplinks.py",
     "reason": "browser check",
-    "sha256": "26f8a2021cac26a8b5dc75228f81583bc7cadc791f423c1b9e37167f13c31adb",
+    "sha256": "2f21080954bd7f623a8df22824d72078f75faa2e0bd1ef9d67b4fd31506091e7",
     "src": "space/shots/check_deeplinks.py",
     "transform": "scrub_python"
   },
   {
     "dest": "space/shots/check_integrity.py",
     "reason": "browser check",
-    "sha256": "da16ac61b8877fd04b3626444d38eb9eabe3c246ff8abf6e6664a602f93533a1",
+    "sha256": "d2884392b7a6806c26b0f09484c80ae6623f9a0112fa64f007cccfdb9e9d1c5b",
     "src": "space/shots/check_integrity.py",
     "transform": "scrub_python"
   },
@@ -212,7 +212,7 @@
   {
     "dest": "space/shots/check_questions.py",
     "reason": "browser check",
-    "sha256": "60f6f6371937f43b57ea60823fcc01916d19757cf22953c0ae4782ee64160ee2",
+    "sha256": "e9231f9dac14014b4ed548a33b90764e36e645851a1b0c4faea20c4c66cf4fa9",
     "src": "space/shots/check_questions.py",
     "transform": "scrub_python"
   },
@@ -238,6 +238,13 @@
     "transform": "scrub_python"
   },
   {
+    "dest": "space/shots/live.py",
+    "reason": "browser check",
+    "sha256": "1ecb293de21d384a7dd54b6ffd0325aedf46e5b6ae21071e5c53e55732edb866",
+    "src": "space/shots/live.py",
+    "transform": "scrub_python"
+  },
+  {
     "dest": "space/README.md",
     "reason": "",
     "sha256": "3ffa093b20db94dbeced4ab68b79c531739109f003d4cbaf8b93a93db2765f65",
@@ -254,7 +261,7 @@
   {
     "dest": "space/test_serve.py",
     "reason": "HTTP server test",
-    "sha256": "062affec0e17a787643f03429733f222a134480f9ef7ee2f28f9cfddf4bfcd8d",
+    "sha256": "456a9950a316f6de64cb24f98935202766bcd89cda9c1179f0e2625e3886e236",
     "src": "release/test_serve.py",
     "transform": "scrub_python"
   },
@@ -1094,7 +1101,7 @@
   {
     "dest": "README.md",
     "reason": "repository scaffold",
-    "sha256": "a9e6c66b131e0fb53998da8d43ff0f6cc01d71b705fc5e1d010c4c1bce30aebd",
+    "sha256": "f14e5671f4f48f52ac71a79a7850efdd0faa20440413f0437c1fdb95929582ec",
     "src": "<generated>",
     "transform": "generate"
   },

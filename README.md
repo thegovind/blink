@@ -38,7 +38,7 @@ Methods and caveats: [docs/RESULTS.md](docs/RESULTS.md) and
 git clone https://github.com/thegovind/blink
 cd blink
 pip install -e ".[serve]"
-hf download thegovind/blink-4b --revision v1.0 --local-dir ./models/blink-4b
+hf download thegovind/blink-4b --revision v1.2 --local-dir ./models/blink-4b
 python -m blink.server --model ./models/blink-4b --port 8000
 ```
 

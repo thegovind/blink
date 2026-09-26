@@ -3460,6 +3460,19 @@ class TestApiTab(unittest.TestCase):
         self.assertEqual(list(out), ["model", "answers", "usage", "meta"])
         for key in ('"model": "thegovind/blink-4b"', '"output_tokens": 0', '"meta"'):
             self.assertIn(key, self.d.SPACE_REPLY)
+        # the documented reply is a live one: the same structure, with the two timings a live engine adds
+        lines = self.d.SPACE_REPLY.splitlines()
+        self.assertEqual(lines[0], "event: complete")
+        (reply,) = json.loads(lines[1].removeprefix("data: "))
+        self.assertEqual(list(reply), list(out))
+        self.assertEqual({q: list(a) for q, a in reply["answers"].items()}, {q: list(a) for q, a in out["answers"].items()})
+        self.assertEqual(list(reply["usage"]), ["input_tokens", "output_tokens"])
+        self.assertEqual(list(reply["meta"]), list(out["meta"]) + ["model_ms", "prefill_tokens"])
+        self.assertEqual(reply["model"], "thegovind/blink-4b")
+        noul = reply["answers"]["urgent"]
+        self.assertAlmostEqual(noul["probabilities"]["yes"] + noul["probabilities"]["no"], 1.0, places=3)
+        self.assertEqual(noul["noul"], round(noul["noul"], 3))
+        self.assertIn("latency_ms and model_ms vary", lines[-1])
 
     def test_python_snippets_compile(self):
         for name in ("PYTHON_CLIENT", "SPACE_PYTHON"):
@@ -3474,6 +3487,16 @@ class TestApiTab(unittest.TestCase):
         self.assertTrue(lines)
         for line in lines:
             self.assertIn("--revision v1.2", line)
+
+    def test_the_how_it_works_snippet_uses_the_same_revision(self):
+        """How it works runs blink.py in-process; it downloads the same code revision the API tab pins."""
+        snippet = self.ui.API_SNIPPET
+        self.assertIn(f'os.environ["BLINK_REVISION"] = "{self.d.CODE_REVISION}"', snippet)
+        self.assertIn(f'hf_hub_download("thegovind/blink-4b", "blink.py", revision="{self.d.CODE_REVISION}")', snippet)
+        self.assertNotIn("v1.0", snippet)
+        self.assertNotIn("@REVISION@", snippet)
+        compile(snippet, "API_SNIPPET", "exec")
+        self.assertIn(self.ui.esc(snippet), "".join(self.ui.how_blocks()))
 
     def test_the_table_is_complete(self):
         marks = {k for k, _ in self.d.COPY["legend"]}

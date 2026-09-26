@@ -16,6 +16,7 @@ from playwright.async_api import async_playwright
 HERE = os.path.dirname(os.path.abspath(__file__))
 sys.path.insert(0, os.path.dirname(HERE))
 import api_doc  # noqa: E402  (pure python: the tab's copy and examples)
+import live  # noqa: E402  (live-Space allowances: shots/live.py)
 
 URL = os.environ.get("BLINK_URL", "http://127.0.0.1:7962/").rstrip("/")
 OUT = os.environ.get("BLINK_SHOTS") or HERE
@@ -80,7 +81,7 @@ async def fresh(browser, size, scheme="light"):
     page = await ctx.new_page()
     errors: list[str] = []
     page.on("pageerror", lambda e: errors.append(f"pageerror: {e}"))
-    page.on("console", lambda m: errors.append(f"console.error: {m.text}") if m.type == "error" else None)
+    page.on("console", lambda m: errors.append(f"console.error: {m.text}") if live.app_error(m) else None)
     return ctx, page, errors
 
 

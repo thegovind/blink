@@ -1041,13 +1041,14 @@ DEMO_Q = {
     "criteria": {"billing": "Charges and refunds", "technical": "Errors and outages"},
 }
 
+# the model repos' code revision, the one the API tab pins (api_doc.CODE_REVISION)
 API_SNIPPET = """# pip install "torch==2.13.0" "transformers==5.17.0" "flash-linear-attention==0.5.2" "accelerate>=1.1.0" safetensors huggingface_hub
 import os, sys
 from huggingface_hub import hf_hub_download
 
 os.environ["BLINK_MODEL"] = "thegovind/blink-4b"
-os.environ["BLINK_REVISION"] = "v1.0"
-sys.path.insert(0, os.path.dirname(hf_hub_download("thegovind/blink-4b", "blink.py", revision="v1.0")))
+os.environ["BLINK_REVISION"] = "@REVISION@"
+sys.path.insert(0, os.path.dirname(hf_hub_download("thegovind/blink-4b", "blink.py", revision="@REVISION@")))
 import blink
 
 out = blink.decide(
@@ -1061,7 +1062,7 @@ out = blink.decide(
         "urgent": {"type": "noul", "instructions": "Does this need an answer today?"},
     },
 )
-print(out["answers"]["queue"]["probabilities"])"""
+print(out["answers"]["queue"]["probabilities"])""".replace("@REVISION@", api_doc.CODE_REVISION)
 
 
 def how_blocks() -> list[str]:

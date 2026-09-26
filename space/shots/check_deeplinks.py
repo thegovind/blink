@@ -12,6 +12,7 @@ import os
 import sys
 
 from playwright.async_api import async_playwright
+import live  # noqa: E402  (live-Space allowances: shots/live.py)
 
 URL = os.environ.get("BLINK_URL", "http://127.0.0.1:7897/").rstrip("/")
 OUT = os.path.dirname(os.path.abspath(__file__))
@@ -47,7 +48,7 @@ async def main() -> int:
         page = await browser.new_page(viewport={"width": 1280, "height": 900}, device_scale_factor=2)
         page.on("pageerror", lambda e: problems.append(f"pageerror: {e}"))
         page.on("console", lambda m: problems.append(f"console.error: {m.text}")
-                if m.type == "error" else None)
+                if live.app_error(m) else None)
 
         async def opens(link, want_tab, want_case):
             """Wait for the view the link names rather than for a guess at how long."""

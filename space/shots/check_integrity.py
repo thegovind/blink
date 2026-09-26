@@ -12,6 +12,7 @@ import os
 import sys
 
 from playwright.async_api import async_playwright
+import live  # noqa: E402  (live-Space allowances: shots/live.py)
 
 URL = os.environ.get("BLINK_URL", "http://127.0.0.1:7911/").rstrip("/")
 OUT = os.path.dirname(os.path.abspath(__file__))
@@ -59,7 +60,15 @@ async def write_json(page, text: str) -> None:
 
 async def decide(page):
     await page.get_by_role("button", name="Decide", exact=True).first.click()
-    await page.wait_for_timeout(2200)
+    if not live.WAIT_MS:
+        await page.wait_for_timeout(2200)
+        return
+    try:  # a live run shows pending cards until it lands; a refused request never shows them
+        await page.wait_for_selector('[aria-busy="true"]', timeout=4000)
+        await page.wait_for_selector('[aria-busy="true"]', state="detached", timeout=live.WAIT_MS)
+    except Exception:  # noqa: BLE001
+        pass
+    await page.wait_for_timeout(1200)
 
 
 async def main() -> int:
@@ -74,9 +83,10 @@ async def main() -> int:
         browser = await pw.chromium.launch()
         page = await browser.new_page(viewport={"width": 1280, "height": 900},
                                       device_scale_factor=2)
+        await live.sign_in(page)
         page.on("pageerror", lambda e: problems.append(f"pageerror: {e}"))
         page.on("console", lambda m: problems.append(f"console.error: {m.text}")
-                if m.type == "error" else None)
+                if live.app_error(m) else None)
         await page.goto(URL + "/?tab=playground", wait_until="load")
         await page.wait_for_selector(".blk-qrow", timeout=30000)
         await page.wait_for_timeout(1800)
@@ -127,7 +137,7 @@ async def main() -> int:
 
         # after bad JSON, Decide must not fall back to whatever ran last
         await page.get_by_role("button", name="Support ticket", exact=True).first.click()
-        await page.wait_for_selector(".blk-q .blk-q-head h4", timeout=25000)
+        await page.wait_for_selector(".blk-q .blk-q-head h4", timeout=live.answer_wait(25000))
         await page.wait_for_timeout(1200)
         keys = await page.evaluate(CARD_KEYS)
         ok(f"a preset answers again: {keys[:1]}", keys[:1] == ["queue"])
@@ -145,7 +155,7 @@ async def main() -> int:
 
         # one click, one row
         await page.get_by_role("button", name="Invoice email", exact=True).first.click()
-        await page.wait_for_selector(".blk-q .blk-q-head h4", timeout=25000)
+        await page.wait_for_selector(".blk-q .blk-q-head h4", timeout=live.answer_wait(25000))
         await page.wait_for_timeout(1200)
         async def add_one(want: int) -> int:
             """One click, then wait for it to land: a second click cannot overtake it."""

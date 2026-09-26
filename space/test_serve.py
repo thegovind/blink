@@ -25,12 +25,14 @@ from unittest import mock
 
 HERE = os.path.dirname(os.path.abspath(__file__))
 # research tree: release/serve.py beside space/; public tree: space/test_serve.py with serve.py at the root
-for d in (os.path.join(HERE, "..", "space"), HERE):
-    if os.path.exists(os.path.join(d, "blink.py")):
-        sys.path.insert(0, d)
-        break
+# serve.py's folder goes on the path first, then blink.py's in front of it, so `import blink` finds space/blink.py
+# even where the public tree's root also holds a `blink` package
 for d in (HERE, os.path.join(HERE, "..")):
     if os.path.exists(os.path.join(d, "serve.py")):
+        sys.path.insert(0, d)
+        break
+for d in (os.path.join(HERE, "..", "space"), HERE):
+    if os.path.exists(os.path.join(d, "blink.py")):
         sys.path.insert(0, d)
         break
 os.environ.setdefault("BLINK_MOCK", "1")

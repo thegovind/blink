@@ -106,7 +106,7 @@ COPY = {
         "A score needs at least two levels; a one-level score gets 422.",
         "The model list has one entry, the served model, with a blank release_date.",
         "Responses from /v1/systemone and /v1/models carry an x-typesafe-request-id header.",
-        "Browser apps cannot call the server directly because it sends no CORS headers.",
+        "Cross-origin browser calls are unsupported; the server sends no CORS headers.",
     ),
 }
 
@@ -338,5 +338,8 @@ ID=$(curl -s -X POST $URL -H "Content-Type: application/json" \\
   -d '{json.dumps({"data": SPACE_DATA})}' | cut -d'"' -f4)
 curl -s -N $URL/$ID"""
 
+# the live Space's reply to SPACE_DATA (2026-09-26, blink-4b), numbers rounded to three decimals like the tab's
+# other examples; the timings are one warm call's and are marked as varying
 SPACE_REPLY = """event: complete
-data: [{"model": "thegovind/blink-4b", "answers": {"urgent": {"type": "noul", "noul": …, "probabilities": {…}}}, "usage": {"input_tokens": …, "output_tokens": 0}, "meta": {…}}]"""
+data: [{"model": "thegovind/blink-4b", "answers": {"urgent": {"type": "noul", "noul": 0.328, "probabilities": {"yes": 0.328, "no": 0.672}}}, "usage": {"input_tokens": 98, "output_tokens": 0}, "meta": {"model": "thegovind/blink-4b", "engine": "torch", "temperature": 1.0, "input_tokens": 98, "generated_tokens": 0, "latency_ms": 262.7, "model_ms": 84.7, "prefill_tokens": 98}}]
+# latency_ms and model_ms vary from call to call"""
