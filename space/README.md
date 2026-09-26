@@ -33,6 +33,8 @@ Switch between them in Playground, Ask or Use cases; every click runs the select
 
 **Ask:** type a question in the Ask tab. [Qwen/Qwen3.5-4B](https://huggingface.co/Qwen/Qwen3.5-4B) drafts the question and its options, blink answers it in one pass, and Open in Playground lets you edit the draft and run it again. Drafting is the only step that writes text; blink's answer generates none.
 
+**API:** See the API tab to use TypeSafe clients with your own blink server or call this Space through its Gradio API.
+
 ## Results
 
 | Decision Index 0.1 (archived) | Index |

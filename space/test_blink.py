@@ -370,6 +370,26 @@ class TestAssembly(unittest.TestCase):
         self.assertEqual(a["choice"], "2")
         self.assertEqual(a["legend"]["1"], "some")
 
+    def test_score_confidence_is_the_choice_formula_over_levels(self):
+        """TypeSafe's score answers carry confidence; blink's is the formula its choice answers use, (K*p_max-1)/(K-1),
+        which reproduces TypeSafe's documented examples. It comes after the fields blink always had."""
+        q = {"type": "score", "criteria": ["none", "some", "lots"]}
+        a = blink.answer_for(q, ["0", "1", "2"], [0.2, 0.3, 0.5])
+        self.assertAlmostEqual(a["confidence"], (0.5 - 1 / 3) / (1 - 1 / 3))
+        self.assertEqual(list(a), ["type", "score", "probabilities", "legend", "choice", "confidence"])
+        for probs, documented in (([0.0, 0.76, 0.24], 0.64), ([0.0, 0.72, 0.28], 0.58), ([0.0, 0.57, 0.43], 0.35)):
+            got = blink.answer_for(q, ["0", "1", "2"], probs)["confidence"]
+            self.assertAlmostEqual(got, documented, delta=0.0051)  # docs.typesafe.ai/primitives/score, 2 decimals
+
+    def test_score_confidence_stays_in_range(self):
+        for n in range(2, 11):
+            q = {"type": "score", "criteria": [str(i) for i in range(n)]}
+            keys = [str(i) for i in range(n)]
+            flat = blink.answer_for(q, keys, [1.0] * n)["confidence"]
+            sure = blink.answer_for(q, keys, [0.0] * (n - 1) + [1.0])["confidence"]
+            self.assertTrue(0.0 <= flat <= 1e-12, (n, flat))
+            self.assertEqual(sure, 1.0)
+
     def test_probabilities_are_renormalised(self):
         q = {"type": "choice", "criteria": {"a": "", "b": ""}}
         a = blink.answer_for(q, ["a", "b"], [2.0, 2.0])
@@ -1536,12 +1556,13 @@ class TestDeepLinks(unittest.TestCase):
     def test_the_slugs_cover_every_tab_and_case(self):
         self.assertEqual(
             self.ui.TAB_IDS,
-            ("home", "playground", "ask", "use-cases", "results", "how-it-works"),
+            ("home", "playground", "ask", "use-cases", "results", "how-it-works", "api"),
         )
         self.assertEqual(self.ui.DEFAULT_TAB, "home")
         self.assertEqual(self.ui.HOME_TAB, "home")
         self.assertEqual(self.ui.ASK_TAB, "ask")
         self.assertEqual(self.ui.CASE_TAB, "use-cases")
+        self.assertEqual(self.ui.API_TAB, "api")
         self.assertEqual(self.ui.CASE_IDS, tuple(c.key for c in examples.USE_CASES))
         self.assertIn("nextclick", self.ui.CASE_IDS)
 
@@ -3342,6 +3363,176 @@ class TestSystemoneEndpoint(unittest.TestCase):
         with self.assertRaises(gr.Error) as caught:
             self.app.systemone("x", {})
         self.assertIn("non-empty", str(caught.exception))
+
+    def test_the_response_carries_typesafes_fields_then_meta(self):
+        out = self.app.systemone("My card was charged twice.", self.q)
+        self.assertEqual(list(out), ["model", "answers", "usage", "meta"])
+        self.assertEqual(out["model"], out["meta"]["model"])
+        self.assertEqual(out["usage"], {"input_tokens": out["meta"]["input_tokens"], "output_tokens": 0})
+        self.assertEqual(out["answers"], blink.decide("My card was charged twice.", self.q)["answers"])
+
+    def test_typesafe_model_names_get_the_default_model(self):
+        import gradio as gr
+
+        for name in ("jev-latest", "JEV-1.13.0", "jev-preview", " jev "):
+            with self.subTest(name=name):
+                self.assertEqual(self.app.systemone("x", self.q, None, name)["model"], blink.MODEL_ID)
+        with self.assertRaises(gr.Error) as caught:  # a blink model this deployment doesn't serve is still an error
+            self.app.systemone("x", self.q, None, "thegovind/blink-9b")
+        self.assertIn("unknown model", str(caught.exception))
+
+    def test_the_state_may_be_json(self):
+        state = {"message": "My card was charged twice.", "order": "A-104"}
+        want = blink.decide(state, self.q)["answers"]
+        self.assertEqual(self.app.systemone(state, self.q)["answers"], want)
+        self.assertEqual(self.app.systemone(json.dumps(state), self.q)["answers"], want)
+
+
+class TestApiTab(unittest.TestCase):
+    """The API tab: its copy lives in api_doc, and every example is the real thing."""
+
+    def setUp(self):
+        import api_doc
+        import ui
+
+        self.d, self.ui = api_doc, ui
+
+    def test_the_tab_has_a_slug_and_deep_links(self):
+        self.assertIn(("api", "API"), self.ui.TABS)
+        for raw in ("?tab=api", "#api", "?tab=API", "?__theme=dark&tab=api"):
+            self.assertEqual(self.ui.parse_deep_link(raw), ("api", None))
+
+    def test_the_example_response_is_blink_4bs_saved_answer(self):
+        """What serve.py returns for EXAMPLE_REQUEST, from blink-4b's saved logits, rounded to three decimals."""
+        req, saved = self.d.EXAMPLE_REQUEST, blink._ENGINE
+        blink._ENGINE = blink.ReplayEngine(blink.replay_path("thegovind/blink-4b"))
+        try:
+            out = blink.decide(req["state"], req["questions"])
+        finally:
+            blink._ENGINE = saved
+        self.assertEqual((out["meta"]["model"], out["meta"]["engine"]), ("thegovind/blink-4b", "replay"))
+
+        def r3(x):
+            if isinstance(x, float):
+                return round(x, 3)
+            if isinstance(x, dict):
+                return {k: r3(v) for k, v in x.items()}
+            return x
+
+        served = {"model": self.d.SERVED_AS, "answers": out["answers"],
+                  "usage": {"input_tokens": out["meta"]["input_tokens"], "output_tokens": 0}}
+        self.assertEqual(json.dumps(r3(served)), json.dumps(self.d.EXAMPLE_RESPONSE))  # values and order
+
+    def test_every_example_request_is_one_blink_accepts(self):
+        for qs in (self.d.EXAMPLE_REQUEST["questions"], self.d.SHORT_REQUEST["questions"], self.d.SPACE_QUESTIONS):
+            blink.validate(qs)
+        self.assertEqual(self.d.EXAMPLE_REQUEST["questions"], json.loads(examples.PLAYGROUND_QUESTIONS))
+
+    def test_the_refusal_is_blinks_own(self):
+        with self.assertRaises(blink.BlinkError) as caught:
+            blink.validate(self.d.REFUSED_REQUEST["questions"])
+        reason = str(caught.exception)
+        self.assertEqual(self.d.REFUSED_BODY, {
+            "error": reason, "detail": [{"loc": ["body", "questions", "urgency"], "msg": reason,
+                                         "type": "value_error"}]})
+        self.assertEqual(self.d.UNAUTHORIZED_BODY["error"], self.d.UNAUTHORIZED_BODY["detail"])
+
+    def test_json_blocks_round_trip(self):
+        for obj in (self.d.EXAMPLE_REQUEST, self.d.EXAMPLE_RESPONSE, self.d.REFUSED_REQUEST, self.d.REFUSED_BODY,
+                    self.d.UNAUTHORIZED_BODY, self.d.MODELS_BODY, self.d.SHORT_REQUEST):
+            self.assertEqual(json.loads(self.d.pretty(obj)), obj)
+        body = self.d.HTTP_CLIENT.split("<<'EOF'\n", 1)[1].rsplit("\nEOF", 1)[0]
+        self.assertEqual(json.loads(body), self.d.SHORT_REQUEST)
+        self.assertIn(f"{self.d.SERVER_URL}/v1/systemone", self.d.HTTP_CLIENT)
+
+    def test_the_space_examples_match_the_endpoint(self):
+        gr = need_gradio(self)
+        del gr
+        self.addCleanup(reload_app)
+        app = reload_app()
+        self.assertEqual(list(inspect.signature(app.systemone).parameters),
+                         ["state", "questions", "temperature", "model"])
+        data = json.loads(re.search(r"-d '(\{.*\})'", self.d.SPACE_CURL).group(1))["data"]
+        self.assertEqual(data, [self.d.SPACE_STATE, self.d.SPACE_QUESTIONS, None, "thegovind/blink-4b"])
+        self.assertIn("/gradio_api/call/v1_systemone", self.d.SPACE_CURL)
+        self.assertIn('api_name="/v1_systemone"', self.d.SPACE_PYTHON)
+        out = app.systemone(*data)
+        self.assertEqual(list(out), ["model", "answers", "usage", "meta"])
+        for key in ('"model": "thegovind/blink-4b"', '"output_tokens": 0', '"meta"'):
+            self.assertIn(key, self.d.SPACE_REPLY)
+
+    def test_python_snippets_compile(self):
+        for name in ("PYTHON_CLIENT", "SPACE_PYTHON"):
+            compile(getattr(self.d, name), name, "exec")
+
+    def test_downloads_pin_the_code_revision(self):
+        """Every model download the tab shows gets the code revision that has this serve.py and blink.py."""
+        self.assertEqual(self.d.CODE_REVISION, "v1.2")
+        texts = [v for v in vars(self.d).values() if isinstance(v, str)]
+        texts += [s for v in self.d.COPY.values() for s in (v if isinstance(v, tuple) else (v,)) if isinstance(s, str)]
+        lines = [line for t in texts for line in t.splitlines() if "hf download" in line or "hf_hub_download" in line]
+        self.assertTrue(lines)
+        for line in lines:
+            self.assertIn("--revision v1.2", line)
+
+    def test_the_table_is_complete(self):
+        marks = {k for k, _ in self.d.COPY["legend"]}
+        self.assertEqual(len(self.d.TABLE_COLS), 4)
+        for row in self.d.TABLE_ROWS:
+            self.assertEqual(len(row), 4, row)
+            self.assertIn(row[2][0], marks)
+            self.assertIn(row[3][0], marks)
+
+    def test_the_blocks_show_all_the_copy(self):
+        html = "".join(self.ui.api_blocks())
+
+        def strings(x):
+            if isinstance(x, str):
+                yield x
+            elif isinstance(x, (tuple, list)):
+                for v in x:
+                    yield from strings(v)
+
+        for key, value in self.d.COPY.items():
+            for s in strings(value):
+                with self.subTest(key=key, s=s[:40]):
+                    self.assertIn(self.ui.esc(s), html)
+        for row in self.d.TABLE_ROWS:
+            self.assertIn(self.ui.esc(row[1]), html)
+        self.assertEqual("blk-copytag" in html, self.d.DRAFT)
+        for code in (self.d.SERVER_RUN, self.d.DOCKER_RUN, self.d.PYTHON_CLIENT, self.d.JS_CLIENT,
+                     self.d.HTTP_CLIENT, self.d.SPACE_PYTHON, self.d.SPACE_CURL):
+            self.assertIn(self.ui.esc(code), html)
+
+    def test_the_tab_is_built(self):
+        gr = need_gradio(self)
+        self.addCleanup(reload_app)
+        app = reload_app()
+        demo = app.build()
+        try:
+            tabs = {b.id: b.label for b in demo.blocks.values() if isinstance(b, gr.Tab)}
+        finally:
+            demo.close()
+        self.assertEqual(tabs.get("api"), "API")
+
+    def test_every_local_module_the_space_imports_is_staged(self):
+        import ast
+
+        try:
+            import stage_space
+        except ImportError:
+            self.skipTest("stage_space.py, the Space upload tool, is not in this repository")
+
+        here = os.path.dirname(os.path.abspath(__file__))
+        for f in (f for f in stage_space.FILES if f.endswith(".py")):
+            with open(os.path.join(here, f), encoding="utf-8") as fh:
+                tree = ast.parse(fh.read())
+            names = {a.name.split(".")[0] for n in ast.walk(tree) if isinstance(n, ast.Import) for a in n.names}
+            names |= {n.module.split(".")[0] for n in ast.walk(tree) if isinstance(n, ast.ImportFrom) and n.module}
+            for name in names:
+                if os.path.exists(os.path.join(here, f"{name}.py")):
+                    with self.subTest(file=f, module=name):
+                        self.assertIn(f"{name}.py", stage_space.FILES)
 
 
 if __name__ == "__main__":

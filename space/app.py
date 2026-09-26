@@ -12,6 +12,7 @@ from __future__ import annotations
 import inspect
 import json
 import os
+import re
 import time
 import traceback
 
@@ -198,6 +199,8 @@ PLAYGROUND_PRESETS = ui.PLAYGROUND_PRESETS
 
 MODELS = blink.models()
 MULTI = len(MODELS) > 1
+# TypeSafe's model names and aliases: jev-latest, jev-preview, jev-1.13.0
+TYPESAFE_NAME = re.compile(r"^jev(?:-[\w.]+)?$", re.IGNORECASE)
 
 
 def model_switch():
@@ -681,22 +684,35 @@ def how_tab():
         gr.HTML(block)
 
 
+def api_tab():
+    """Static: using blink with TypeSafe API clients, and calling this Space. Nothing here calls a model."""
+    for block in ui.api_blocks():
+        gr.HTML(block)
+
+
 # --- api ----------------------------------------------------------------------------
 
 
 def systemone(state: str, questions: dict, temperature: float | None = None,
               model: str | None = None) -> dict:
-    """TypeSafe /v1/systemone-shaped endpoint: {state, questions} -> {answers, meta}.
-    `questions` may also arrive as a JSON string; a request blink can't answer comes back as its reason."""
+    """TypeSafe /v1/systemone-shaped endpoint: {state, questions, model?} -> {model, answers, usage, meta}.
+    `state` may be text or JSON (a JSON-looking string is parsed); `questions` may also arrive as a JSON string.
+    `model` picks a served blink model; TypeSafe's names (jev-latest, jev-1.13.0, ...) get the default one, as
+    serve.py answers every name. A request blink can't answer comes back as its reason."""
     if isinstance(questions, str):
         try:
             questions = json.loads(questions)
         except json.JSONDecodeError as exc:
             raise gr.Error(f"questions is not valid JSON: {exc}") from None
+    if isinstance(model, str) and model not in MODELS and TYPESAFE_NAME.match(model.strip()):
+        model = None
     try:
-        return blink.decide(as_state(state), questions, temperature=temperature, model=model)
+        out = blink.decide(as_state(state), questions, temperature=temperature, model=model)
     except blink.BlinkError as exc:
         raise gr.Error(str(exc)) from None
+    meta = out["meta"]
+    return {"model": meta["model"], "answers": out["answers"],
+            "usage": {"input_tokens": meta["input_tokens"], "output_tokens": 0}, "meta": meta}
 
 
 def ask_api(ask: str, model: str | None = None) -> dict:
@@ -874,6 +890,8 @@ def build() -> gr.Blocks:
                 results_tab()
             with gr.Tab(TAB_LABEL["how-it-works"], id="how-it-works"):
                 how_tab()
+            with gr.Tab(TAB_LABEL[ui.API_TAB], id=ui.API_TAB):
+                api_tab()
         gr.HTML(ui.footer())
         here = gr.Textbox(visible=False)
         at_tab = gr.Textbox(ui.DEFAULT_TAB, visible=False)

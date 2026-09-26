@@ -29,6 +29,8 @@ LINKS = [
     ("/?case=rag", "Use cases", "Passage check"),
     ("/?tab=use-cases&case=policy", "Use cases", "Policy checks"),
     ("/?tab=how-it-works", "How it works", None),
+    ("/?tab=api", "API", None),
+    ("/#api", "API", None),
     ("/?tab=nonsense", "Home", None),
     ("/?__theme=light&tab=results", "Results", None),
 ]

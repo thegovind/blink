@@ -28,7 +28,7 @@ one forward pass, with no generated text. Long or large multi-question requests 
 *Personal research release by thegovind, not an official product of any company. No affiliation with TypeSafe AI,
 Xiaomi, Alibaba Cloud or the Qwen team. Weights are for non-commercial research; see [Licence](#licence).*
 
-![blink-mimo-9b one-pass readout diagram: a state and typed choice, noul and score questions are rendered as evidence, criterion and lettered options; questions are batched and each batch is one forward pass, giving next-token logits at the answer position, and an FP32 softmax over the offered letters gives one probability per option. No text is generated.](assets/blink-mimo-9b-readout.png)
+![blink-mimo-9b one-pass readout diagram: a state and typed choice, noul and score questions are rendered as evidence, criterion and lettered options; questions are batched and each batch is one forward pass, giving next-token logits at the answer position, and an FP32 softmax over the offered letters gives one probability per option. No text is generated.](../assets/blink-mimo-9b/blink-mimo-9b-readout.png)
 
 ## Results
 
@@ -154,7 +154,7 @@ Our harness and sampling on 500 Multimodal-Mind2Web test steps with five offered
 
 ## What we changed in the network
 
-![blink-mimo-9b network diagram: 32 decoder layers repeating 3 Gated DeltaNet layers then one full-attention layer (24 and 8 in total, hidden 4096), with full attention at 0-based layers 3, 7, … 31 as in the tensor names; LoRA rank 16 on every attention, Gated DeltaNet and MLP projection (43.3M parameters, merged after training); token embeddings, norms and lm_head frozen, with lm_head untied, a separate matrix; the 27-block vision tower kept byte-for-byte; and the answer read from the offered option-letter rows of lm_head.](assets/blink-mimo-9b-network.png)
+![blink-mimo-9b network diagram: 32 decoder layers repeating 3 Gated DeltaNet layers then one full-attention layer (24 and 8 in total, hidden 4096), with full attention at 0-based layers 3, 7, … 31 as in the tensor names; LoRA rank 16 on every attention, Gated DeltaNet and MLP projection (43.3M parameters, merged after training); token embeddings, norms and lm_head frozen, with lm_head untied, a separate matrix; the 27-block vision tower kept byte-for-byte; and the answer read from the offered option-letter rows of lm_head.](../assets/blink-mimo-9b/blink-mimo-9b-network.png)
 
 | | What ships |
 |---|---|
@@ -184,7 +184,7 @@ use or reproduce it. No RL or preference optimisation.
 
 ## The climb
 
-![blink-mimo-9b post-training diagram: one run (123,195 rows) broken down by data category feed supervised fine-tuning with cross-entropy over the offered option letters; a single pre-registered epoch is merged and grafted back into the full vision-language checkpoint, vision tower unchanged, as release v1.0. Decision Index 0.1 full suite 56.53.](assets/blink-mimo-9b-post-training.png)
+![blink-mimo-9b post-training diagram: one run (123,195 rows) broken down by data category feed supervised fine-tuning with cross-entropy over the offered option letters; a single pre-registered epoch is merged and grafted back into the full vision-language checkpoint, vision tower unchanged, as release v1.0. Decision Index 0.1 full suite 56.53.](../assets/blink-mimo-9b/blink-mimo-9b-post-training.png)
 
 One pre-registered run, one epoch; no other MiMo variant was trained or picked. The gate was DI-S ≥ 55 before training: pass it, then read the full suite and release. DI-S intervals are a few points wide, so this is a narrow gate pass, not a claim of superiority.
 
@@ -203,8 +203,8 @@ import os, sys
 from huggingface_hub import hf_hub_download
 
 os.environ["BLINK_MODEL"] = "thegovind/blink-mimo-9b"
-os.environ["BLINK_REVISION"] = "v1.0"
-sys.path.insert(0, os.path.dirname(hf_hub_download("thegovind/blink-mimo-9b", "blink.py", revision="v1.0")))
+os.environ["BLINK_REVISION"] = "v1.2"
+sys.path.insert(0, os.path.dirname(hf_hub_download("thegovind/blink-mimo-9b", "blink.py", revision="v1.2")))
 import blink
 
 out = blink.decide(
@@ -224,14 +224,17 @@ print(out["answers"]["intent"]["probabilities"])
 
 ## Run it as a server
 
-`serve.py` accepts Jev-compatible `POST /v1/systemone` (`{state, questions}` → `{answers, usage}`);
-JevBench's stock `typesafe` adapter and the Decision Index kit's `http` engine use this format.
-`GET /healthz` reports startup checks.
+`serve.py` handles TypeSafe's request and answer fields at `POST /v1/systemone` and lists its model at
+`GET /v1/models`. From server-side code, point TypeSafe's Python or JavaScript SDK at the server with
+`TYPESAFE_BASE_URL`;
+JevBench's stock `typesafe` adapter and the Decision Index kit's `http` engine still work unchanged.
+`GET /healthz` reports startup checks. `v1.2` changes code only; its weights are identical to `v1.0`.
 
 ```sh
 pip install "torch==2.13.0" "transformers==5.17.0" "flash-linear-attention==0.5.2" "accelerate>=1.1.0" safetensors huggingface_hub
-hf download thegovind/blink-mimo-9b --revision v1.0 --local-dir blink-mimo-9b
+hf download thegovind/blink-mimo-9b --revision v1.2 --local-dir blink-mimo-9b
 python blink-mimo-9b/serve.py --model ./blink-mimo-9b --port 8000
+# TypeSafe SDKs: export TYPESAFE_BASE_URL=http://127.0.0.1:8000 TYPESAFE_API_KEY=any
 ```
 
 In another terminal: `curl -s http://127.0.0.1:8000/healthz`.
@@ -250,25 +253,30 @@ docker build -t blink-mimo-9b . && docker run --rm --gpus all -p 127.0.0.1:8000:
   answers), `kernels` (fast path or slower fallback without flash-linear-attention), `versions` and `hub_offline`.
 - Limits: 255 options per choice, 2–10 score levels, 131,072 input tokens per question and 512 questions
   per request. Over-limit requests get HTTP 422 with the reason; nothing is truncated.
+- `GET /v1/models` lists the one served model with a blank `release_date`. Every request uses that model
+  regardless of its `model` field.
+- The server is open by default. Set `--api-key` or `BLINK_API_KEY` to require `Authorization: Bearer <key>` on both API
+  routes. Missing or wrong keys get 401; `/healthz` stays open.
+- Error bodies put the reason in `error` and `detail`. Over-limit requests return 422, with nothing cut.
 - Requests run one at a time. Questions are batched; each batch takes one forward pass (large requests
   can take more than one). Serving the downloaded folder or Docker image enables Hugging Face offline
   mode before model loading (`hub_offline: true`). The server doesn't otherwise restrict network access.
 - Set `--batch-window-ms 5` to turn on cross-request batching with a 5 ms collection window, up to
   `--max-batch-requests` requests at a time, which defaults to 16. The window defaults to 0, so requests still
   run one at a time. `--max-queued-requests` lets up to 64 requests wait for a batch by default. Excess requests
-  get HTTP 503 with `Retry-After`, so clients should retry. On a 1,000-request Decision Index sample over HTTP,
-  throughput rose about 15% with 4 concurrent clients and 16% with 16. One client saw no gain. Offline runs on
-  long documents showed no meaningful gain. On the Decision Index sample, a set of long workflow documents, and
-  the public TypeSafe cases covered by the FP32 reference, batched answers passed the same numerical-parity
-  checks against an FP32 reference as one-at-a-time answers, covering argmax agreement and probability
-  differences. TypeSafe documents were sent as JSON objects. The FP32 reference could not run the five longest
-  TypeSafe documents, so parity covered 170 of 354 TypeSafe questions. Batched and one-at-a-time answers chose
-  the same option every time on the other 184. A few near-tied answers can still flip. `v1.1` changes code only,
-  leaving `v1.0` weights unchanged. Update the two code files in an existing `v1.0` download, then restart with
-  the flag:
+  get HTTP 529 with `Retry-After`, so clients should retry. `v1.1` returned HTTP 503 for a full queue. On a
+  1,000-request Decision Index sample over HTTP, throughput rose about 15% with 4 concurrent clients and 16%
+  with 16. One client saw no gain. Offline runs on long documents showed no meaningful gain. On the Decision
+  Index sample, a set of long workflow documents, and the public TypeSafe cases covered by the FP32 reference,
+  batched answers passed the same numerical-parity checks against an FP32 reference as one-at-a-time answers,
+  covering argmax agreement and probability differences. TypeSafe documents were sent as JSON objects. The FP32
+  reference could not run the five longest TypeSafe documents, so parity covered 170 of 354 TypeSafe questions.
+  Batched and one-at-a-time answers chose the same option every time on the other 184. A few near-tied answers
+  can still flip. Batching arrived in `v1.1`. The current code revision is `v1.2`, with weights identical to
+  `v1.0`. Update the two code files in an existing `v1.0` download, then restart with the flag:
 
   ```sh
-  hf download thegovind/blink-mimo-9b serve.py blink.py --revision v1.1 --local-dir blink-mimo-9b
+  hf download thegovind/blink-mimo-9b serve.py blink.py --revision v1.2 --local-dir blink-mimo-9b
   python blink-mimo-9b/serve.py --model ./blink-mimo-9b --port 8000 --batch-window-ms 5
   ```
 - blink-mimo-9b weights are 18.8 GB in bf16. Long prompts need more memory.

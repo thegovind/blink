@@ -217,7 +217,8 @@ class WithFakeEngine(unittest.TestCase):
     REQS = TestDecideManyAndBatcher.REQS
     SCHEMA_BAD = ("x", {"q": {"type": "score", "instructions": "?", "criteria": ["only one"]}})
     TOO_LONG = ("y" * 5000, {"q": {"type": "noul", "instructions": "Is this long?"}})
-    DEEP = ("z", {"q": {"type": "noul", "instructions": deep_list(3000)}})
+    # deep enough to overflow on every supported Python: 3.13's C JSON encoder renders 3,000 levels fine
+    DEEP = ("z", {"q": {"type": "noul", "instructions": deep_list(50_000)}})
 
     def setUp(self):
         self.saved, self.eng = blink._ENGINE, FakeBatchEngine()

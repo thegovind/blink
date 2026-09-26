@@ -15,7 +15,7 @@ from playwright.async_api import async_playwright
 
 URL = os.environ.get("BLINK_URL", "http://127.0.0.1:7921/").rstrip("/")
 SIZES = ({"width": 1456, "height": 900}, {"width": 390, "height": 844})
-TABS = ("home", "playground", "ask", "use-cases", "results", "how-it-works")
+TABS = ("home", "playground", "ask", "use-cases", "results", "how-it-works", "api")
 PAINT = """() => {
   const surface = (e) => {
     for (let n = e; n; n = n.parentElement) {

@@ -2879,6 +2879,272 @@ body {
   }
 }
 
+/* --- api: TypeSafe API clients, a blink server and this Space ------------------- */
+
+.gradio-container .blk-copytag {
+  display: inline-block;
+  margin-left: 8px;
+  vertical-align: 4px;
+  border-style: dashed;
+  border-color: var(--blink-light) !important;
+  color: var(--blink-ink) !important;
+  background: var(--blink-tint) !important;
+}
+
+/* gradio's prose draws a text-coloured border on every table and row; these keep only the hairlines */
+.gradio-container .blk-apifig table.blk-apitable,
+.gradio-container .blk-apifig table.blk-apitable tr,
+.gradio-container table.blk-apitext,
+.gradio-container table.blk-apitext tr {
+  border: 0;
+  margin: 0;
+}
+
+.blk-apifig table.blk-apitable th,
+.blk-apifig table.blk-apitable td {
+  text-align: left;
+  white-space: normal;
+  vertical-align: top;
+  line-height: 1.45;
+  min-width: 140px;
+}
+
+.blk-apifig table.blk-apitable th:first-child,
+.blk-apifig table.blk-apitable td:first-child {
+  min-width: 0;
+}
+
+.blk-apifig table.blk-apitable tbody th {
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--ink);
+  background: transparent;
+  white-space: nowrap;
+}
+
+.blk-apifig table.blk-apitable tbody tr:last-child th {
+  border-bottom: 0;
+}
+
+/* a mark says how a cell compares; its shape tells them apart as much as its colour */
+.blk-mk {
+  display: inline-block;
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  margin: 0 8px 1px 0;
+  vertical-align: middle;
+}
+
+.blk-mk.same {
+  background: var(--blink);
+}
+
+.blk-mk.adds {
+  background: var(--paper);
+  box-shadow: inset 0 0 0 2px var(--blink);
+}
+
+.blk-mk.differs {
+  background: var(--color-ref);
+}
+
+.blk-mk.none {
+  background: transparent;
+  box-shadow: inset 0 0 0 1.5px var(--line-strong);
+}
+
+.blk-apilegend {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px 18px;
+  margin: 12px 0 0;
+  font-size: var(--text-caption);
+  line-height: 1.5;
+  color: var(--mid-c);
+}
+
+.blk-apilegend span {
+  display: inline-flex;
+  align-items: center;
+}
+
+.gradio-container .blk-apifig code,
+.gradio-container .blk-steps code {
+  font-family: var(--font-geist-mono);
+  font-size: 12px;
+  font-weight: 400;
+  line-height: 1.5;
+  color: var(--ink-soft);
+  background: var(--alt);
+  border: 1px solid var(--line);
+  border-radius: var(--radius-small);
+  padding: 1px 6px;
+  white-space: normal;
+  overflow-wrap: break-word;
+}
+
+.gradio-container .blk-steps code {
+  display: block;
+  justify-self: stretch;
+  min-width: 0;
+  padding: 8px 10px;
+}
+
+.gradio-container .blk-apifig code::before,
+.gradio-container .blk-apifig code::after,
+.gradio-container .blk-steps code::before,
+.gradio-container .blk-steps code::after {
+  content: none;
+}
+
+.blk-steps {
+  list-style: none;
+  counter-reset: blk-step;
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 12px;
+  margin: 0 0 24px;
+  padding: 0;
+}
+
+.gradio-container .blk-steps li {
+  counter-increment: blk-step;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  justify-items: start;
+  align-content: start;
+  gap: 10px;
+  margin: 0;
+  padding: 16px 20px;
+  background: var(--paper);
+  border: 1px solid var(--line);
+  border-radius: var(--radius-cards);
+  box-shadow: var(--shadow-subtle);
+}
+
+.blk-steps li::before {
+  content: counter(blk-step);
+  display: inline-grid;
+  place-items: center;
+  width: 22px;
+  height: 22px;
+  border-radius: 50%;
+  font: 500 var(--text-caption) / 1 var(--font-geist-mono);
+  color: var(--paper);
+  background: var(--blink);
+}
+
+.blk-steps b {
+  font-size: var(--text-body);
+  font-weight: 600;
+  color: var(--ink);
+}
+
+/* inside a fold, code and tables line up with the text under the summary */
+.blk-api details.blk-d > .blk-pre,
+.blk-api details.blk-d > .blk-apimini {
+  margin-left: 16px;
+}
+
+.gradio-container .blk-api details.blk-d > p.blk-apilabel {
+  margin: 16px 0 6px 16px;
+}
+
+.blk-apilabel {
+  margin: 16px 0 6px;
+  font-size: var(--text-caption);
+  font-weight: 500;
+  line-height: 1.33;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  color: var(--mid-c);
+}
+
+.gradio-container .blk-api details.blk-d ul {
+  margin: 0 0 14px 16px;
+  padding-left: 18px;
+  max-width: 700px;
+}
+
+.gradio-container .blk-api details.blk-d li {
+  font-size: var(--text-body);
+  line-height: 1.6;
+  color: var(--mid-c);
+  margin: 0 0 6px;
+}
+
+.blk-apimini {
+  max-width: 760px;
+  margin: 4px 0 12px;
+}
+
+table.blk-apitext th,
+table.blk-apitext td {
+  text-align: left;
+  white-space: normal;
+  vertical-align: top;
+}
+
+table.blk-apitext td:first-child {
+  font-family: var(--font-geist-mono);
+  white-space: nowrap;
+}
+
+@media (max-width: 720px) {
+  .blk-steps {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  /* a phone stacks each row: its name, then one labelled line per column */
+  .blk-apifig table.blk-apitable thead {
+    display: none;
+  }
+
+  .blk-apifig table.blk-apitable,
+  .blk-apifig table.blk-apitable tbody,
+  .blk-apifig table.blk-apitable tr {
+    display: block;
+    width: 100%;
+  }
+
+  .blk-apifig table.blk-apitable tr {
+    padding: 10px 14px;
+    border-bottom: 1px solid var(--line) !important;
+  }
+
+  .blk-apifig table.blk-apitable tr:last-child {
+    border-bottom: 0 !important;
+  }
+
+  .blk-apifig table.blk-apitable th,
+  .blk-apifig table.blk-apitable td {
+    display: grid;
+    grid-template-columns: 92px minmax(0, 1fr);
+    align-items: baseline;
+    gap: 8px;
+    min-width: 0;
+    padding: 3px 0;
+    border: 0 !important;
+  }
+
+  .blk-apifig table.blk-apitable tbody th {
+    display: block;
+    padding: 0 0 4px;
+  }
+
+  .blk-apifig table.blk-apitable td::before {
+    content: attr(data-col);
+    font-size: var(--text-caption);
+    color: var(--mid);
+  }
+
+  .blk-api details.blk-d > .blk-pre,
+  .blk-api details.blk-d > .blk-apimini {
+    margin-left: 0;
+  }
+}
+
 /* everything lands in its final state at once; nothing repeats */
 @media (prefers-reduced-motion: reduce) {
   *,

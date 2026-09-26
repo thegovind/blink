@@ -51,18 +51,59 @@ class Slugs(unittest.TestCase):
 
 class Strings(unittest.TestCase):
     def test_every_string_is_used(self):
-        data = json.loads((HERE / "strings.json").read_text(encoding="utf-8"))
-        keys = set(data["draft"]) | set(data["reused"])
+        own = json.loads((HERE / "strings.json").read_text(encoding="utf-8"))
+        reused = json.loads((HERE / "strings-reused.json").read_text(encoding="utf-8"))["strings"]
+        self.assertTrue(all(isinstance(v, str) for v in own.values()))
+        self.assertFalse(set(own) & set(reused))
         code = (HERE / "build.py").read_text(encoding="utf-8")
-        for key in keys - {"readme.docs_line"}:
+        for key in (set(own) | set(reused)) - {"readme.docs_line"}:
             used = f'"{key}"' in code or key.startswith("nav.group.")
             self.assertTrue(used, f"{key} is never used")
-        self.assertFalse(set(data["draft"]) & set(data["reused"]))
 
     def test_nav_groups_have_labels(self):
         s = build.load_strings()
         for group in build.GROUPS:
             self.assertIn(f"nav.group.{group}", s)
+
+
+# where each reused string comes from: (file, what must be in it), with {text} for the string
+REUSED_SOURCES = {
+    "hero.chip": [("space/ui.py", '"{text}"')],
+    "home.cta_space": [("docs/models/blink-4b.md", "[{text}]("), ("docs/models/blink-27b.md", "[{text}]("),
+                       ("docs/models/blink-mimo-9b.md", "[{text}](")],
+    "home.how": [("README.md", "\n## {text}\n"), ("space/ui.py", '"{text}"')],
+    "home.quickstart": [("README.md", "\n## {text}\n")],
+    "home.state": [("space/build_static.py", '"{text}"')],
+}
+
+
+class ReusedStrings(unittest.TestCase):
+    """Each reused string is still, word for word, in the text it was copied from."""
+
+    def setUp(self):
+        self.root = HERE.parent
+        if not (self.root / "README.md").exists() or not (self.root / "space" / "ui.py").exists():
+            self.skipTest("not inside the repository")
+        self.reused = json.loads((HERE / "strings-reused.json").read_text(encoding="utf-8"))["strings"]
+
+    def test_every_reused_string_is_in_its_source(self):
+        for key, item in self.reused.items():
+            if key == "footer.note":
+                continue
+            self.assertIn(key, REUSED_SOURCES, f"{key} has no source check")
+            for rel, needle in REUSED_SOURCES[key]:
+                text = (self.root / rel).read_text(encoding="utf-8")
+                self.assertIn(needle.format(text=item["text"]), text, f"{key} is no longer in {rel}")
+
+    def test_footer_is_the_spaces(self):
+        import html
+        import re
+        import subprocess
+
+        code = "import ui; print(ui.footer())"
+        out = subprocess.run([sys.executable, "-c", code], cwd=self.root / "space", capture_output=True, text=True,
+                             env={**__import__("os").environ, "BLINK_MOCK": "1"}, check=True).stdout
+        self.assertEqual(html.unescape(re.sub(r"<[^>]+>", "", out)).strip(), self.reused["footer.note"]["text"])
 
 
 @unittest.skipUnless(HAVE_MD, "needs site/requirements.txt")

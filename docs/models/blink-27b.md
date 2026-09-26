@@ -28,7 +28,7 @@ one forward pass, with no generated text. Long or large multi-question requests 
 *Personal research release by thegovind, not an official product of any company. No affiliation with TypeSafe AI,
 Xiaomi, Alibaba Cloud or the Qwen team. Weights are for non-commercial research; see [Licence](#licence).*
 
-![blink-27b one-pass readout diagram: a state and typed choice, noul and score questions are rendered as evidence, criterion and lettered options; questions are batched and each batch is one forward pass, giving next-token logits at the answer position, and an FP32 softmax over the offered letters gives one probability per option. No text is generated.](assets/blink-27b-readout.png)
+![blink-27b one-pass readout diagram: a state and typed choice, noul and score questions are rendered as evidence, criterion and lettered options; questions are batched and each batch is one forward pass, giving next-token logits at the answer position, and an FP32 softmax over the offered letters gives one probability per option. No text is generated.](../assets/blink-27b/blink-27b-readout.png)
 
 ## Results
 
@@ -138,7 +138,7 @@ We ran the complete archived 0.1 suite: 132,422 requests across 37 benchmarks. T
 
 ## What we changed in the network
 
-![blink-27b network diagram: 64 decoder layers repeating 3 Gated DeltaNet layers then one full-attention layer (48 and 16 in total, hidden 5120), with full attention at 0-based layers 3, 7, … 63 as in the tensor names; LoRA rank 16 on every attention, Gated DeltaNet and MLP projection (116.7M parameters, merged after training); token embeddings, norms and lm_head frozen, with lm_head untied, a separate matrix; the vision encoder and multi-token-prediction head removed; and the answer read from the offered option-letter rows of lm_head.](assets/blink-27b-network.png)
+![blink-27b network diagram: 64 decoder layers repeating 3 Gated DeltaNet layers then one full-attention layer (48 and 16 in total, hidden 5120), with full attention at 0-based layers 3, 7, … 63 as in the tensor names; LoRA rank 16 on every attention, Gated DeltaNet and MLP projection (116.7M parameters, merged after training); token embeddings, norms and lm_head frozen, with lm_head untied, a separate matrix; the vision encoder and multi-token-prediction head removed; and the answer read from the offered option-letter rows of lm_head.](../assets/blink-27b/blink-27b-network.png)
 
 | | What ships |
 |---|---|
@@ -166,7 +166,7 @@ use or reproduce it. No RL or preference optimisation.
 
 ## The climb
 
-![blink-27b post-training diagram: T2 (72,700 rows) and T4 (74,754 rows) broken down by data category feed supervised fine-tuning with cross-entropy over the offered option letters; T2 starts from the base and T4 continues from it, then the adapters are merged into release v1.0. Decision Index 0.1 full suite 63.44.](assets/blink-27b-post-training.png)
+![blink-27b post-training diagram: T2 (72,700 rows) and T4 (74,754 rows) broken down by data category feed supervised fine-tuning with cross-entropy over the offered option letters; T2 starts from the base and T4 continues from it, then the adapters are merged into release v1.0. Decision Index 0.1 full suite 63.44.](../assets/blink-27b/blink-27b-post-training.png)
 
 DI-S is the 3,000-request selection sample; full and outside-DI-S scores use the archived 0.1 suite.
 
@@ -184,8 +184,8 @@ import os, sys
 from huggingface_hub import hf_hub_download
 
 os.environ["BLINK_MODEL"] = "thegovind/blink-27b"
-os.environ["BLINK_REVISION"] = "v1.0"
-sys.path.insert(0, os.path.dirname(hf_hub_download("thegovind/blink-27b", "blink.py", revision="v1.0")))
+os.environ["BLINK_REVISION"] = "v1.2"
+sys.path.insert(0, os.path.dirname(hf_hub_download("thegovind/blink-27b", "blink.py", revision="v1.2")))
 import blink
 
 out = blink.decide(
@@ -205,14 +205,17 @@ print(out["answers"]["intent"]["probabilities"])
 
 ## Run it as a server
 
-`serve.py` accepts Jev-compatible `POST /v1/systemone` (`{state, questions}` → `{answers, usage}`);
-JevBench's stock `typesafe` adapter and the Decision Index kit's `http` engine use this format.
-`GET /healthz` reports startup checks.
+`serve.py` handles TypeSafe's request and answer fields at `POST /v1/systemone` and lists its model at
+`GET /v1/models`. From server-side code, point TypeSafe's Python or JavaScript SDK at the server with
+`TYPESAFE_BASE_URL`;
+JevBench's stock `typesafe` adapter and the Decision Index kit's `http` engine still work unchanged.
+`GET /healthz` reports startup checks. `v1.2` changes code only; its weights are identical to `v1.0`.
 
 ```sh
 pip install "torch==2.13.0" "transformers==5.17.0" "flash-linear-attention==0.5.2" "accelerate>=1.1.0" safetensors huggingface_hub
-hf download thegovind/blink-27b --revision v1.0 --local-dir blink-27b
+hf download thegovind/blink-27b --revision v1.2 --local-dir blink-27b
 python blink-27b/serve.py --model ./blink-27b --port 8000
+# TypeSafe SDKs: export TYPESAFE_BASE_URL=http://127.0.0.1:8000 TYPESAFE_API_KEY=any
 ```
 
 In another terminal: `curl -s http://127.0.0.1:8000/healthz`.
@@ -231,9 +234,16 @@ docker build -t blink-27b . && docker run --rm --gpus all -p 127.0.0.1:8000:8000
   answers), `kernels` (fast path or slower fallback without flash-linear-attention), `versions` and `hub_offline`.
 - Limits: 255 options per choice, 2–10 score levels, 131,072 input tokens per question and 512 questions
   per request. Over-limit requests get HTTP 422 with the reason; nothing is truncated.
+- `GET /v1/models` lists the one served model with a blank `release_date`. Every request uses that model
+  regardless of its `model` field.
+- The server is open by default. Set `--api-key` or `BLINK_API_KEY` to require `Authorization: Bearer <key>` on both API
+  routes. Missing or wrong keys get 401; `/healthz` stays open.
+- Error bodies put the reason in `error` and `detail`. Over-limit requests return 422, with nothing cut.
 - Requests run one at a time. Questions are batched; each batch takes one forward pass (large requests
   can take more than one). Serving the downloaded folder or Docker image enables Hugging Face offline
   mode before model loading (`hub_offline: true`). The server doesn't otherwise restrict network access.
+- `--batch-window-ms` is available in the `blink-27b` `v1.2` code. Its speed and numerical parity have not been
+  measured for this model.
 - blink-27b weights are 53.8 GB in bf16. Long prompts need more memory.
 
 </details>

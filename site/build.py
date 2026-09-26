@@ -6,10 +6,11 @@
     python3 -m http.server --bind 127.0.0.1 --directory _site 8000
 
 The pages are the README, docs/, the model cards, CHANGELOG, CONTRIBUTING, SECURITY and
-examples/. Every string the site adds is in site/strings.json; links and pinned assets are
-in site/config.json. A Mermaid block uses the SVG that site/render_diagrams.py saved in
-site/diagrams/ for it, and is drawn in the browser when there is none. The home page reuses
-the Space's own renderers (space/results.py and space/ui.py) and its saved blink-4b run.
+examples/. Every string the site adds is in site/strings.json; text it reuses verbatim is in
+site/strings-reused.json; links and pinned assets are in site/config.json. A Mermaid block
+uses the SVG that site/render_diagrams.py saved in site/diagrams/ for it, and is drawn in the
+browser when there is none. The home page reuses the Space's own renderers (space/results.py
+and space/ui.py) and its saved blink-4b run.
 """
 
 from __future__ import annotations
@@ -76,11 +77,13 @@ class BuildError(RuntimeError):
 
 
 def load_strings() -> dict[str, str]:
-    data = json.loads((HERE / "strings.json").read_text(encoding="utf-8"))
-    out = dict(data["draft"])
-    for key, item in data["reused"].items():
+    """strings.json: every string the site adds. strings-reused.json: text copied verbatim from its source."""
+    own = json.loads((HERE / "strings.json").read_text(encoding="utf-8"))
+    reused = json.loads((HERE / "strings-reused.json").read_text(encoding="utf-8"))["strings"]
+    out = dict(own)
+    for key, item in reused.items():
         if key in out:
-            raise BuildError(f"strings.json defines {key} twice")
+            raise BuildError(f"{key} is in both strings.json and strings-reused.json")
         out[key] = item["text"]
     return out
 

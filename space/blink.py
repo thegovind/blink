@@ -223,12 +223,16 @@ def answer_for(q: dict, keys: list[str], probs: list[float]) -> dict:
         return {"type": "noul", "noul": p["yes"], "probabilities": p}
     levels = [str(i) for i in range(len(q["criteria"]))]
     ev = sum(int(k) * p[k] for k in levels)
+    top = max(levels, key=lambda k: (p[k], -int(k)))
+    K = len(levels)
     return {
         "type": "score",
         "score": ev,
         "probabilities": {k: p[k] for k in levels},
         "legend": {k: text(q["criteria"][int(k)]) for k in levels},
-        "choice": max(levels, key=lambda k: (p[k], -int(k))),
+        "choice": top,
+        # added after the fields above, which are unchanged: the choice formula over the levels (TypeSafe-shaped)
+        "confidence": min(1.0, max(0.0, (p[top] - 1 / K) / (1 - 1 / K))),
     }
 
 

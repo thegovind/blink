@@ -1,57 +1,28 @@
 {
-  "about": "Every user-facing string the docs site adds to the repository's own Markdown. Strings under draft are new and wait for a writer; strings under reused are verbatim from the named source. The hero line is read from README.md at build time and is not repeated here.",
-  "draft": {
-    "site.docs": "Docs",
-    "site.github": "GitHub",
-    "site.skip": "Skip to content",
-    "nav.aria": "Documentation",
-    "nav.menu": "Menu",
-    "nav.group.start": "Start",
-    "nav.group.models": "Models",
-    "nav.group.evaluation": "Evaluation",
-    "nav.group.learn": "Learn",
-    "nav.group.project": "Project",
-    "nav.overview": "Overview",
-    "nav.examples": "Examples",
-    "nav.first_principles": "First principles",
-    "toc.title": "On this page",
-    "page.source": "Source on GitHub",
-    "code.copy": "Copy",
-    "code.copied": "Copied",
-    "home.cta_docs": "Read the docs",
-    "home.example_caption": "A saved blink-4b run of the support example in the Space.",
-    "home.example_link": "Try it in the Space",
-    "home.model_card": "Model card",
-    "home.model_hub": "Hugging Face",
-    "examples.intro": "Request bodies for `POST /v1/systemone`, and two small clients.",
-    "notfound.title": "Page not found",
-    "notfound.home": "Go to the home page",
-    "readme.docs_line": "**Docs:** [thegovind.github.io/blink](https://thegovind.github.io/blink/)"
-  },
-  "reused": {
-    "hero.chip": {
-      "text": "0 generated tokens",
-      "from": "space/ui.py, MAST[\"chip\"]"
-    },
-    "home.cta_space": {
-      "text": "Space demo",
-      "from": "docs/models/*.md, the \"Try it\" line"
-    },
-    "home.how": {
-      "text": "How it works",
-      "from": "README.md heading; Space tab label"
-    },
-    "home.quickstart": {
-      "text": "Quickstart",
-      "from": "README.md heading"
-    },
-    "home.state": {
-      "text": "State",
-      "from": "space/build_static.py, the state field label"
-    },
-    "footer.note": {
-      "text": "Personal research release by thegovind. Not an official product of any company, and not affiliated with TypeSafe AI, Xiaomi, Alibaba Cloud or the Qwen team. Weights are for non-commercial research and evaluation; app code is Apache-2.0.",
-      "from": "space/ui.py, footer()"
-    }
-  }
+ "site.docs": "Docs",
+ "site.github": "GitHub",
+ "site.skip": "Skip to content",
+ "nav.aria": "Docs navigation",
+ "nav.menu": "Menu",
+ "nav.group.start": "Get started",
+ "nav.group.models": "Models",
+ "nav.group.evaluation": "Evaluation",
+ "nav.group.learn": "Learn",
+ "nav.group.project": "Project",
+ "nav.overview": "Overview",
+ "nav.examples": "Examples",
+ "nav.first_principles": "First principles",
+ "toc.title": "On this page",
+ "page.source": "View source on GitHub",
+ "code.copy": "Copy",
+ "code.copied": "Copied",
+ "home.cta_docs": "Read the docs",
+ "home.example_caption": "Saved blink-4b run of the support example in the Space.",
+ "home.example_link": "Try it in the Space",
+ "home.model_card": "Model card",
+ "home.model_hub": "Hugging Face",
+ "examples.intro": "Request bodies for `POST /v1/systemone` and two small clients.",
+ "notfound.title": "Page not found",
+ "notfound.home": "Back to home",
+ "readme.docs_line": "**Docs:** [thegovind.github.io/blink](https://thegovind.github.io/blink/)"
 }

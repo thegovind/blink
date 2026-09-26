@@ -10,6 +10,7 @@ from __future__ import annotations
 import json
 import urllib.parse
 
+import api_doc
 import blink
 import examples
 import results
@@ -35,12 +36,14 @@ TABS = (
     ("use-cases", "Use cases"),
     ("results", "Results"),
     ("how-it-works", "How it works"),
+    ("api", "API"),
 )
 TAB_IDS = tuple(slug for slug, _ in TABS)
 DEFAULT_TAB = TAB_IDS[0]  # home
 CASE_TAB = "use-cases"
 ASK_TAB = "ask"
 HOME_TAB = "home"
+API_TAB = "api"
 CASE_IDS = tuple(case.key for case in examples.USE_CASES)
 DEFAULT_CASE = CASE_IDS[0]
 
@@ -1107,4 +1110,119 @@ def how_blocks() -> list[str]:
         "<p>BLINK_MODEL picks the model, BLINK_TEMPERATURE the readout temperature. The "
         "weights are for non-commercial research use; see the model cards.</p>"
         "</details>",
+    ]
+
+
+# --- api ----------------------------------------------------------------------------
+# The copy, the table rows and the examples all live in api_doc; this only arranges them.
+
+
+def _api_mark(kind: str) -> str:
+    label = dict(api_doc.COPY["legend"])[kind]
+    return f'<i class="blk-mk {esc(kind)}" role="img" aria-label="{esc(label)}" title="{esc(label)}"></i>'
+
+
+def _api_code(text: str, label: str = "") -> str:
+    head = f'<p class="blk-apilabel">{esc(label)}</p>' if label else ""
+    return f'{head}<div class="blk-pre">{esc(text)}</div>'
+
+
+def _api_notes(notes) -> str:
+    return "".join(f"<p>{esc(n)}</p>" for n in notes)
+
+
+def _api_text_table(cols, rows) -> str:
+    head = "".join(f'<th scope="col">{esc(h)}</th>' for h in cols)
+    body = "".join("<tr>" + "".join(f"<td>{esc(v)}</td>" for v in row) + "</tr>" for row in rows)
+    return (f'<div class="blk-tablewrap blk-apimini"><table class="blk-table blk-apitext"><thead><tr>{head}'
+            f"</tr></thead><tbody>{body}</tbody></table></div>")
+
+
+def api_table() -> str:
+    """TypeSafe's API, a blink server and this Space, row by row, each cell marked."""
+    c = api_doc.COPY
+    head = "".join(f'<th scope="col">{esc(h)}</th>' for h in api_doc.TABLE_COLS)
+    _, c1, c2, c3 = (esc(h) for h in api_doc.TABLE_COLS)
+    # each cell names its column, so a phone can stack a row with its labels (style.css)
+    body = "".join(
+        f'<tr><th scope="row">{esc(row)}</th><td data-col="{c1}"><code>{esc(theirs)}</code></td>'
+        f'<td data-col="{c2}"><span>{_api_mark(sk)}{esc(server)}</span></td>'
+        f'<td data-col="{c3}"><span>{_api_mark(pk)}{esc(space)}</span></td></tr>'
+        for row, theirs, (sk, server), (pk, space) in api_doc.TABLE_ROWS
+    )
+    legend = "".join(f"<span>{_api_mark(k)}{esc(label)}</span>" for k, label in c["legend"])
+    return (
+        f'<figure class="blk-figure blk-apifig"><figcaption>{esc(c["table_label"])}</figcaption>'
+        f'<div class="blk-tablewrap"><table class="blk-table blk-apitable"><thead><tr>{head}</tr></thead>'
+        f"<tbody>{body}</tbody></table></div>"
+        f'<p class="blk-apilegend">{legend}</p></figure>'
+    )
+
+
+def api_steps() -> str:
+    c = api_doc.COPY
+    items = "".join(f"<li><b>{esc(title)}</b><code>{esc(code)}</code></li>" for title, code in c["steps"])
+    return f'<p class="blk-eyebrow">{esc(c["steps_label"])}</p><ol class="blk-steps">{items}</ol>'
+
+
+def _api_fold(summary: str, inner: str) -> str:
+    return f'<details class="blk-d blk-apifold"><summary>{esc(summary)}</summary>{inner}</details>'
+
+
+def api_blocks() -> list[str]:
+    """The API tab: the table and three steps first; the details fold away."""
+    c, d = api_doc.COPY, api_doc
+    draft = f' <span class="blk-tag blk-copytag">{esc(c["draft"])}</span>' if d.DRAFT else ""
+    server = (
+        _api_code(d.SERVER_RUN)
+        + _api_code(d.DOCKER_RUN, "Docker, from the downloaded folder")
+        + _api_notes(c["server_notes"])
+        + f'<p class="blk-apilabel">{esc(c["key"])}</p>' + _api_notes(c["key_notes"]) + _api_code(d.KEY_RUN)
+        + f'<p class="blk-apilabel">{esc(c["batching"])}</p>' + _api_notes(c["batching_notes"])
+        + _api_code(d.BATCH_RUN)
+    )
+    client = (
+        _api_code(d.CLIENT_ENV)
+        + _api_notes(c["client_notes"])
+        + _api_code(d.PYTHON_CLIENT, c["python"])
+        + _api_code(d.JS_CLIENT, c["javascript"])
+        + _api_code(d.HTTP_CLIENT, c["http"])
+    )
+    example = (
+        f'<p class="blk-apilabel">{esc(c["fields_label"])}</p>'
+        + _api_text_table(c["fields_cols"], c["fields"])
+        + _api_code(d.pretty(d.EXAMPLE_REQUEST), "Request")
+        + _api_code(d.pretty(d.EXAMPLE_RESPONSE), "Response")
+        + f'<p>{esc(c["example_note"])}</p>'
+    )
+    errors = (
+        _api_text_table(c["errors_cols"], c["error_rows"])
+        + f'<p>{esc(c["error_note"])}</p>'
+        + _api_code(d.pretty(d.REFUSED_REQUEST), "A one-level score")
+        + _api_code("HTTP/1.1 422 Unprocessable Entity\n" + d.pretty(d.REFUSED_BODY))
+        + _api_code("HTTP/1.1 401 Unauthorized\nWWW-Authenticate: Bearer\n" + d.pretty(d.UNAUTHORIZED_BODY),
+                    "Without the key the server checks")
+        + f'<p>{esc(c["limits"])}</p>'
+        + _api_code(d.MODELS_CALL + "\n" + d.pretty(d.MODELS_BODY), c["models"])
+    )
+    space = (
+        _api_notes(c["space_notes"][:1])
+        + _api_code(d.SPACE_PYTHON, c["python"])
+        + _api_code(d.SPACE_CURL, c["http"])
+        + _api_code(d.SPACE_REPLY)
+        + _api_notes(c["space_notes"][1:])
+    )
+    diff = "<ul>" + "".join(f"<li>{esc(n)}</li>" for n in c["diff_notes"]) + "</ul>"
+    return [
+        f'<h2 class="blk-h2">{esc(c["heading"])}{draft}</h2><p class="blk-note">{esc(c["lede"])}</p>',
+        api_table(),
+        api_steps(),
+        '<div class="blk-api">'
+        + _api_fold(c["server"], server)
+        + _api_fold(c["client"], client)
+        + _api_fold(c["example"], example)
+        + _api_fold(c["errors"], errors)
+        + _api_fold(c["space"], space)
+        + _api_fold(c["diff"], diff)
+        + "</div>",
     ]
