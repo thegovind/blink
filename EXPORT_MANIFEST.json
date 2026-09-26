@@ -364,6 +364,13 @@
     "transform": "scrub_python"
   },
   {
+    "dest": "lab/di02_card_data.py",
+    "reason": "generic evaluation tool",
+    "sha256": "f4092200c037878c8a564b59b80605b4a64a5d5ebd9343e9a7af1561fc099576",
+    "src": "lab/di02_card_data.py",
+    "transform": "scrub_python"
+  },
+  {
     "dest": "lab/jevlab/__init__.py",
     "reason": "training/data-generation",
     "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
@@ -674,28 +681,28 @@
   {
     "dest": "docs/blink-first-principles.md",
     "reason": "",
-    "sha256": "10c58566b95e8c4b471c4203381417fb7ce67bd9af49be72dad2696e683fafbe",
+    "sha256": "caee4eaa13e435d90e289de3f96109425e6fd7237581ae836d13c52e038efd38",
     "src": "docs/blink-first-principles.md",
     "transform": "scrub_docs"
   },
   {
     "dest": "docs/blink-first-principles.html",
     "reason": "",
-    "sha256": "841da68459705566cbd4fe0253a4a11afdee26a96d75078e6c2d42dc80c653c9",
+    "sha256": "b59f561739a8ad28b801914c527ff3381526979c08f1068d6a015e6a06e04688",
     "src": "docs/blink-first-principles.html",
     "transform": "scrub_docs"
   },
   {
     "dest": "docs/facts/FACTS.md",
     "reason": "",
-    "sha256": "ba413cb547fe3cc33d17d6010af0c6e316ebb600ce2d8197ea972fd78e48f335",
+    "sha256": "d1a0353d224fd9f194417e6162906f7568047a326ee1f9b8e5e2b4efa4360d89",
     "src": "docs/facts/FACTS.md",
     "transform": "facts"
   },
   {
     "dest": "docs/models/blink-4b.md",
     "reason": "model card",
-    "sha256": "b622c379b45c83bc2520ebdaa6939bcf97088c0c2fcf6444a6c082b8e97e1623",
+    "sha256": "80d1b772908aacc031f40a1977dad063f4eb763a2c52e0518030112b19dbdc66",
     "src": "release/out/blink-4b/README.md",
     "transform": "scrub_docs"
   },
@@ -711,6 +718,13 @@
     "reason": "",
     "sha256": "eb385a670474109419c0ffabe64af06243674e7cc868e285031f85f546d7ee74",
     "src": "release/out/blink-4b/eval/decision-index-0.1-minus-dis.json",
+    "transform": "scrub"
+  },
+  {
+    "dest": "docs/models/blink-4b/eval/decision-index-0.2-local.json",
+    "reason": "",
+    "sha256": "5892d11242455b97e8a99195d45d6c556d0cff017ce1d341a7291e7eea60c2d3",
+    "src": "release/out/blink-4b/eval/decision-index-0.2-local.json",
     "transform": "scrub"
   },
   {
@@ -730,7 +744,7 @@
   {
     "dest": "docs/models/blink-27b.md",
     "reason": "model card",
-    "sha256": "8f96bcbe0500d0b5f756d208facbc6a18eb80ea7707c4e8c8342125dcb3773f6",
+    "sha256": "5555e6ea499056e9f55ea1f60575c1b8be2de22482da3dc2dd7d670b372e71b9",
     "src": "release/out/blink-27b/README.md",
     "transform": "scrub_docs"
   },
@@ -749,6 +763,13 @@
     "transform": "scrub"
   },
   {
+    "dest": "docs/models/blink-27b/eval/decision-index-0.2-local.json",
+    "reason": "",
+    "sha256": "99c0ded4ac2a7ac4885479318b52f599e40a795f459356b4d1ae71a6f0601b25",
+    "src": "release/out/blink-27b/eval/decision-index-0.2-local.json",
+    "transform": "scrub"
+  },
+  {
     "dest": "docs/models/blink-27b/Dockerfile",
     "reason": "",
     "sha256": "36b6d0c3b61d5ae50b307721b87023308e4e65410646e3a173faacd6cd85db2f",
@@ -758,7 +779,7 @@
   {
     "dest": "docs/models/blink-mimo-9b.md",
     "reason": "model card",
-    "sha256": "3abaa9f70f36d6866b5557301fd9f920c885dbfa9be7d95553f361f3437679e9",
+    "sha256": "ca021f3cc287931bb364eaa26f2756463ad176b82867431bbe3ed5ad58b083d5",
     "src": "release/out/blink-mimo-9b/README.md",
     "transform": "scrub_docs"
   },
@@ -774,6 +795,13 @@
     "reason": "",
     "sha256": "d0ee29536948d5233c81da4247f0fc0dbef6ce4564ffec0c76bfad9cc474f345",
     "src": "release/out/blink-mimo-9b/eval/decision-index-0.1-minus-dis.json",
+    "transform": "scrub"
+  },
+  {
+    "dest": "docs/models/blink-mimo-9b/eval/decision-index-0.2-local.json",
+    "reason": "",
+    "sha256": "3c9dbc603a039d0f9250de78f86d16c12aee86e9e9950b9f455f2548fa292a9e",
+    "src": "release/out/blink-mimo-9b/eval/decision-index-0.2-local.json",
     "transform": "scrub"
   },
   {
@@ -1052,7 +1080,7 @@
   {
     "dest": "README.md",
     "reason": "repository scaffold",
-    "sha256": "2e99c56117d150c0d244d897680daf11cfae8896711849dd1be6c527aa098b9f",
+    "sha256": "d39532386642601d42c625c362dff5e946e87ba72e2addc66248e50e0d6b8097",
     "src": "<generated>",
     "transform": "generate"
   },
@@ -1094,7 +1122,7 @@
   {
     "dest": "CHANGELOG.md",
     "reason": "repository scaffold",
-    "sha256": "e1aae08cabcb6fee325d9448e046172b89b5747a1b7964b80987f774221689e9",
+    "sha256": "5038a6ff632f89a302afa0f962cd06709f587a3ca08c7154647cddcdb1e5e8ca",
     "src": "<generated>",
     "transform": "generate"
   },
@@ -1157,14 +1185,14 @@
   {
     "dest": "docs/EVALUATION.md",
     "reason": "repository scaffold",
-    "sha256": "7fe84e89b7087501ca9c0dff0bb96e6007f78e670c7c601a2d94e5a4aa0d4cfc",
+    "sha256": "1696eace6f78afd42952efb24843e97bd775d4e108c0ae6e462b56deadfe7332",
     "src": "<generated>",
     "transform": "generate"
   },
   {
     "dest": "docs/RESULTS.md",
     "reason": "repository scaffold",
-    "sha256": "7b8c97b9ba01911beb4b3aa903530791aca341ea3a965a4fb1c6060f2d813a63",
+    "sha256": "69c29d71653ee128f43f698c6459e2d6509f737b55edb433fae16ff266a6f7a0",
     "src": "<generated>",
     "transform": "generate"
   },

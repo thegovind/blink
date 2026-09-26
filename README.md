@@ -20,7 +20,10 @@ Three open models are tagged `v1.0`: `thegovind/blink-4b`,
 | blink-4b | 52.12 | 80/111 | 68.5% |
 
 Decision Index 0.1 numbers are local runs of the official kit on the archived
-0.1 edition, not leaderboard submissions. There is no Decision Index 0.2 result.
+edition, not leaderboard submissions. Decision Index 0.2 numbers are also
+local, descriptive runs, not accepted leaderboard results. Known training
+exposure remains in the 0.2 scores without the leaderboard's penalty, so they
+cannot be ranked against leaderboard results. Details are on each model card.
 JevBench numbers are public-item development proxies, not official scores.
 Held-out numbers were never used for training or for choosing a model.
 

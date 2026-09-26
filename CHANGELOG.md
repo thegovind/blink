@@ -7,7 +7,10 @@
   limit get HTTP 503 with `Retry-After`.
 - Serving is unchanged with the flag unset. An error in one request does not affect others in its batch.
 - New tests cover batching, including HTTP-level checks.
-- `thegovind/blink-4b` has this code at revision `v1.1`. Weights are unchanged from `v1.0`.
+- `thegovind/blink-4b` and `thegovind/blink-mimo-9b` have this code at revision `v1.1`. Their weights are
+  unchanged from `v1.0`.
+- The model cards now report local, descriptive Decision Index 0.2 runs, not accepted leaderboard results.
+  Known training exposure remains without the leaderboard's penalty, so the scores cannot be ranked against it.
 
 ## v1.0.0 - 2026-09-25
 

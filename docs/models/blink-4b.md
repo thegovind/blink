@@ -50,6 +50,56 @@ Both proxies use the same harness on public items. They aren't official JevBench
 
 </details>
 
+### Decision Index 0.2 (local run)
+
+We ran the full Decision Index 0.2 suite ourselves with the official scoring kit at commit 19ad28e on 2026-09-25. This is a descriptive run, not a leaderboard submission or accepted result. The kit's scorer does not apply the leaderboard's penalty for rows an entrant trained on, so known training exposure stays in these scores and they cannot be ranked against the leaderboard.
+
+| Balanced skill | Balanced raw | Breadth skill | Without MMLU-Pro |
+|---:|---:|---:|---:|
+| 37.85 | 53.33 | 36.78 | 37.41 |
+
+- Training included 281 MMLU-Pro test-partition questions, so the 0.2 MMLU-Pro score is contaminated. “Without MMLU-Pro” drops that benchmark but does not remove other training effects. Public train splits used in training are listed under “Training overlap” below.
+
+<details><summary>Extra tables and method</summary>
+
+| Area | Number of benchmarks | Skill | Raw |
+|---|---:|---:|---:|
+| Knowledge & Reasoning | 10 | 26.4 | 43.1 |
+| Language Understanding | 10 | 47.4 | 62.7 |
+| Retrieval & Classification | 7 | 36.8 | 54.7 |
+| Tools & Automation | 6 | 51.6 | 60.0 |
+| Arts & Human Taste | 7 | 27.2 | 46.1 |
+
+The seven benchmarks added in 0.2.
+
+| Benchmark | Metric | Requests | Answered | Raw | Skill |
+|---|---|---:|---:|---:|---:|
+| PhishNChips phishing decisions | accuracy | 2,000 | 2,000 | 63.6 | 27.3 |
+| MMLU-Pro | accuracy | 12,032 | 12,032 | 52.1 | 46.1 |
+| BBH fixed-option tasks | accuracy | 5,507 | 5,507 | 63.8 | 47.5 |
+| RAGTruth response-level hallucination | F1 on hallucinated class | 2,700 | 2,700 | 66.5 | 43.1 |
+| HoVer claim verification | accuracy | 4,000 | 4,000 | 63.1 | 26.2 |
+| When2Call MCQ | accuracy | 3,652 | 3,652 | 62.8 | 50.3 |
+| New Yorker caption matching | accuracy | 528 | 528 | 58.9 | 48.6 |
+
+- All 151,034 of 151,034 scoreable requests scored. Of 44 scored benchmarks, 40 count toward the index across five equal areas.
+- Requests shared with 0.1 reuse the model's 0.1 predictions. We ran the 30,419 added requests with the same frozen evaluation setup as 0.1, the evaluated soup, which is the published weights, at temperature 1.0.
+- Balanced skill is the headline index. “Without MMLU-Pro” drops MMLU-Pro, averages the other nine Knowledge benchmarks, and keeps five equal areas. It is a sensitivity check, not a score free of training effects.
+- These are point estimates, with no significance, calibration, or latency claims. Do not compare them with 0.1 numbers because the editions differ.
+
+Training-row text matches in the added requests.
+
+| Training stage | Rows in the stage | Rows matching added-request text | From MMLU-Pro | From SuperGPQA | Other |
+|---|---:|---:|---:|---:|---:|
+| T3 | 23,156 | 138 | 131 | 6 | 1 |
+| T4 | 42,360 | 156 | 148 | 7 | 1 |
+
+We screened for exact normalised strings of at least 30 characters shared by training rows and added requests, ignoring strings found in 20 or more requests as templates. Counts are training rows by stage and source, not unique test questions. A matching option or passage need not be the same question, and a clean screen cannot rule out semantic or pretraining overlap.
+
+We did not produce the planned calibration read or a score without the DI-S selection sample.
+
+</details>
+
 ### Decision Index 0.1 (archived edition)
 
 **Full suite: blink-4b 52.12 vs Jev 1.13.0 59.51.**
@@ -64,9 +114,7 @@ Both proxies use the same harness on public items. They aren't official JevBench
 | Kev 9B | 9B | 50.48 | 32.96 | 30.54 |
 | Kev 4B | 4B | 47.43 | 28.86 | 25.67 |
 
-We ran the complete archived 0.1 suite: 132,422 requests across 37 benchmarks. The headline index averages 19 panel benchmarks. Comparison rows use the 2026-09-22 leaderboard snapshot. We ran the official kit's scorer locally; these aren't leaderboard submissions. The live [Decision Index](https://huggingface.co/spaces/multimodalart/jev-decision-index) moved to 0.2 on 2026-09-24, but the public kit can't build 0.2 yet.
-
-No Decision Index 0.2 result is reported for these models. Comparable shared-benchmark results require matched request subsets and the 0.2 metric transformations.
+We ran the complete archived 0.1 suite: 132,422 requests across 37 benchmarks. The headline index averages 19 panel benchmarks. Comparison rows use the 2026-09-22 leaderboard snapshot. We ran the official kit's scorer locally; these aren't leaderboard submissions. The live [Decision Index](https://huggingface.co/spaces/multimodalart/jev-decision-index) moved to 0.2 on 2026-09-24. Our local 0.2 run is in the section above.
 
 On the archived 0.1 board, the best open entry with 3.5–5B served parameters was Kev 4B at 47.43; this model scored 52.12.
 
@@ -218,10 +266,10 @@ docker build -t blink-4b . && docker run --rm --gpus all -p 127.0.0.1:8000:8000 
   get HTTP 503 with `Retry-After`, so clients should retry. On a 1,000-request Decision Index sample over HTTP,
   throughput rose about 20% with 4 concurrent clients and 24% with 16. One client saw no gain. Offline runs on
   long documents showed no meaningful gain. On the Decision Index sample, a set of long workflow documents, and
-  the public TypeSafe cases, with each document sent as a JSON object, batched answers passed the same
-  numerical-parity checks against an FP32 reference as one-at-a-time answers, covering argmax agreement and
-  probability differences. A few near-tied answers can still flip. `v1.1` changes code only, leaving `v1.0`
-  weights unchanged. Update the two code files in an existing `v1.0` download, then restart with the flag:
+  the public TypeSafe cases, batched answers passed the same numerical-parity checks against an FP32 reference
+  as one-at-a-time answers, covering argmax agreement and probability differences. TypeSafe documents were sent
+  as JSON objects. A few near-tied answers can still flip. `v1.1` changes code only, leaving `v1.0` weights
+  unchanged. Update the two code files in an existing `v1.0` download, then restart with the flag:
 
   ```sh
   hf download thegovind/blink-4b serve.py blink.py --revision v1.1 --local-dir blink-4b
@@ -290,9 +338,9 @@ These are source-repository licences; they don't settle rights in every underlyi
 - **Scorer parity.** `blink.py` and the evaluation scorer matched prompts, labels and argmaxes on 296 requests (max |Δp| < 1e-7). From a fresh pinned install and a fresh Hub download, JevBench's stock `typesafe` adapter matched the development run on decision answers, probabilities and token usage across all 231 public items (easy 48/48, standard 71/72, hard 80/111); only the reported model identifier differed, so raw responses weren't byte-identical. The Decision Index kit's `http` engine scored DI-S 50.16 versus 50.08 in-process; its per-request timer on 1,000 random suite requests served serially measured a 66.4 ms median over HTTP versus 65.2 ms in-process.
 - **Selection.** We reused DI-S, the official kit's 3,000-request sample of the 0.1 suite, to pick the prompt format and candidate checkpoints. We fixed blink-4b using JevBench development proxies before its full-suite run. It scored 52.29 on the 129,422 requests outside DI-S.
 - **Training overlap.** Public train splits also used by the 0.1 index: ContractNLI, iSarcasmEval, VAST, Amazon ESCI, Humicroedit, GSM8K (train split; solution-checking items). We also used ANLI and BANKING77 train splits; they're in the 0.1 suite but outside its index, and both are in the 0.2 panel. The audit below reports what was checked and any shared passages.
-- **Partitions.** Public-source data included training and development partitions, plus 281 MMLU-Pro test-partition questions (not in the 0.1 suite, but in the 0.2 panel, so don't score these weights on 0.2 MMLU-Pro) and 2 GPQA extended-set questions outside GPQA Diamond.
+- **Partitions.** Public-source data included training and development partitions, plus 281 MMLU-Pro test-partition questions and 2 GPQA extended-set questions outside GPQA Diamond; MMLU-Pro is not in the 0.1 suite but is in the 0.2 panel, so the 0.2 MMLU-Pro score is contaminated by those training questions and the 0.2 results are descriptive.
 - **Final-mixture audit.** Rechecked every question row (including teacher-written rows, plus base-model anchors) against the complete 0.1 suite (132,422 requests) and JevBench's 231 public items. The checks looked for exact matches of normalised strings of at least 30 characters in any field and shared 13-word passages in each row's question text (instructions, state.question, state.code). Strings or passages seen in 20 or more suite requests were treated as prompt templates and ignored. No public JevBench item matched under these checks; a separate position check found no shared chess positions.
-- **Suite overlap.** No content match with the suite under these checks; all 36 flags were the fixed BANKING77 prompt template.
+- **Suite overlap.** No content match with the 0.1 suite under these checks; all 36 flags were the fixed BANKING77 prompt template.
 - **Audit limits.** The 13-word passage check didn't search long-document bodies or option text. Semantic or pretraining overlap can't be ruled out, and private JevBench items weren't available to check.
 - **Generated reasoning.** Our programs computed the labels for CRUXEval-style code and CLadder-style causal questions; no items from those benchmarks were used. We didn't reuse the suite's GSM8K distractors.
 - **Teacher documents.** We kept Qwen3.8-27B's documents only if a fresh blind solve by that same teacher agreed with the answer. That's an agreement filter, not independent verification.

@@ -2,9 +2,12 @@
 
 ## Decision Index
 
-Decision Index numbers in this repository are local runs of the official kit on
-the archived 0.1 edition. They are not leaderboard submissions. No Decision
-Index 0.2 score is reported for blink v1.0.
+Decision Index 0.1 numbers in this repository are local runs of the official
+kit on the archived edition, not leaderboard submissions. We also report local,
+descriptive 0.2 runs of the official kit, not accepted leaderboard results.
+Known training exposure remains in the 0.2 scores without the leaderboard's
+penalty, so they cannot be ranked against leaderboard results. Details are on
+each model card.
 
 ## JevBench
 

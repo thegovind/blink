@@ -10,7 +10,10 @@ All numbers below inherit the caveats in the model cards.
 
 Decision Index 0.1 numbers are local runs of the official kit on the archived
 edition, not leaderboard submissions. The live board moved to 0.2 on
-2026-09-24, and there is no blink 0.2 result.
+2026-09-24, and we now report local, descriptive 0.2 runs, not accepted
+leaderboard results. Known training exposure remains in the 0.2 scores without
+the leaderboard's penalty, so they cannot be ranked against leaderboard
+results. Details are on each model card.
 
 JevBench numbers are public-item development proxies, not official scores.
 blink-4b public hard was 80/111 with hard ECE 0.067. blink-mimo-9b public hard

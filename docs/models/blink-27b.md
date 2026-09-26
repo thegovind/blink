@@ -32,6 +32,56 @@ Xiaomi, Alibaba Cloud or the Qwen team. Weights are for non-commercial research;
 
 ## Results
 
+### Decision Index 0.2 (local run)
+
+We ran the full Decision Index 0.2 suite ourselves with the official scoring kit at commit 19ad28e on 2026-09-25. This is a descriptive run, not a leaderboard submission or accepted result. The kit's scorer does not apply the leaderboard's penalty for rows an entrant trained on, so known training exposure stays in these scores and they cannot be ranked against the leaderboard.
+
+| Balanced skill | Balanced raw | Breadth skill | Without MMLU-Pro |
+|---:|---:|---:|---:|
+| 52.72 | 63.81 | 51.93 | 52.16 |
+
+- Training included about 3.2k MMLU-Pro test-partition questions, so the 0.2 MMLU-Pro score is contaminated. “Without MMLU-Pro” drops that benchmark but does not remove other training effects. Public train splits used in training are listed under “Training overlap” below.
+
+<details><summary>Extra tables and method</summary>
+
+| Area | Number of benchmarks | Skill | Raw |
+|---|---:|---:|---:|
+| Knowledge & Reasoning | 10 | 45.0 | 56.7 |
+| Language Understanding | 10 | 65.5 | 74.4 |
+| Retrieval & Classification | 7 | 45.7 | 57.6 |
+| Tools & Automation | 6 | 64.7 | 72.1 |
+| Arts & Human Taste | 7 | 42.6 | 58.3 |
+
+The seven benchmarks added in 0.2.
+
+| Benchmark | Metric | Requests | Answered | Raw | Skill |
+|---|---|---:|---:|---:|---:|
+| PhishNChips phishing decisions | accuracy | 2,000 | 2,000 | 68.5 | 37.1 |
+| MMLU-Pro | accuracy | 12,032 | 12,032 | 73.3 | 70.0 |
+| BBH fixed-option tasks | accuracy | 5,507 | 5,507 | 78.1 | 68.3 |
+| RAGTruth response-level hallucination | F1 on hallucinated class | 2,700 | 2,700 | 81.1 | 67.9 |
+| HoVer claim verification | accuracy | 4,000 | 4,000 | 73.8 | 47.6 |
+| When2Call MCQ | accuracy | 3,652 | 3,652 | 69.8 | 59.8 |
+| New Yorker caption matching | accuracy | 528 | 528 | 71.8 | 64.7 |
+
+- All 151,034 of 151,034 scoreable requests scored. Of 44 scored benchmarks, 40 count toward the index across five equal areas.
+- Requests shared with 0.1 reuse the model's 0.1 predictions. We ran the 30,419 added requests with the same frozen evaluation setup as 0.1, the evaluated T4 adapter on the base model, which the published merged weights matched on JevBench's 231 public items (see Evaluation notes), at temperature 1.0.
+- Balanced skill is the headline index. “Without MMLU-Pro” drops MMLU-Pro, averages the other nine Knowledge benchmarks, and keeps five equal areas. It is a sensitivity check, not a score free of training effects.
+- These are point estimates, with no significance, calibration, or latency claims. Do not compare them with 0.1 numbers because the editions differ.
+
+Training-row text matches in the added requests.
+
+| Training stage | Rows in the stage | Rows matching added-request text | From MMLU-Pro | From SuperGPQA | Other |
+|---|---:|---:|---:|---:|---:|
+| T2 | 72,700 | 2,125 | 2,009 | 113 | 3 |
+| T4 | 74,754 | 1,281 | 1,217 | 63 | 1 |
+
+We screened for exact normalised strings of at least 30 characters shared by training rows and added requests, ignoring strings found in 20 or more requests as templates. Counts are training rows by stage and source, not unique test questions. A matching option or passage need not be the same question, and a clean screen cannot rule out semantic or pretraining overlap.
+
+We did not produce the planned calibration read or a score without the DI-S selection sample.
+
+</details>
+
 ### Decision Index 0.1 (archived edition)
 
 **Full suite: blink-27b 63.44 vs Jev 1.13.0 59.51.**
@@ -50,9 +100,7 @@ Xiaomi, Alibaba Cloud or the Qwen team. Weights are for non-commercial research;
 | Kev 9B | 9B | 50.48 | 32.96 | 30.54 |
 | Kev 4B | 4B | 47.43 | 28.86 | 25.67 |
 
-We ran the complete archived 0.1 suite: 132,422 requests across 37 benchmarks. The headline index averages 19 panel benchmarks. Comparison rows use the 2026-09-22 leaderboard snapshot. We ran the official kit's scorer locally; these aren't leaderboard submissions. The live [Decision Index](https://huggingface.co/spaces/multimodalart/jev-decision-index) moved to 0.2 on 2026-09-24, but the public kit can't build 0.2 yet.
-
-No Decision Index 0.2 result is reported for these models. Comparable shared-benchmark results require matched request subsets and the 0.2 metric transformations.
+We ran the complete archived 0.1 suite: 132,422 requests across 37 benchmarks. The headline index averages 19 panel benchmarks. Comparison rows use the 2026-09-22 leaderboard snapshot. We ran the official kit's scorer locally; these aren't leaderboard submissions. The live [Decision Index](https://huggingface.co/spaces/multimodalart/jev-decision-index) moved to 0.2 on 2026-09-24. Our local 0.2 run is in the section above.
 
 | Area | blink-27b | Jev 1.13.0 |
 |---|---:|---:|
@@ -252,9 +300,9 @@ These are source-repository licences; they don't settle rights in every underlyi
 - **Scorer parity.** `blink.py` and the evaluation scorer matched prompts, labels and argmaxes on 296 requests (max |Δp| < 1e-7). With matched batching, the published merged weights matched the evaluated adapter on JevBench's 231 public items (0 argmax changes, max |Δp| < 1e-4). The Decision Index kit's per-request timer on 1,000 random suite requests served serially measured a 192.2 ms median over HTTP versus 190.0 ms in-process. From a fresh Hub download and install at the pinned revision, `serve.py` with JevBench's stock adapter returned easy 48/48, standard 71/72 and hard 89/111 versus 90/111 hard in the padded-batch evaluation: one near-tie flipped (p = 0.508 batched vs 0.500 served), 1/231 answers changed, max |Δp| 0.022; serial serving changes bf16 numerics, so this is not exact reproduction.
 - **Selection.** We reused DI-S, the official kit's 3,000-request sample of the 0.1 suite, to pick the prompt format and candidate checkpoints. On the 129,422 requests outside DI-S, T4 scored 63.46.
 - **Training overlap.** Public train splits also used by the 0.1 index: ContractNLI, iSarcasmEval, VAST, Amazon ESCI, Humicroedit, ChessBench (searchless_chess training positions; none of the 5,000 test positions). We also used ANLI and BANKING77 train splits; they're in the 0.1 suite but outside its index, and both are in the 0.2 panel. The audit below reports what was checked and any shared passages.
-- **Partitions.** Public-source data included training and development partitions, plus about 3.2k MMLU-Pro test-partition questions and 19 GPQA extended-set questions outside GPQA Diamond; MMLU-Pro isn't in the 0.1 suite but is in the 0.2 panel, so don't score these weights on 0.2 MMLU-Pro.
+- **Partitions.** Public-source data included training and development partitions, plus about 3.2k MMLU-Pro test-partition questions and 19 GPQA extended-set questions outside GPQA Diamond; MMLU-Pro is not in the 0.1 suite but is in the 0.2 panel, so the 0.2 MMLU-Pro score is contaminated by those training questions and the 0.2 results are descriptive.
 - **Final-mixture audit.** Rechecked every question row (including teacher-written rows) against the complete 0.1 suite (132,422 requests) and JevBench's 231 public items. The checks looked for exact matches of normalised strings of at least 30 characters in any field and shared 13-word passages in each row's question text (instructions, state.question, state.code). Strings or passages seen in 20 or more suite requests were treated as prompt templates and ignored. No public JevBench item matched under these checks; a separate position check found no shared chess positions.
-- **Suite overlap.** 16 BANKING77/VAST training rows share a 13-word passage with 31 suite requests: 23 of VAST's 3,006 and 8 of BANKING77's 3,080. Two VAST training posts are near-duplicates of a test post, but these rows had no exact normalised-text match under the audit. Dropping those requests leaves the index at 63.44 (VAST 0.7955 → 0.7954); BANKING77 is outside the index.
+- **Suite overlap.** 16 BANKING77/VAST training rows share a 13-word passage with 31 suite requests: 23 of VAST's 3,006 and 8 of BANKING77's 3,080. Two VAST training posts are near-duplicates of a test post, but these rows had no exact normalised-text match under the audit. Dropping those requests leaves the index at 63.44 (VAST 0.7955 → 0.7954); BANKING77 is outside the 0.1 index.
 - **Audit limits.** The 13-word passage check didn't search long-document bodies or option text. Semantic or pretraining overlap can't be ruled out, and private JevBench items weren't available to check.
 - **Generated reasoning.** Our programs computed the labels for CRUXEval-style code and CLadder-style causal questions; no items from those benchmarks were used. We didn't reuse the suite's GSM8K distractors.
 - **Teacher documents.** We kept Qwen3.8-27B's documents only if a fresh blind solve by that same teacher agreed with the answer. That's an agreement filter, not independent verification.

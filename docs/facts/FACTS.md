@@ -10,8 +10,10 @@ General ML background may be written from knowledge, but must be correct.
 - Don't mention employers, internal infrastructure, machine or host names, file-system paths from the
   training machines, or the specific GPU models used for training. Generic terms like "GPU memory" are fine,
   and so are the ZeroGPU facts below (public HF docs).
-- The Decision Index numbers are **our local runs of the official kit** on the archived 0.1 edition, not
-  leaderboard submissions. The live board moved to 0.2 on 2026-09-24, and we have **no 0.2 score**.
+- The Decision Index numbers are **our local runs of the official kit** on the archived 0.1 edition and on 0.2, not
+  leaderboard submissions. The live board moved to 0.2 on 2026-09-24. The model cards now report **local,
+  descriptive 0.2 runs** with known training exposure left in and no leaderboard penalty, so those scores cannot
+  be ranked against the leaderboard.
 - JevBench numbers are **public-item development proxies from our own runs with JevBench's code**, not
   official scores. blink-4b is submitted (fstandhartinger/jevbench#81) and waits in their measurement queue.
 
@@ -243,7 +245,8 @@ Shapes are [out, in]. A Linear layer computes y = W x with W of shape [out, in].
     benchmarks.
   - Panel: MMLU, GPQA Diamond, GSM8K, CRUXEval, CLadder, ChessBench, ContractNLI, iSarcasmEval, VAST, BRIGHT,
     Amazon ESCI, BFCL, ToolRet, RouterBench, BPoMP, Humicroedit, POP909-CL, cfcolor, Habermas Machine.
-  - 0.2 (live since 2026-09-24): 121,057 requests, 44 benchmarks, different metric transformations.
+  - 0.2 (live since 2026-09-24): 151,034 scoreable requests (120,615 carried over from 0.1 plus 30,419 added),
+    44 benchmarks (40 count toward the index), different metric transformations.
 - **DI-S:** a fixed 3,000-request sample of the 0.1 suite, used for checkpoint selection. It also gives
   "outside DI-S" (the suite minus the sample), a cleaner read.
 - **Results (0.1, full suite, our runs):**
