@@ -1,4 +1,4 @@
-.PHONY: test lint serve space leak-scan site site-diagrams
+.PHONY: test lint serve space leak-scan site
 
 test:
 	BLINK_MOCK=1 python -m unittest discover -s space -p 'test_*.py'
@@ -16,10 +16,7 @@ space:
 leak-scan:
 	python scripts/leak_scan.py .
 
-# the docs site; needs site/requirements.txt (and playwright for site-diagrams)
+# the docs site; needs site/requirements.txt
 site:
 	python site/build.py --out _site
 	python site/check.py _site
-
-site-diagrams:
-	python site/render_diagrams.py

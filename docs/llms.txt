@@ -1,0 +1,23 @@
+# blink
+
+> Send text or JSON state with typed questions and get probabilities for every option in one forward pass, with no generated text.
+
+blink supports yes/no (`noul`), choice, and ordered score questions. The server is wire-compatible with TypeSafe's API. The Space accepts the same fields through its Gradio API.
+
+## Docs
+
+- [API](https://thegovind.github.io/blink/api.md): Endpoints, requests, responses, limits, and clients.
+- [Agent experience](https://thegovind.github.io/blink/agents.md): Skill setup and agent-facing docs.
+- [Models](https://thegovind.github.io/blink/models.md): Available models and model cards.
+
+## Models
+
+- [blink-4b](https://huggingface.co/thegovind/blink-4b)
+- [blink-mimo-9b](https://huggingface.co/thegovind/blink-mimo-9b)
+- [blink-27b](https://huggingface.co/thegovind/blink-27b)
+
+## Optional
+
+- [Live Space](https://huggingface.co/spaces/thegovind/blink)
+- [GitHub repo](https://github.com/thegovind/blink)
+- [blink Agent Skill](https://github.com/thegovind/blink/blob/main/skills/blink/SKILL.md)

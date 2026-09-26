@@ -13,7 +13,7 @@
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="{{fonts_css}}">
 <link rel="stylesheet" href="{{root}}assets/site.css">
-{{head_extra}}
+<script>document.documentElement.classList.add("js")</script>
 <script defer src="{{root}}assets/site.js"></script>
 </head>
 <body class="{{body_class}}" data-copy="{{copy}}" data-copied="{{copied}}">
@@ -21,18 +21,14 @@
 <header class="top">
 <div class="top-in">
 <a class="brand" href="{{home}}"><span class="word">blink<em class="dot" aria-hidden="true"></em></span></a>
-<nav class="top-links">
-<a href="{{root}}overview/">{{docs}}</a>
-<a href="{{space_url}}">{{space}}</a>
-<a href="{{github_url}}">{{github}}</a>
-</nav>
+<nav class="top-links" aria-label="{{nav_aria}}">{{top_links}}</nav>
 </div>
 </header>
 {{body}}
 <footer class="foot">
 <div class="foot-in">
 <p class="foot-note">{{footer_note}}</p>
-<p class="foot-links"><a href="{{github_url}}">{{github}}</a><a href="{{space_url}}">{{space}}</a><a href="{{hub_url}}">{{hub}}</a></p>
+<p class="foot-links"><a href="{{github_url}}">{{github}}</a><a href="{{space_url}}">{{space}}</a><a href="{{hub_url}}">{{hub}}</a><a href="{{root}}llms.txt">llms.txt</a></p>
 </div>
 </footer>
 </body>

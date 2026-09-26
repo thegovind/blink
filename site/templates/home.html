@@ -1,36 +1,15 @@
 <main id="main" class="home">
 <section class="hero">
-<h1 class="mast"><span class="word">blink<em class="dot" aria-hidden="true"></em></span></h1>
-<p class="lede">{{pitch}}</p>
+<h1 class="mast">{{title}}</h1>
+<p class="lede">{{lede}}</p>
 <div class="chips">{{chips}}</div>
-<div class="ctas">{{ctas}}</div>
 </section>
-<div class="rule"></div>
-<section class="band how" aria-labelledby="how">
-<h2 class="eyebrow" id="how">{{how}}</h2>
+{{cards}}
+<div class="pipe">
 <div class="pipe-wide">{{figure}}</div>
 <div class="pipe-narrow"><ol>{{stages}}</ol>{{stage_notes}}</div>
-<div class="example">
-<div class="ex-state">
-<p class="ex-label">{{state_label}}</p>
-<p class="ex-text">{{state}}</p>
 </div>
-<div class="ex-answers">{{answers}}</div>
-<p class="ex-cap">{{caption}} <a href="{{case_url}}">{{example_link}}</a></p>
+<div class="prose home-prose">
+{{rest}}
 </div>
-</section>
-<section class="band quick" aria-labelledby="quickstart">
-<h2 class="eyebrow" id="quickstart">{{quick_title}}</h2>
-<div class="prose quick-prose">
-{{quickstart}}
-</div>
-</section>
-<section class="band" aria-labelledby="models">
-<h2 class="eyebrow" id="models">{{models_title}}</h2>
-<div class="tiles">{{model_tiles}}</div>
-</section>
-<section class="band" aria-labelledby="docs">
-<h2 class="eyebrow" id="docs">{{docs_title}}</h2>
-<nav class="tiles" aria-labelledby="docs">{{doc_tiles}}</nav>
-</section>
 </main>

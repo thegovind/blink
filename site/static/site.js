@@ -1,5 +1,4 @@
-/* blink docs: copy buttons, math, diagrams without a saved drawing, and the on-page contents.
-   Nothing here is needed to read a page. */
+/* blink docs: copy buttons, code tabs and the on-page contents. Nothing here is needed to read a page. */
 (() => {
   document.documentElement.classList.add("js");
   const body = document.body;
@@ -31,14 +30,14 @@
   };
   document.querySelectorAll(".code").forEach((block) => {
     const head = block.querySelector(".code-head");
-    const pre = block.querySelector("pre");
-    if (!head || !pre) return;
+    const shown = () => block.querySelector(".code-panel.on pre") || block.querySelector("pre");
+    if (!head || !shown()) return;
     const button = document.createElement("button");
     button.type = "button";
     button.className = "copy";
     button.textContent = copyLabel;
     button.addEventListener("click", async () => {
-      if (!(await copyText(pre.innerText.replace(/\n$/, "")))) return;
+      if (!(await copyText(shown().innerText.replace(/\n$/, "")))) return;
       button.textContent = copiedLabel;
       button.classList.add("done");
       clearTimeout(button.blinkTimer);
@@ -50,28 +49,28 @@
     head.append(button);
   });
 
-  // math, typeset by KaTeX where the page has any
-  if (window.katex) {
-    document.querySelectorAll(".math").forEach((el) => {
-      try {
-        window.katex.render(el.textContent, el, {
-          displayMode: el.classList.contains("display"),
-          throwOnError: false,
-          output: "htmlAndMathml",
-        });
-      } catch (err) {
-        /* the source stays readable */
+  // code tabs: one panel at a time; arrow keys, Home and End move between tabs
+  document.querySelectorAll(".code-tabs").forEach((group) => {
+    const tabs = [...group.querySelectorAll("[role=tab]")];
+    const select = (tab, focus) => {
+      for (const t of tabs) {
+        const on = t === tab;
+        t.setAttribute("aria-selected", String(on));
+        t.tabIndex = on ? 0 : -1;
+        document.getElementById(t.getAttribute("aria-controls")).classList.toggle("on", on);
       }
+      if (focus) tab.focus();
+    };
+    tabs.forEach((tab, i) => {
+      tab.addEventListener("click", () => select(tab, false));
+      tab.addEventListener("keydown", (e) => {
+        const to = { ArrowRight: i + 1, ArrowLeft: i - 1, Home: 0, End: tabs.length - 1 }[e.key];
+        if (to === undefined) return;
+        e.preventDefault();
+        select(tabs[(to + tabs.length) % tabs.length], true);
+      });
     });
-  }
-
-  // a diagram with no saved drawing is drawn here, with the same settings
-  const pending = document.querySelectorAll("pre.mermaid");
-  const config = document.getElementById("mermaid-config");
-  if (pending.length && window.mermaid && config) {
-    window.mermaid.initialize(JSON.parse(config.textContent));
-    window.mermaid.run({ nodes: pending });
-  }
+  });
 
   // the on-page contents mark the section being read
   const links = [...document.querySelectorAll(".toc a[href^='#']")];

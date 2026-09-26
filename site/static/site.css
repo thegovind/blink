@@ -1,5 +1,5 @@
 /* blink docs — the Space's frosted paper: one cobalt for blink, one lime for the instant.
-   Tokens and the figure, answer and tile rules are the Space's own (space/style.css).
+   Tokens, chips and the one-pass figure are the Space's own (space/style.css).
    One palette: a dark system setting draws the same page. */
 
 :root {
@@ -78,6 +78,11 @@ html {
 
 body {
   margin: 0;
+  /* a column, so a short page still puts the footer at the bottom of the window */
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+  min-height: 100dvh;
   background: var(--canvas);
   color: var(--ink);
   font-family: var(--font-geist);
@@ -194,6 +199,7 @@ a:hover {
   color: var(--mid-c);
   font-weight: 500;
   text-decoration: none;
+  white-space: nowrap;
   transition: background-color 0.15s ease, color 0.15s ease;
 }
 
@@ -202,7 +208,14 @@ a:hover {
   color: var(--ink);
 }
 
-/* --- buttons, pills, chips ------------------------------------------------------------ */
+/* where you are: the page on paper, like the Space's selected tab */
+.top-links a[aria-current="page"] {
+  background: var(--paper);
+  color: var(--ink);
+  box-shadow: inset 0 0 0 1px var(--line);
+}
+
+/* --- buttons and chips ------------------------------------------------------------------ */
 
 .btn {
   display: inline-flex;
@@ -220,44 +233,6 @@ a:hover {
 }
 
 .btn:hover {
-  background: var(--alt);
-  border-color: var(--line-strong);
-  color: var(--ink);
-}
-
-/* the one filled colour on a page is the action that runs blink */
-.btn.primary {
-  background: var(--blink);
-  border-color: var(--blink);
-  color: #ffffff;
-}
-
-.btn.primary:hover {
-  background: var(--color-blink-hover);
-  border-color: var(--color-blink-hover);
-  color: #ffffff;
-}
-
-.btn.primary:active {
-  background: var(--color-blink-deep);
-}
-
-.pill {
-  display: inline-flex;
-  align-items: center;
-  min-height: 28px;
-  padding: 0 12px;
-  border: 1px solid var(--line);
-  border-radius: var(--radius-pill);
-  background: var(--paper);
-  color: var(--ink);
-  font-size: 13px;
-  font-weight: 500;
-  text-decoration: none;
-  transition: background-color 0.15s ease, border-color 0.15s ease;
-}
-
-.pill:hover {
   background: var(--alt);
   border-color: var(--line-strong);
   color: var(--ink);
@@ -338,155 +313,90 @@ a.chip.key:hover {
   margin: 12px 0 0;
 }
 
-.ctas {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 8px;
-  margin-top: 24px;
+.lede code,
+.card code {
+  font-family: var(--font-geist-mono);
+  font-size: 0.86em;
+  padding: 1px 6px;
+  border-radius: var(--radius-small);
+  background: var(--canvas);
 }
 
-.rule {
-  height: 1px;
-  background: var(--line);
-  margin: 48px 0 0;
-}
-
-.band {
-  padding-top: 40px;
-}
-
-.eyebrow {
-  font-size: var(--text-caption);
-  font-weight: 500;
-  line-height: 1.33;
-  letter-spacing: 0.05em;
-  text-transform: uppercase;
-  color: var(--mid-c);
-  margin: 0 0 16px;
-}
-
-.pipe-narrow {
-  display: none;
-}
-
-.example {
+/* three ways in, each a card on paper */
+.cards {
   display: grid;
-  grid-template-columns: minmax(0, 5fr) minmax(0, 7fr);
-  grid-template-rows: auto 1fr;
-  grid-template-areas: "state answers" "cap answers";
-  gap: 12px 20px;
-  align-items: start;
-  margin-top: 28px;
-}
-
-.ex-answers {
-  grid-area: answers;
-}
-
-.ex-state {
-  grid-area: state;
-  background: var(--paper);
-  border: 1px solid var(--line);
-  border-radius: var(--radius-cards);
-  box-shadow: var(--shadow-subtle);
-  padding: 20px;
-}
-
-.ex-label {
-  margin: 0 0 8px;
-  font-size: var(--text-caption);
-  font-weight: 500;
-  color: var(--mid-c);
-}
-
-.ex-text {
-  margin: 0;
-  font-size: 15px;
-  line-height: 1.55;
-  color: var(--ink);
-  white-space: pre-wrap;
-  overflow-wrap: anywhere;
-}
-
-.ex-cap {
-  grid-area: cap;
-  margin: 0 4px;
-  font-size: 13px;
-  line-height: 1.5;
-  color: var(--mid-c);
-}
-
-/* the README's quickstart, set on the canvas rather than in a card */
-.home .prose {
-  max-width: 960px;
-  background: none;
-  border: 0;
-  border-radius: 0;
-  box-shadow: none;
-  padding: 0;
-}
-
-.tiles {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  grid-template-columns: repeat(3, minmax(0, 1fr));
   gap: 12px;
+  margin-top: 40px;
 }
 
-.tile {
+.card {
   display: grid;
-  gap: 4px 12px;
+  grid-template-columns: 1fr auto;
+  align-items: baseline;
+  align-content: start;
+  gap: 6px 12px;
+  padding: 20px;
   border: 1px solid var(--line);
   border-radius: var(--radius-cards);
   background: var(--paper);
   box-shadow: var(--shadow-subtle);
-  padding: 16px 20px;
   color: var(--ink);
   text-decoration: none;
   transition: border-color 0.15s ease;
+  animation: blk-rise 0.42s var(--ease) both;
 }
 
-.tile b {
-  font-size: var(--text-body);
-  font-weight: 600;
+.card:nth-child(2) {
+  animation-delay: 60ms;
 }
 
-.tile > span {
-  font-size: 13px;
-  line-height: 1.5;
-  color: var(--mid);
-  font-family: var(--font-geist-mono);
+.card:nth-child(3) {
+  animation-delay: 120ms;
 }
 
-.tile.model .tile-links {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 6px;
-  margin-top: 10px;
-}
-
-.tile.doc {
-  grid-template-columns: 1fr auto;
-  align-items: baseline;
-  background: var(--alt);
-  box-shadow: none;
-  padding: 14px 18px;
-}
-
-a.tile:hover {
+.card:hover {
   border-color: var(--line-strong);
   color: var(--ink);
 }
 
-.tile.doc em {
+.card b {
+  font-size: 16px;
+  font-weight: 600;
+  letter-spacing: -0.01em;
+}
+
+.card span {
+  grid-column: 1 / -1;
+  font-size: var(--text-body);
+  line-height: 1.5;
+  color: var(--mid-c);
+}
+
+.card em {
+  grid-row: 1;
+  grid-column: 2;
   font-style: normal;
   font-size: var(--text-caption);
   font-weight: 500;
   line-height: 1.5;
   color: var(--ink-soft);
-  background: var(--paper);
-  border: 1px solid var(--line);
+  background: var(--canvas);
   border-radius: var(--radius-pill);
   padding: 0 8px;
+}
+
+/* the Space's one-pass figure, kept small */
+.pipe {
+  margin-top: 36px;
+}
+
+.pipe-wide {
+  max-width: 900px;
+}
+
+.pipe-narrow {
+  display: none;
 }
 
 /* --- the Space's pipeline figure (results.pipeline_figure) ---------------------------- */
@@ -580,35 +490,36 @@ a.tile:hover {
   margin: 0;
   padding: 0;
   display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
   gap: 8px;
 }
 
 .pipe-narrow li {
   display: grid;
-  grid-template-columns: 20px 1fr;
-  gap: 2px 10px;
+  align-content: start;
+  gap: 2px;
   background: var(--paper);
   border: 1px solid var(--line);
   border-radius: var(--radius-pill);
-  padding: 12px 16px;
+  padding: 12px 14px;
 }
 
 .pipe-narrow li .n {
-  grid-row: span 2;
   font-size: 12px;
   font-weight: 600;
   color: var(--blink);
-  line-height: 22px;
+  line-height: 18px;
 }
 
 .pipe-narrow li b {
-  font-size: 16px;
+  font-size: 15px;
   font-weight: 600;
   letter-spacing: -0.02em;
 }
 
 .pipe-narrow li span:not(.n) {
-  font-size: 13px;
+  font-size: 12.5px;
+  line-height: 1.45;
   color: var(--mid-c);
 }
 
@@ -618,235 +529,46 @@ a.tile:hover {
   color: var(--mid-c);
 }
 
-/* --- the Space's answer cards (ui.render_answers) ------------------------------------- */
-
-.blk-answers {
-  display: grid;
-  gap: 12px;
-}
-
-.blk-q {
-  background: var(--paper);
-  border: 1px solid var(--line);
-  border-radius: var(--radius-cards);
-  box-shadow: var(--shadow-subtle);
-  padding: 20px;
-  animation: blk-rise 0.42s var(--ease) both;
-  animation-delay: var(--d, 0ms);
-}
-
-.blk-q-head {
-  display: grid;
-  gap: 6px;
-}
-
-.blk-q-head p {
-  margin: 0;
-  font-size: 15px;
-  font-weight: 500;
-  line-height: 1.45;
-  letter-spacing: -0.01em;
-  color: var(--ink);
-  overflow-wrap: anywhere;
-}
-
-.blk-q-head p:empty {
-  display: none;
-}
-
-.blk-q-meta {
-  display: flex;
-  align-items: center;
-  flex-wrap: wrap;
-  gap: 8px;
-}
-
-.blk-q-head h4 {
-  font-family: var(--font-geist-mono);
-  font-size: var(--text-caption);
-  font-weight: 500;
-  margin: 0;
-  color: var(--mid-c);
-}
-
-.blk-kind {
-  font-size: var(--text-caption);
-  font-style: normal;
-  font-weight: 500;
-  line-height: 1.5;
-  border-radius: var(--radius-pill);
-  padding: 0 8px;
-  color: var(--ink-soft);
-  background: var(--canvas);
-}
-
-.blk-headline {
-  display: flex;
-  align-items: baseline;
-  gap: 10px;
-  margin: 12px 0 0;
-  flex-wrap: wrap;
-}
-
-.blk-headline b {
-  font-weight: 600;
-  font-size: var(--text-heading);
-  line-height: 1.2;
-  letter-spacing: -0.025em;
-  color: var(--ink);
-  overflow-wrap: anywhere;
-}
-
-.blk-headline .blk-sub {
-  font-size: 13px;
-  color: var(--mid);
-  font-variant-numeric: tabular-nums;
-}
-
-.blk-opts {
-  list-style: none;
-  margin: 16px 0 0;
+/* the rest of the home page sits on the canvas, its headings set like the Space's eyebrows */
+.home-prose.prose {
+  max-width: none;
+  margin-top: 40px;
+  background: none;
+  border: 0;
+  border-radius: 0;
+  box-shadow: none;
   padding: 0;
-  display: grid;
-  gap: 8px;
 }
 
-.blk-opt {
-  display: grid;
-  grid-template-columns: minmax(0, 188px) 1fr 64px;
-  align-items: center;
-  gap: 12px;
-  margin: 0;
-  font-size: 13px;
-}
-
-.blk-opt .k {
-  color: var(--mid);
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
-}
-
-.blk-opt.win .k {
-  color: var(--ink);
-  font-weight: 500;
-}
-
-.blk-opt .track {
-  height: 8px;
-  background: var(--track);
-  border-radius: 999px;
-  overflow: hidden;
-}
-
-/* every bar is blink's own probability; the one it picked is the full cobalt */
-.blk-opt .track i {
-  display: block;
-  height: 100%;
-  border-radius: 999px;
-  background: var(--blink-light);
-  transform-origin: left center;
-  animation: blk-wipe 0.5s var(--ease) both;
-  animation-delay: calc(var(--d, 0ms) + var(--i, 0) * 40ms);
-}
-
-.blk-opt.win .track i {
-  background: var(--blink);
-}
-
-.blk-opt .v {
-  font-size: 13px;
-  color: var(--mid);
-  text-align: right;
-  font-variant-numeric: tabular-nums;
-}
-
-/* the instant: where the one pass lands, flashed on once */
-.blk-opt.win .v {
-  justify-self: end;
-  color: var(--color-flash-ink);
-  font-weight: 600;
-  background: var(--flash);
-  border-radius: var(--radius-pill);
-  padding: 0 8px;
-  line-height: 20px;
-  animation: blk-flash 0.5s ease-out both;
-  animation-delay: calc(var(--d, 0ms) + 380ms);
-}
-
-/* --- docs layout ------------------------------------------------------------------------ */
-
-.docs {
-  max-width: 1280px;
-  margin: 0 auto;
-  padding: 24px var(--gutter) 24px;
-  display: grid;
-  grid-template-columns: 216px minmax(0, 1fr) 208px;
-  gap: 32px;
-  align-items: start;
-}
-
-.side,
-.toc {
-  position: sticky;
-  top: calc(var(--top-h) + 24px);
-  max-height: calc(100vh - var(--top-h) - 48px);
-  overflow-y: auto;
-  overscroll-behavior: contain;
-  scrollbar-width: thin;
-}
-
-.nav {
-  font-size: var(--text-body);
-}
-
-.nav-group {
-  margin: 20px 0 6px;
-  padding-left: 12px;
+.home-prose.prose h2 {
+  margin: 0 0 16px;
   font-size: var(--text-caption);
   font-weight: 500;
+  line-height: 1.33;
   letter-spacing: 0.05em;
   text-transform: uppercase;
   color: var(--mid-c);
 }
 
-.nav .nav-group:first-child {
-  margin-top: 4px;
-}
-
-.nav ul {
-  list-style: none;
-  margin: 0;
-  padding: 0;
-  display: grid;
-  gap: 1px;
-}
-
-.nav a {
-  display: block;
-  padding: 6px 12px;
-  border-radius: var(--radius-pill);
-  color: var(--mid-c);
-  font-weight: 500;
-  line-height: 1.43;
-  text-decoration: none;
-  transition: background-color 0.15s ease, color 0.15s ease;
-}
-
-.nav a:hover {
-  background: rgba(10, 10, 10, 0.05);
-  color: var(--ink);
-}
-
-/* where you are: the page on paper, like the Space's selected tab */
-.nav a[aria-current="page"] {
-  background: var(--paper);
-  color: var(--ink);
-  box-shadow: inset 0 0 0 1px var(--line);
-}
-
-.navm {
+.home-prose.prose h2 .anchor {
   display: none;
+}
+
+/* --- docs pages: one column on paper, the contents beside it -------------------------- */
+
+.page {
+  max-width: 1120px;
+  margin: 0 auto;
+  padding: 32px var(--gutter) 24px;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 208px;
+  gap: 40px;
+  align-items: start;
+}
+
+.page.solo {
+  max-width: 884px;
+  grid-template-columns: minmax(0, 1fr);
 }
 
 .doc {
@@ -863,6 +585,9 @@ a.tile:hover {
 }
 
 .doc-source {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px 20px;
   margin: 12px 4px 0;
   font-size: 13px;
 }
@@ -873,6 +598,15 @@ a.tile:hover {
 
 .doc-source a:hover {
   color: var(--ink);
+}
+
+.toc {
+  position: sticky;
+  top: calc(var(--top-h) + 32px);
+  max-height: calc(100vh - var(--top-h) - 64px);
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  scrollbar-width: thin;
 }
 
 .toc-title {
@@ -922,6 +656,26 @@ a.tile:hover {
 
 .tocm {
   display: none;
+}
+
+.tocm > summary {
+  cursor: pointer;
+  list-style: none;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 8px 0;
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--ink-soft);
+}
+
+.tocm > summary::-webkit-details-marker {
+  display: none;
+}
+
+.tocm nav {
+  padding: 4px 0 12px;
 }
 
 /* --- prose ----------------------------------------------------------------------------- */
@@ -1127,6 +881,64 @@ a.tile:hover {
   font-family: inherit;
 }
 
+/* one example in several languages: a tab each, set like the language name */
+.code-tabs .tabs {
+  display: flex;
+  gap: 2px;
+  margin-left: -10px;
+}
+
+.tab {
+  height: 26px;
+  padding: 0 10px;
+  border: 0;
+  border-radius: var(--radius-pill);
+  background: none;
+  color: var(--mid);
+  font-family: var(--font-geist-mono);
+  font-size: 11.5px;
+  cursor: pointer;
+  transition: background-color 0.15s ease, color 0.15s ease;
+}
+
+.tab:hover {
+  color: var(--ink-soft);
+}
+
+.tab[aria-selected="true"] {
+  background: var(--canvas);
+  color: var(--ink);
+}
+
+.tab:focus-visible {
+  outline: none;
+  box-shadow: var(--ring);
+}
+
+.js .code-panel:not(.on) {
+  display: none;
+}
+
+/* without scripts every panel shows, each under its language */
+html:not(.js) .code-tabs > .code-head {
+  display: none;
+}
+
+html:not(.js) .code-panel::before {
+  content: attr(data-lang);
+  display: block;
+  padding: 9px 16px;
+  border-bottom: 1px solid var(--line);
+  background: var(--paper);
+  font-family: var(--font-geist-mono);
+  font-size: 11.5px;
+  color: var(--mid);
+}
+
+html:not(.js) .code-panel + .code-panel {
+  border-top: 1px solid var(--line);
+}
+
 /* tables: the Space's hairline table */
 .table-wrap {
   margin: 0 0 18px;
@@ -1206,7 +1018,6 @@ a.tile:hover {
 }
 
 .prose details > summary::before,
-.navm > summary::before,
 .tocm > summary::before {
   content: "";
   width: 6px;
@@ -1219,7 +1030,6 @@ a.tile:hover {
 }
 
 .prose details[open] > summary::before,
-.navm[open] > summary::before,
 .tocm[open] > summary::before {
   transform: rotate(45deg);
 }
@@ -1232,51 +1042,6 @@ a.tile:hover {
   margin-bottom: 4px;
 }
 
-/* diagrams, drawn ahead of time; wider than the column, they scroll inside their card */
-.diagram {
-  margin: 8px 0 20px;
-  padding: 20px;
-  border: 1px solid var(--line);
-  border-radius: var(--radius-pill);
-  background: var(--paper);
-  overflow-x: auto;
-  text-align: center;
-}
-
-.diagram svg {
-  display: inline-block;
-  max-width: 100%;
-  height: auto;
-}
-
-/* Mermaid measured its labels without the prose rules; keep them out */
-.prose .diagram p {
-  margin: 0;
-  font-size: inherit;
-  line-height: inherit;
-  color: inherit;
-}
-
-.diagram pre.mermaid {
-  margin: 0;
-  text-align: left;
-  font-family: var(--font-geist-mono);
-  font-size: 12px;
-  color: var(--mid-c);
-  white-space: pre-wrap;
-}
-
-.math.display {
-  display: block;
-  margin: 4px 0 16px;
-  overflow-x: auto;
-  overflow-y: hidden;
-  padding: 4px 0;
-}
-
-.math.inline {
-  font-size: 0.98em;
-}
 
 /* --- plain pages ------------------------------------------------------------------------ */
 
@@ -1296,9 +1061,14 @@ a.tile:hover {
 
 /* --- footer ------------------------------------------------------------------------------ */
 
+body > .top + * {
+  width: 100%;
+  margin-bottom: 48px;
+}
+
 .foot {
   border-top: 1px solid var(--line);
-  margin-top: 48px;
+  margin-top: auto;
 }
 
 .foot-in {
@@ -1337,9 +1107,10 @@ a.tile:hover {
 
 /* --- narrower screens ---------------------------------------------------------------------- */
 
-@media (max-width: 1180px) {
-  .docs {
-    grid-template-columns: 208px minmax(0, 1fr);
+@media (max-width: 1080px) {
+  .page {
+    grid-template-columns: minmax(0, 1fr);
+    max-width: 884px;
   }
 
   .toc {
@@ -1354,66 +1125,15 @@ a.tile:hover {
     border-radius: var(--radius-pill);
     background: var(--alt);
   }
-
-  .tocm > summary,
-  .navm > summary {
-    cursor: pointer;
-    list-style: none;
-    display: flex;
-    align-items: center;
-    gap: 10px;
-    padding: 8px 0;
-    font-size: 13px;
-    font-weight: 500;
-    color: var(--ink-soft);
-  }
-
-  .tocm > summary::-webkit-details-marker,
-  .navm > summary::-webkit-details-marker {
-    display: none;
-  }
-
-  .tocm nav {
-    padding: 4px 0 12px;
-  }
 }
 
 @media (max-width: 860px) {
-  .docs {
+  .cards {
     grid-template-columns: minmax(0, 1fr);
-    gap: 0;
-    padding-top: 12px;
-  }
-
-  .side {
-    display: none;
-  }
-
-  .navm {
-    display: block;
-    margin: 0 0 12px;
-    padding: 2px 16px;
-    border: 1px solid var(--line);
-    border-radius: var(--radius-pill);
-    background: var(--paper);
-  }
-
-  .navm .nav {
-    padding: 0 0 12px;
-  }
-
-  .navm .nav a {
-    padding: 8px 12px;
   }
 
   .prose {
     padding: 28px 24px 32px;
-  }
-
-  .example {
-    grid-template-columns: minmax(0, 1fr);
-    grid-template-rows: auto;
-    grid-template-areas: "state" "answers" "cap";
   }
 }
 
@@ -1424,6 +1144,10 @@ a.tile:hover {
 
   .top-links a {
     padding: 0 9px;
+  }
+
+  .top-links a.wide {
+    display: none;
   }
 
   .hero {
@@ -1438,12 +1162,12 @@ a.tile:hover {
     font-size: 17px;
   }
 
-  .rule {
-    margin-top: 36px;
+  .cards {
+    margin-top: 28px;
   }
 
-  .band {
-    padding-top: 32px;
+  .card {
+    padding: 16px 18px;
   }
 
   .pipe-wide {
@@ -1454,19 +1178,8 @@ a.tile:hover {
     display: block;
   }
 
-  .blk-q,
-  .ex-state {
-    padding: 16px;
-  }
-
-  .blk-opt {
-    grid-template-columns: minmax(0, 1fr) auto;
-    grid-auto-flow: row dense;
-    gap: 4px 10px;
-  }
-
-  .blk-opt .track {
-    grid-column: 1 / -1;
+  .page {
+    padding-top: 16px;
   }
 
   .prose {
@@ -1493,16 +1206,6 @@ a.tile:hover {
     line-height: 1.65;
   }
 
-  /* a diagram keeps a readable size on a phone and scrolls sideways in its card */
-  .diagram {
-    padding: 14px;
-    text-align: left;
-  }
-
-  .diagram svg {
-    max-width: none;
-  }
-
   .prose th,
   .prose td {
     padding: 7px 10px;
@@ -1513,9 +1216,9 @@ a.tile:hover {
   }
 }
 
-@media (max-width: 380px) {
-  .top-links a:first-child {
-    display: none;
+@media (max-width: 360px) {
+  .top-links a {
+    padding: 0 7px;
   }
 }
 
@@ -1544,15 +1247,6 @@ a.tile:hover {
   }
 }
 
-@keyframes blk-wipe {
-  from {
-    transform: scaleX(0);
-  }
-  to {
-    transform: scaleX(1);
-  }
-}
-
 @keyframes blk-pop {
   from {
     opacity: 0;
@@ -1576,23 +1270,6 @@ a.tile:hover {
 @keyframes blk-draw {
   to {
     stroke-dashoffset: 0;
-  }
-}
-
-/* the picked option's number comes on, blinks, and stays */
-@keyframes blk-flash {
-  0% {
-    opacity: 0;
-  }
-  40% {
-    opacity: 1;
-  }
-  60% {
-    opacity: 0.3;
-  }
-  80%,
-  100% {
-    opacity: 1;
   }
 }
 

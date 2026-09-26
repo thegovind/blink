@@ -52,8 +52,6 @@ def main() -> int:
                 val = m.group(0)
                 if val in {"127.0.0.1", "0.0.0.0"}:
                     continue
-                if pat.pattern.startswith("\\b(?:\\d{1,3}") and rel.as_posix() == "docs/blink-first-principles.html":
-                    continue
                 hits.append(f"{rel}: {pat.pattern}: {val[:80]}")
     if hits:
         print("\n".join(hits))

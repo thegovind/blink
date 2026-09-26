@@ -17,4 +17,4 @@ Attributions:
   whose model card declares MIT licensing for the base model.
 - Contributor Covenant: CODE_OF_CONDUCT.md is based on Contributor Covenant 2.1.
 
-Dataset licenses are listed in the model cards under docs/models/.
+Dataset licenses are listed in the model cards at https://huggingface.co/thegovind.
