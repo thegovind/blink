@@ -175,6 +175,19 @@ class Links(unittest.TestCase):
         self.assertIn("See notes.", html)
         self.assertTrue(env["math"])
 
+    def test_table_code_wraps_only_at_spaces_and_slashes(self):
+        self.assertEqual(build.cell_code("/v1/systemone"),
+                         '<code class="cell"><span>/v1</span><wbr><span>/systemone</span></code>')
+        self.assertEqual(build.cell_code("--batch-window-ms"), '<code class="cell"><span>--batch-window-ms</span></code>')
+        self.assertEqual(build.cell_code("https://x.org/a"),
+                         '<code class="cell"><span>https://x.org</span><wbr><span>/a</span></code>')
+        self.assertEqual(build.cell_code('{"true": "<y>"}'),
+                         '<code class="cell"><span>{&quot;true&quot;:</span> <span>&quot;&lt;y&gt;&quot;}</span></code>')
+        html, _ = self.site.render("| `a/b` |\n| --- |\n| `c/d` |\n\nSee `e/f`.\n", self.guide)
+        self.assertIn('<th><code class="cell"><span>a</span><wbr><span>/b</span></code></th>', html)
+        self.assertIn('<td><code class="cell"><span>c</span><wbr><span>/d</span></code></td>', html)
+        self.assertIn("<code>e/f</code>", html)
+
     def test_diagrams_fall_back_to_the_browser(self):
         html, env = self.site.render("```mermaid\nflowchart TB\n  A --> B\n```\n", self.guide)
         self.assertIn('<pre class="mermaid">', html)

@@ -325,6 +325,13 @@ class Site:
                 return ""
             return renderer.renderToken(tokens, idx, options, env)
 
+        plain_code = md.renderer.rules["code_inline"]
+
+        def code_inline(renderer, tokens, idx, options, env):
+            if tokens[idx].meta.get("cell"):
+                return cell_code(tokens[idx].content)
+            return plain_code(tokens, idx, options, env)
+
         def link_close(renderer, tokens, idx, options, env):
             return "" if tokens[idx].meta.get("unlink") else "</a>"
 
@@ -344,12 +351,18 @@ class Site:
         md.add_render_rule("table_close", table_close)
         md.add_render_rule("link_open", link_open)
         md.add_render_rule("link_close", link_close)
+        md.add_render_rule("code_inline", code_inline)
         md.add_render_rule("math_inline", math_inline)
         md.add_render_rule("math_inline_double", math_inline_double)
         md.add_render_rule("math_block", math_block)
 
     def prepare(self, tokens, page: Page, env: dict) -> None:
+        in_cell = False
         for i, tok in enumerate(tokens):
+            if tok.type in ("td_open", "th_open"):
+                in_cell = True
+            elif tok.type in ("td_close", "th_close"):
+                in_cell = False
             if tok.type == "heading_open":
                 text = inline_text(tokens[i + 1]).strip()
                 hid = env["slugger"].slug(text)
@@ -366,7 +379,9 @@ class Site:
                 continue
             stack = []
             for c in tok.children:
-                if c.type.startswith("math_inline"):
+                if c.type == "code_inline" and in_cell:
+                    c.meta["cell"] = True
+                elif c.type.startswith("math_inline"):
                     env["math"] = True
                 elif c.type == "link_open":
                     href = c.attrGet("href") or ""
@@ -710,6 +725,19 @@ class Site:
 
 def new_env() -> dict:
     return {"toc": [], "slugger": Slugger(), "math": False, "mermaid": False}
+
+
+# a table cell's code may wrap before a '/' (not one that opens it, or one of '//')
+SLASH_BREAK = re.compile(r"(?<=[^/\s])(?=/[^/\s])")
+
+
+def cell_code(content: str) -> str:
+    """Inline code in a table cell: whole segments that wrap only at a space or just before a '/', never inside a
+    token; where a segment is still too wide, the table scrolls."""
+    words = []
+    for word in content.split(" "):
+        words.append("<wbr>".join(f"<span>{esc(seg)}</span>" for seg in SLASH_BREAK.split(word) if seg))
+    return f'<code class="cell">{" ".join(words)}</code>'
 
 
 def code_html(code: str, lang: str) -> str:

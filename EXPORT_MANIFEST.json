@@ -1157,7 +1157,7 @@
   {
     "dest": ".github/workflows/ci.yml",
     "reason": "repository scaffold",
-    "sha256": "a101e9319d47939b2b9988bb4f21faf15b9cbb250fa00f44432239a837c8a331",
+    "sha256": "d0f381484c961664d71cc738cc0abf1a16a185fdec09737134f011e5a4e588fc",
     "src": "<generated>",
     "transform": "generate"
   },
@@ -1304,7 +1304,7 @@
   {
     "dest": "site/build.py",
     "reason": "docs site",
-    "sha256": "cbf896e835415a6b15dc525dc5bb69d8bd1cc828ff5749b2140f03b8419011ad",
+    "sha256": "11da17bddde02456ca86da3e38debf8ebb1721b0bb47d2a2f9573a8cb011655d",
     "src": "<site>",
     "transform": "copy"
   },
@@ -1323,310 +1323,310 @@
     "transform": "copy"
   },
   {
-    "dest": "site/diagrams/103562624aba88af.svg",
+    "dest": "site/diagrams/00e35e2729583590.svg",
     "reason": "docs site",
-    "sha256": "11b3547846d7012c5e8ecb0f55cb264d5b1915a135e402e33f15408958525fa0",
+    "sha256": "7eb09d7b412bbd70b80432ae3f46facb18e81e472418ad169daac9114d595807",
     "src": "<site>",
     "transform": "copy"
   },
   {
-    "dest": "site/diagrams/1dd3e87e941dcbd8.svg",
+    "dest": "site/diagrams/03bdcecd3b950e8e.svg",
     "reason": "docs site",
-    "sha256": "2fd3768ccc91335997ca790bcc87081332993f878edb36439c960194e672117f",
+    "sha256": "c65708c82ca113983fc03377a9676c73ddd0b1cd774eb911824fc96bbba543de",
     "src": "<site>",
     "transform": "copy"
   },
   {
-    "dest": "site/diagrams/21679bdb3a4f8b05.svg",
+    "dest": "site/diagrams/069bfdc97e782f29.svg",
     "reason": "docs site",
-    "sha256": "7dbe6e5e919082cf794531b6e0d691cae00ebc6713b02e84b2bbaa788a59bcf7",
+    "sha256": "1b8bd11ba43a71e6571a6c62b759c7311490b12ca47e0874f297bde678db5a09",
     "src": "<site>",
     "transform": "copy"
   },
   {
-    "dest": "site/diagrams/2187fe3a8adfb5e1.svg",
+    "dest": "site/diagrams/0d9feaa4d158e486.svg",
     "reason": "docs site",
-    "sha256": "a46c79adf7cd7cf2a9b976b1427f19407e6444d10f0caab8811ad41a2e11f21f",
+    "sha256": "a3fc0688809cd16516b71be7dd5fed57f2815c25059668198b7146f307f44258",
     "src": "<site>",
     "transform": "copy"
   },
   {
-    "dest": "site/diagrams/2c5e8805147c38b4.svg",
+    "dest": "site/diagrams/162942675597dde8.svg",
     "reason": "docs site",
-    "sha256": "7c5f102a5934ef580d7ffb194f73327cdce2b67ba0e0dd03059ec0780d244c24",
+    "sha256": "662f838f30b4028e47366e789f69195f13e60067addf92a0e11d7cf49dbc453c",
     "src": "<site>",
     "transform": "copy"
   },
   {
-    "dest": "site/diagrams/2f7fd75aac652db6.svg",
+    "dest": "site/diagrams/23877f53780a32dd.svg",
     "reason": "docs site",
-    "sha256": "ee2a73af6641c55e246255f23de997d3c7c2dd98a0f0f83f0e0f951db0fc0d94",
+    "sha256": "85ef4f4c013dcccaae3737e239ed331bd0acce312461f771a30e74c98cc2dee1",
     "src": "<site>",
     "transform": "copy"
   },
   {
-    "dest": "site/diagrams/30266db271ecee5c.svg",
+    "dest": "site/diagrams/27dbc3e4314dae9c.svg",
     "reason": "docs site",
-    "sha256": "7a8f32ab3d76b50a0dd1fbfa8121d3ca0173e882a37c1cebb200a575d48e9250",
+    "sha256": "41f80ff1f737a75c4ca1b6b46bdf7aca1cb5e0155517a2b4b55f6aff5e6821fb",
     "src": "<site>",
     "transform": "copy"
   },
   {
-    "dest": "site/diagrams/3bd42398615273e6.svg",
+    "dest": "site/diagrams/3c5e099472ba2c44.svg",
     "reason": "docs site",
-    "sha256": "e966f3428447d209ed962ea1c09c2d67559bb130a045a8cb25c6c45221bf633f",
+    "sha256": "4e94d839818434b222ba95301d2c4ab21de9d805602ace1521c00df6f8ad065a",
     "src": "<site>",
     "transform": "copy"
   },
   {
-    "dest": "site/diagrams/48cc1961e1c54866.svg",
+    "dest": "site/diagrams/3df8337bd384146b.svg",
     "reason": "docs site",
-    "sha256": "1996f0d151e783a0887e920c72c94999b8e5c2dc0c859d34959a69959cd8196f",
+    "sha256": "cf9f0ddd5be1db8b2cc27b96bd5836910e88db1ed9a01628ca2b788d4bbeaf07",
     "src": "<site>",
     "transform": "copy"
   },
   {
-    "dest": "site/diagrams/4b8eb20dd7221969.svg",
+    "dest": "site/diagrams/488cd5f115c7873d.svg",
     "reason": "docs site",
-    "sha256": "3c036279780255c632d8c5fb3ab04d62f208c817f05f1aacd4aefa6c6a2d76bd",
+    "sha256": "4fefde481f8b6326bc8b0720488c46ab6664060be3026d9caf79fac11c06ca2e",
     "src": "<site>",
     "transform": "copy"
   },
   {
-    "dest": "site/diagrams/4c0822bbfea3981e.svg",
+    "dest": "site/diagrams/4ff59136d45d1634.svg",
     "reason": "docs site",
-    "sha256": "ccee0dcd8a47b43614b6398fb3f510e2bb3838835448be692d928f5644e37cf4",
+    "sha256": "6432784377013a2d52b0c5f409f2e9f497dd06a56c34251ad5a8bc9ba5a817cc",
     "src": "<site>",
     "transform": "copy"
   },
   {
-    "dest": "site/diagrams/4c42d9bd2bb7ef87.svg",
+    "dest": "site/diagrams/59cc50652b73f6cb.svg",
     "reason": "docs site",
-    "sha256": "5d77bcdca3ad2342536de9b7f22b01be448bceb96904dc0d74bb32df6fafc297",
+    "sha256": "7efd61c8d4dc7dc0f1f1f8fd5de122f5611a1c374ef5e24dd3904edfcfec54f9",
     "src": "<site>",
     "transform": "copy"
   },
   {
-    "dest": "site/diagrams/521c61499c08c71e.svg",
+    "dest": "site/diagrams/5e4b0bbf18cc923e.svg",
     "reason": "docs site",
-    "sha256": "9a96c6e7d9caa5cca3886e4efbbafb5c07047d788820139349c0389f6d828e9d",
+    "sha256": "18b4f6f8cf38c612e368f34156adc65d39581c32f89be235d859de60b3a37354",
     "src": "<site>",
     "transform": "copy"
   },
   {
-    "dest": "site/diagrams/55989009ba289615.svg",
+    "dest": "site/diagrams/5edea7dd6ba5f41c.svg",
     "reason": "docs site",
-    "sha256": "8e521a2edbfe5051dc316e7363929a1ac1eaa4c2ad9dd3aaeabf86112a2f76a4",
+    "sha256": "e3b95b54a9dfec39b2995aba5872a86bf822aa569d4abec05e187def51b5cc65",
     "src": "<site>",
     "transform": "copy"
   },
   {
-    "dest": "site/diagrams/5b1cb829ad70b11f.svg",
+    "dest": "site/diagrams/5faa54e74ed99865.svg",
     "reason": "docs site",
-    "sha256": "2e8b824242dbcd61fbd24cfbefd3c6d631e89e90f0612c148ef9220eee8dc209",
+    "sha256": "4782276958807f85444162eef1a6b0bfb16ab69a722fdad612a7e2ddac2a30c0",
     "src": "<site>",
     "transform": "copy"
   },
   {
-    "dest": "site/diagrams/6090845c211ebecb.svg",
+    "dest": "site/diagrams/5fe8bffbb4575f22.svg",
     "reason": "docs site",
-    "sha256": "c8095e93464816f0a91473923e11cf19bbccf9187c2139fb7cd81b2575fa034d",
+    "sha256": "c2d94e5ce1f3cc46e2f5bf0fa57c06b3189e5335721cc796502843702ec2c36b",
     "src": "<site>",
     "transform": "copy"
   },
   {
-    "dest": "site/diagrams/60b5a1030a9776e4.svg",
+    "dest": "site/diagrams/652e3887e3d53da2.svg",
     "reason": "docs site",
-    "sha256": "b2c2812346564fdc7d44572ca8796dee8035d3857549bac3702c8d6f938b7d96",
+    "sha256": "5c198af6bbb73704b19c7ce691b373445170c1df4b5dc49b82312db9db28ac87",
     "src": "<site>",
     "transform": "copy"
   },
   {
-    "dest": "site/diagrams/63b43a1a78d77f8c.svg",
+    "dest": "site/diagrams/6cd20f31a12cd5c6.svg",
     "reason": "docs site",
-    "sha256": "9b224881bfc1250d9fb586d7e6be388cbf1ae5e11e7cb6a9ed49225e8aa1b725",
+    "sha256": "5f4042688d6ae105333ac16ab1ea9067204befb8f86cc10b3e4db4f65b869739",
     "src": "<site>",
     "transform": "copy"
   },
   {
-    "dest": "site/diagrams/6f87dd3d95e783ba.svg",
+    "dest": "site/diagrams/78edeba407739a83.svg",
     "reason": "docs site",
-    "sha256": "a55944df603bb8ee464949257955c55d694be81b9dfe7d7c8b8bdb228179e440",
+    "sha256": "495a0913f8cd418976c925e75e8c27b3a7e7d27a3dc7c4ba8eec73cc5cff219b",
     "src": "<site>",
     "transform": "copy"
   },
   {
-    "dest": "site/diagrams/794342c557c95562.svg",
+    "dest": "site/diagrams/875c479956094566.svg",
     "reason": "docs site",
-    "sha256": "38f131b31833dcb718f7a0553c61ad3b6140a7a28c77b7bc1decb5ffad66a255",
+    "sha256": "2365ac134aceb26904b2b73a502509f50260833c73f0d1e7136a89aac0506dbe",
     "src": "<site>",
     "transform": "copy"
   },
   {
-    "dest": "site/diagrams/7dc086a6adeaad5a.svg",
+    "dest": "site/diagrams/89bd707a5b145808.svg",
     "reason": "docs site",
-    "sha256": "ce71a3857d70bc508bcf07ce16e9033b7522ab18e6dbf5781954463f89455611",
+    "sha256": "84937fcd333e6da18a925be4a54e9ec4ac372d1b83c670443bdb17136fca6d31",
     "src": "<site>",
     "transform": "copy"
   },
   {
-    "dest": "site/diagrams/7e77c30e6210e0d5.svg",
+    "dest": "site/diagrams/8ad0b722a7e17c1f.svg",
     "reason": "docs site",
-    "sha256": "bbae70989660c4c559d64f7e210077dcae2fac5d9e40fc4b19f2a71605cf0461",
+    "sha256": "f11877052f298e8a7bffb36115ca2c200d9212d07672efab2a204ec10167eff7",
     "src": "<site>",
     "transform": "copy"
   },
   {
-    "dest": "site/diagrams/836ce9ac38139c03.svg",
+    "dest": "site/diagrams/8dbd02a38f3c5e00.svg",
     "reason": "docs site",
-    "sha256": "a6c67cd3df4f6d091db606acde591909b7a28070af1188b8613ef1be5ba49c0c",
+    "sha256": "2326e27357e6d11f9a234e6c4d11f5377db973f1810927764632367dae5680b0",
     "src": "<site>",
     "transform": "copy"
   },
   {
-    "dest": "site/diagrams/8c8b51647f928bd1.svg",
+    "dest": "site/diagrams/8f2e1a4a10da59c0.svg",
     "reason": "docs site",
-    "sha256": "3c03d7e133432e058afd7068fbba079e0b051aef6d7407c3ba827f61bcc18146",
+    "sha256": "b33d7bd6c96f6cfaf44c54b6b6992c31737397da3f7da4449ceb7e465c143174",
     "src": "<site>",
     "transform": "copy"
   },
   {
-    "dest": "site/diagrams/8e264bbfc7e7c1f3.svg",
+    "dest": "site/diagrams/93b414acd62a971f.svg",
     "reason": "docs site",
-    "sha256": "110c6569bf0c7fdcbc2261702c9f141185090ee946562a402a28dd696ac40323",
+    "sha256": "861ea09a52e2aeb46fee1c9742a0ba22afbf128e47c2b2f87fb1f738b9f4d6a2",
     "src": "<site>",
     "transform": "copy"
   },
   {
-    "dest": "site/diagrams/8e6960d684d0cc24.svg",
+    "dest": "site/diagrams/9a5ceff5ed2b773c.svg",
     "reason": "docs site",
-    "sha256": "c825aab74b644a8a0041145e2743c79460c6208887b4a7e668a589c02bf742ca",
+    "sha256": "c604d329e33ce22230f9a870f787bc39e2c95de7d0dbbbefbbba74f9ee283e7f",
     "src": "<site>",
     "transform": "copy"
   },
   {
-    "dest": "site/diagrams/95e5eec00383ee5e.svg",
+    "dest": "site/diagrams/a2032a04be210f25.svg",
     "reason": "docs site",
-    "sha256": "34be55193be5599211fa83d186f292743e16e713a77e5325c6ab83f8e6c342b2",
+    "sha256": "b427491976110d2b242dae50c148cb634125a95a3de55d074e779c6d86e030e5",
     "src": "<site>",
     "transform": "copy"
   },
   {
-    "dest": "site/diagrams/97894ffdde281cec.svg",
+    "dest": "site/diagrams/a7ae54940d041fc3.svg",
     "reason": "docs site",
-    "sha256": "6c7b09dd5386da3ac31fdc8d431a98a7bb07986a08722828660261e6c3d05926",
+    "sha256": "e6b82726dbde7fc2e1d217dd3879c7df8dccee13579cf5301a3b3df6caef3123",
     "src": "<site>",
     "transform": "copy"
   },
   {
-    "dest": "site/diagrams/9b053bba06035642.svg",
+    "dest": "site/diagrams/b096c36059ed0d12.svg",
     "reason": "docs site",
-    "sha256": "8531d17167cad79acf748f7b4fc4e4ac0ce70fc814bcc43bcd19f7edf0923269",
+    "sha256": "16824a42941669182bfcebd63c7ac8b65a83360ee14ac1fc2d61869a43f09673",
     "src": "<site>",
     "transform": "copy"
   },
   {
-    "dest": "site/diagrams/9eb7f635caa47d04.svg",
+    "dest": "site/diagrams/b3adff20e2c56a8d.svg",
     "reason": "docs site",
-    "sha256": "d7ca1cee004cf2e76444bbf9d2b6ac64094ad6503ab1ee73fc6a9ed98f8d8d2c",
+    "sha256": "b098d54beb69cb956004fbb3e30b25aaef665adbb1de829804688e4027e4a35d",
     "src": "<site>",
     "transform": "copy"
   },
   {
-    "dest": "site/diagrams/9f92d5da6dab0c1e.svg",
+    "dest": "site/diagrams/b50eb5b3a01afd01.svg",
     "reason": "docs site",
-    "sha256": "8dda04a28c1f7d04b594d11dbc41b93873a6294e3ca4256c49d4ac6076c54ffc",
+    "sha256": "c46cb15c5ad8515edd0ff4532190fde7b21c839101631113288a6d0f380ffde0",
     "src": "<site>",
     "transform": "copy"
   },
   {
-    "dest": "site/diagrams/a1ccf8f64ddcae59.svg",
+    "dest": "site/diagrams/c31b4e869d136ca8.svg",
     "reason": "docs site",
-    "sha256": "1314e91502a917d1200800f9c27df86d5a5ad901708d0617361dcb113e7cc416",
+    "sha256": "dfc0c7f4bd05d4049e031e481631cd5ea9da736934fb510ae9609df371ddf08b",
     "src": "<site>",
     "transform": "copy"
   },
   {
-    "dest": "site/diagrams/af579be5c9a41108.svg",
+    "dest": "site/diagrams/ca0cdebc0dcf989b.svg",
     "reason": "docs site",
-    "sha256": "40cfc1069a9f87c5d3faf91b36bfde9e4a8a953f746072105e855ece60f83d64",
+    "sha256": "bbe5dc4d408365359d7458278528ad7ecd85bf91cecd14aca388398d8a1a2fb7",
     "src": "<site>",
     "transform": "copy"
   },
   {
-    "dest": "site/diagrams/b8584dc54b65ce66.svg",
+    "dest": "site/diagrams/cc3a0795e528e03c.svg",
     "reason": "docs site",
-    "sha256": "f8adfb32a1a1b9ae7b9a8bdc421ec600eeec2da6e444254a11635ad5882b630f",
+    "sha256": "cebb4c43caefce443a1cec0ef3afc1988b5af8722e143f1abca698c0345bfc08",
     "src": "<site>",
     "transform": "copy"
   },
   {
-    "dest": "site/diagrams/b95c4beec743b220.svg",
+    "dest": "site/diagrams/cd1bb0c52064d643.svg",
     "reason": "docs site",
-    "sha256": "57f328ea201f4711fec5135b3c744625824c9b7e56c0037407ede3d3eccb688d",
+    "sha256": "4d68d32fd39a4e3dc923ffd202b9f1375b6023b33dea972d23411dd519eb4ba0",
     "src": "<site>",
     "transform": "copy"
   },
   {
-    "dest": "site/diagrams/c6624135a41335b7.svg",
+    "dest": "site/diagrams/d3dd207b889a06d6.svg",
     "reason": "docs site",
-    "sha256": "3ae900f4c495381eb0b68c27472d944242e2870ff34c364c4d97cd7d424f3f13",
+    "sha256": "3c5cae7fc75350a8fde95798df3160449c7eb5527b0508b89f1960e7848df860",
     "src": "<site>",
     "transform": "copy"
   },
   {
-    "dest": "site/diagrams/c85f58d2b0655726.svg",
+    "dest": "site/diagrams/da0cc20dd3af655b.svg",
     "reason": "docs site",
-    "sha256": "371dc72e14dc3e2058930e90c3d823854411fa29ca40c2a4ab0a803e4098eb6a",
+    "sha256": "f6b6cdbd699b5f196dc702f762d966232e5eee1c5c7a090471174c96c51d4fe6",
     "src": "<site>",
     "transform": "copy"
   },
   {
-    "dest": "site/diagrams/c90702dc9d5ae6e3.svg",
+    "dest": "site/diagrams/df76fd880d9692f6.svg",
     "reason": "docs site",
-    "sha256": "3955716cfe126e4e6e8ce5059c2008761fa0c8deda4e9e8bc82580aa5c4ad748",
+    "sha256": "ded3122fc1905dbb5c68f8a51545bea0bb79c4f2f1c2e8bc3802ce511105aa19",
     "src": "<site>",
     "transform": "copy"
   },
   {
-    "dest": "site/diagrams/d2483ee5d5eb9a40.svg",
+    "dest": "site/diagrams/e723b851e48d3b3d.svg",
     "reason": "docs site",
-    "sha256": "8ad217d65aad7697130780a81aa7fc025581c4f1aceda133e10384345c6054f4",
+    "sha256": "28fd84b62b4047c81c2acdbc2134272d5c9f93122c6fb8ddaf61bb80d0b4b8dd",
     "src": "<site>",
     "transform": "copy"
   },
   {
-    "dest": "site/diagrams/e7909e04282f3f6f.svg",
+    "dest": "site/diagrams/eb09b4f499b97e5f.svg",
     "reason": "docs site",
-    "sha256": "1a3329894bdefb092bd17ccb8a85509c2939957a67823a1582f333aae78ce53a",
+    "sha256": "6bb42731fa3bee9b8662b4145c13e639f1176c5cff7e7a88d02fa42162163593",
     "src": "<site>",
     "transform": "copy"
   },
   {
-    "dest": "site/diagrams/e884ca16c7f47dc3.svg",
+    "dest": "site/diagrams/eebc57d2cfe947d4.svg",
     "reason": "docs site",
-    "sha256": "4ea490fa2ed4ec82552cb7a4402c9b2957dc57aaed1a4b01f9751efc9e4fcce2",
+    "sha256": "f6c968eeb1f5f77e79413e2f8371ac65a62ed469cc214a294cd3c2b24933d346",
     "src": "<site>",
     "transform": "copy"
   },
   {
-    "dest": "site/diagrams/ed43273ac29e4a4a.svg",
+    "dest": "site/diagrams/f25e3654f7f38722.svg",
     "reason": "docs site",
-    "sha256": "1513f5b0b68740d1287a7174d354bd1a8fc9a9cec0d1d2858bd433328b44f0f9",
+    "sha256": "8cd6dbee056319ea765d35777e12e1afe63bb5dec2843497d6aaac3754289717",
     "src": "<site>",
     "transform": "copy"
   },
   {
-    "dest": "site/diagrams/f7efce8057a1eb3d.svg",
+    "dest": "site/diagrams/faf519c3cc5a7a86.svg",
     "reason": "docs site",
-    "sha256": "445e48183c915de7a1b26f00d480289ab646bbd7d7f6325b78f8ac611491a645",
+    "sha256": "039d225d006c5879e72ad56eeb8304c039604778c21089fb2b3d8e47cfea617b",
     "src": "<site>",
     "transform": "copy"
   },
   {
-    "dest": "site/diagrams/fa4c04b19a8798bd.svg",
+    "dest": "site/diagrams/fde70b22c096f28c.svg",
     "reason": "docs site",
-    "sha256": "274697891e37ace36f543502f0d17e420597d2bb4c40ad505ca41de3d3540a6f",
+    "sha256": "efb3f7e1a26a13a66e99879af36e16b0447bb5736719f9d6b9a35379f1120099",
     "src": "<site>",
     "transform": "copy"
   },
@@ -1654,7 +1654,7 @@
   {
     "dest": "site/static/site.css",
     "reason": "docs site",
-    "sha256": "2966ea326f26bb969375d483beb928ae29c65a6f0d4a6f3d333d3165aa969b93",
+    "sha256": "ac96b4fae98faf64654e8465a5b8145836e2ddfd309e76588dd722e252edcb8e",
     "src": "<site>",
     "transform": "copy"
   },
@@ -1710,7 +1710,7 @@
   {
     "dest": "site/test_build.py",
     "reason": "docs site",
-    "sha256": "dd0261eb51169580d1cbbe823ef9bcd00ea210c7de15e961e46496c495fbd2df",
+    "sha256": "19c770cee279e4f010000090668e8958b1b24f0a5a6246e8b73a5eadc2fdf8e5",
     "src": "<site>",
     "transform": "copy"
   }
