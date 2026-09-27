@@ -23,13 +23,13 @@ Probabilities are over the offered options only, not certified chances of being 
 
 Do not use blink for writing, rewriting, summarizing, explaining, or any task that needs generated text.
 
-The blink weights are for non-commercial research and evaluation only.
+Code: Apache-2.0. Weights: non-commercial research and evaluation only.
 
 ## Call blink
 
 Point a server-side TypeSafe Python or JavaScript SDK at a self-hosted server. Set `TYPESAFE_BASE_URL` to the server URL. Set `TYPESAFE_API_KEY` to any value or the server's key. Or send plain HTTP to `POST /v1/systemone`.
 
-For screenshots on a self-hosted v1.3 server with vision enabled, send a PNG, JPEG, or WebP data URI in a `state` string or top-level `images` list; see the [API example](https://thegovind.github.io/blink/api.md#screenshots-opt-in).
+For screenshots on a self-hosted v1.3 or later server with vision enabled, send a PNG, JPEG, or WebP data URI in a `state` string or top-level `images` list; see the [API example](https://thegovind.github.io/blink/api.md#screenshots-servepy-only-opt-in).
 
 For a quick text-only test, call the [Space](https://huggingface.co/spaces/thegovind/blink) with `gradio_client`. Send `state` and `questions` through its Gradio API. The demo Space does not serve screenshots and is not a TypeSafe endpoint.
 
@@ -123,7 +123,7 @@ blink-4b's saved answer to this request, rounded to three decimals.
 
 Read `noul` as the probability of yes. Read `choice` as the picked option. Use `probabilities` for the full distribution and `confidence` for `choice` and `score`. Read `score` as the expected level.
 
-Limits: 255 options per choice, 2-10 score levels, 131,072 tokens per question, and 512 questions per request; blink does not cut input.
+Default `serve.py` limits: 255 options per choice, 2-10 score levels, 131,072 tokens per question and 512 questions per request; input is never truncated. The 4B vLLM server was tested at a 32,768-token context; questions over that return `422`.
 
 Errors: `400` the body isn't a JSON object (or isn't valid JSON), `401` the server has an API key and the request's key is missing or wrong, `404` unknown path, `422` unsupported question or exceeded limit, `500` server error, and `529` full batching queue with `Retry-After`.
 

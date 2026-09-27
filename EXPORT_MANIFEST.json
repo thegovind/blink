@@ -30,7 +30,7 @@
   {
     "dest": "space/api_doc.py",
     "reason": "",
-    "sha256": "bd961bef931dc4d168897fa16313ce4ace97c2f13a95f1d31913189637725fed",
+    "sha256": "7b3afc2e92aff36716bfc2c983438bfae6be1e26007c2598904fa5cbd1265019",
     "src": "space/api_doc.py",
     "transform": "scrub_python"
   },
@@ -93,7 +93,7 @@
   {
     "dest": "space/test_blink.py",
     "reason": "",
-    "sha256": "bea8bfcd9556d40e61ae359e739ec19cb9aa16f3377801b61892d8baeafb5097",
+    "sha256": "974e4a2d3e060cad1503136e36122be87d6a3199cc2cb8826620c2aabdd2d33b",
     "src": "space/test_blink.py",
     "transform": "scrub_python"
   },
@@ -282,8 +282,22 @@
   {
     "dest": "space/test_serve.py",
     "reason": "HTTP server test",
-    "sha256": "f197fbdd4a968c8c3cb976ef6510190bf55b83b7e786ecd50698d3ce6d64c19c",
+    "sha256": "6bb0ec5a59379c7e12765e8ef011cdf4e07bbcbadfc774d9f57294c63215ba16",
     "src": "release/test_serve.py",
+    "transform": "scrub_python"
+  },
+  {
+    "dest": "serve_vllm.py",
+    "reason": "opt-in HTTP server",
+    "sha256": "d09368d9b182a2bb80f33b4e35095749d7fbcad45a3ed98c0b8cb7df08ad6379",
+    "src": "release/serve_vllm.py",
+    "transform": "scrub_python"
+  },
+  {
+    "dest": "space/test_serve_vllm.py",
+    "reason": "opt-in HTTP server test",
+    "sha256": "93d4eebe07721ef15189327cd249f71c76a02db182d14a72698e35bb9f1bcde3",
+    "src": "release/test_serve_vllm.py",
     "transform": "scrub_python"
   },
   {
@@ -744,7 +758,7 @@
   {
     "dest": "README.md",
     "reason": "repository scaffold",
-    "sha256": "18be9e576b967a40ccde8f0b6aaf0f54b27a71f537f8fb4147e59a52a945b330",
+    "sha256": "815e0a52e4b30869d23ae502090f01f50928148f4d6d4c08ca88cfae628a8500",
     "src": "<generated>",
     "transform": "generate"
   },
@@ -758,49 +772,49 @@
   {
     "dest": "skills/blink/SKILL.md",
     "reason": "repository scaffold",
-    "sha256": "01859c8a0c9e3acba2b385ea90447b3bf2a3699ef6228393788615617c864a52",
+    "sha256": "64f3ef981108589f9235ba1b9277b65f200eeffb22353b22e6572290076dbd50",
     "src": "<generated>",
     "transform": "generate"
   },
   {
     "dest": "docs/index.md",
     "reason": "repository scaffold",
-    "sha256": "e0f5c74519e9c0417067deaf0e90680f70e844928c84900447804e2a6bccbb9a",
+    "sha256": "c47f2a6b97d230c6584c5bdbc19842e847b43019ff0f6bbb494936857771ec39",
     "src": "<generated>",
     "transform": "generate"
   },
   {
     "dest": "docs/api.md",
     "reason": "repository scaffold",
-    "sha256": "90151f15737fc9c57bb05390d6e399fa09a6872e3227538a8fe460ab59fd0f4d",
+    "sha256": "85280f905efb2adfa13b722dcd6ba0418b60a80913e00500e89efc99df43ba92",
     "src": "<generated>",
     "transform": "generate"
   },
   {
     "dest": "docs/agents.md",
     "reason": "repository scaffold",
-    "sha256": "8356378415b5320d6da3234f32906dd5ae2cfa9f11f4d6c780246309e6466f46",
+    "sha256": "72837cc9ad3ce155ffd966a444f4f84b1bcba101e8a72f0782641207cb450074",
     "src": "<generated>",
     "transform": "generate"
   },
   {
     "dest": "docs/models.md",
     "reason": "repository scaffold",
-    "sha256": "26cc6684f13ea0c0d164a7132c3bba2089c9f6772687c94c487dc9b11eef089f",
+    "sha256": "559487c30bed1a5623419f36258be39134015204400b569e4bbb4770dcc460b4",
     "src": "<generated>",
     "transform": "generate"
   },
   {
     "dest": "docs/llms.txt",
     "reason": "repository scaffold",
-    "sha256": "6c78749b83c438de1ec9076805707d70e1a6e63f3174c06b76b6a239a61d1a7a",
+    "sha256": "85c8a9dc09f4f0a1b977a395209f44e324548b770a8954d18d91599b51001cbb",
     "src": "<generated>",
     "transform": "generate"
   },
   {
     "dest": "pyproject.toml",
     "reason": "repository scaffold",
-    "sha256": "d1cb33ca55df9261a81471a2468175770a000c17a967161c91adcd28f2f1134c",
+    "sha256": "6e31efcde5709a386db3afc30172b9006e87fbb73549cf447763e70b1c2bee92",
     "src": "<generated>",
     "transform": "generate"
   },
@@ -835,14 +849,14 @@
   {
     "dest": "CHANGELOG.md",
     "reason": "repository scaffold",
-    "sha256": "f7eed0fab309b755fa0c6cdac5aebb2f7c3dd9b1edcc181663f19c0e83bc24c8",
+    "sha256": "240fbdab3cf017d687912ab64ec802ee6c92ffcf1c11456e00ba7ffd65764288",
     "src": "<generated>",
     "transform": "generate"
   },
   {
     "dest": "CITATION.cff",
     "reason": "repository scaffold",
-    "sha256": "d5870bcbbd91c9c3b6e2bf645c90eeb4a695b559e18d12351f140087fb767115",
+    "sha256": "b208a3f41eb4be7aaae51d350cadfce2e4a9e909cafc191d42de3a9d557fcc0e",
     "src": "<generated>",
     "transform": "generate"
   },

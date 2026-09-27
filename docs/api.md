@@ -1,6 +1,6 @@
 # API
 
-Point a TypeSafe SDK or plain HTTP client at blink's server. It is wire-compatible with TypeSafe's API.
+The limits and options below are for default `serve.py`, which accepts TypeSafe SDKs and plain HTTP. The opt-in 4B `serve_vllm.py` is text-only, tested at `--max-model-len 32768`; see the [vLLM guide](https://huggingface.co/thegovind/blink-4b/blob/v1.4/VLLM.md).
 
 ## Endpoints
 
@@ -76,6 +76,13 @@ curl -s http://127.0.0.1:8000/v1/systemone \
 }
 EOF
 ```
+
+## Browser agents
+
+- [jev-ultrafast](https://github.com/browser-use/jev-ultrafast) hardcodes its hosted URL, so `TYPESAFE_BASE_URL` alone is ignored. The same two-line change as [open PR #146](https://github.com/browser-use/jev-ultrafast/pull/146) worked locally. Set `TYPESAFE_API_KEY` to any placeholder when blink has no key.
+- Three fixed local pages were tested on `serve.py`: three repeats at each combination of one or three concurrent agent loops and 0 or 5 ms batch windows (36 attempts per model). Page checks passed 36/36 (27B), 12/36 (MiMo, lookup only), 0/36 (4B); all 348/348 decision HTTP requests returned valid 200 responses.
+- One agent loop, no batch window: client p50/p95 per decision (ms) was 27B 581/740, MiMo 205/263, 4B 160/201. These include a local capture proxy.
+- jev-ultrafast's docs report a 178 ms median per hosted Jev request on a live, networked flight-search task. Different setup; not a speed comparison.
 
 ## Request
 
@@ -175,11 +182,11 @@ Probabilities are over the offered options only, not certified chances of being 
 | `500` | Server error |
 | `529` | Batching queue full; check `Retry-After` |
 
-Limits: 255 options per choice, 2-10 score levels, 131,072 tokens per question, and 512 questions per request. Requests over these limits fail; blink does not cut input.
+Default `serve.py` limits: 255 options per choice, 2-10 score levels, 131,072 tokens per question and 512 questions per request. Over-limit requests fail; input is never truncated.
 
-Set an optional key with `--api-key` or `BLINK_API_KEY`. Enable batching with `--batch-window-ms 5`.
+For default `serve.py`, set an optional key with `--api-key` or `BLINK_API_KEY`; enable batching with `--batch-window-ms 5`.
 
-## Screenshots (opt-in)
+## Screenshots (`serve.py` only, opt-in)
 
 Image input is off by default and works only on a self-hosted server. TypeSafe's hosted Jev is text-only and its API has no image field. Text-only requests keep the byte-identical pre-image prompt and numeric path.
 
@@ -192,7 +199,7 @@ Put a `data:image/png;base64,...` URI (JPEG and WebP work too) in a string in `s
 }
 ```
 
-Image mode needs `torchvision==0.28.0`; install it before starting the server. For downloaded 4B or 27B folders, cache the matching base model at the pinned revision below before serving; local-folder mode is offline. Download the full v1.3 model repository so `graft_keys.py` sits beside `blink.py`.
+Image mode needs `torchvision==0.28.0`; install it before starting the server. For downloaded 4B or 27B folders, cache the matching base model at the pinned revision below before serving; local-folder mode is offline. Download the full v1.4 model repository so `graft_keys.py` sits beside `blink.py`.
 
 Enable screenshots with the flag for your model:
 - `blink-mimo-9b`: `--vision` (its own tower).

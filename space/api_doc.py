@@ -22,7 +22,7 @@ SPACE_ID = "thegovind/blink"
 SPACE_URL = "https://thegovind-blink.hf.space"
 WIRE_FORMAT_URL = "https://thegovind.github.io/blink/api/"  # the docs site's full reference for this tab
 SERVED_AS = "./blink-4b"  # what the answers name as the model after `serve.py --model ./blink-4b`
-CODE_REVISION = "v1.3"  # the model repos' code revision with this serve.py and blink.py
+CODE_REVISION = "v1.4"  # the model repos' code revision with this serve.py and blink.py
 
 COPY = {
     "heading": "Use blink with TypeSafe clients",

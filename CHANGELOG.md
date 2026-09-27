@@ -1,5 +1,15 @@
 # Changelog
 
+## v1.4.0 - 2026-09-27
+
+- Opt-in, text-only `serve_vllm.py` for blink-4b only. `serve.py` stays the default.
+- [Serving docs](https://thegovind.github.io/blink/models.md#serve-it) cover latency,
+  throughput and quality limits. `blink.py`, `serve.py` and the weights are unchanged.
+- The MiMo and 27B vLLM paths failed quality checks. All tested INT8 builds failed too;
+  none of those paths ships.
+
+Code: Apache-2.0. Weights: non-commercial research and evaluation only; see each model card's license.
+
 ## v1.3.0 - 2026-09-27
 
 - Opt-in screenshots for self-hosted `/v1/systemone`; text-only requests keep the byte-identical pre-image

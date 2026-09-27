@@ -2,7 +2,7 @@
 
 Send text or JSON state with typed questions. Each question gets a probability for every offered option from one forward pass. No generated text.
 
-[![License](https://img.shields.io/badge/code-Apache--2.0-blue.svg)](LICENSE)
+Code: Apache-2.0 ([LICENSE](LICENSE)). Weights: non-commercial research and evaluation only; see each model card's license.
 [![Models](https://img.shields.io/badge/Hugging%20Face-models-yellow.svg)](https://huggingface.co/thegovind)
 [![Space](https://img.shields.io/badge/demo-Space-orange.svg)](https://huggingface.co/spaces/thegovind/blink)
 
@@ -22,17 +22,19 @@ Open the [Space](https://huggingface.co/spaces/thegovind/blink).
 
 ```sh
 pip install "torch==2.13.0" "transformers==5.17.0" "flash-linear-attention==0.5.2" "accelerate>=1.1.0" safetensors huggingface_hub
-hf download thegovind/blink-4b --revision v1.3 --local-dir blink-4b
+hf download thegovind/blink-4b --revision v1.4 --local-dir blink-4b
 python blink-4b/serve.py --model ./blink-4b --port 8000
 ```
 
 Check `curl -s http://localhost:8000/healthz`.
 
+For self-hosted latency and throughput, see [serving options](https://thegovind.github.io/blink/models.md#serve-it).
+
 ## Use it from code
 
 Follow the [API docs](https://thegovind.github.io/blink/api.md).
 
-For screenshots on a self-hosted v1.3 server, [turn on image input](https://thegovind.github.io/blink/api.md#screenshots-opt-in).
+For screenshots on a self-hosted v1.3 or later server, [turn on image input](https://thegovind.github.io/blink/api.md#screenshots-servepy-only-opt-in).
 
 ## Use it from agents
 
@@ -54,4 +56,4 @@ Code: Apache-2.0. Weights: non-commercial research and evaluation only; see each
 - [Agent experience](https://thegovind.github.io/blink/agents.md)
 - [Contributing](CONTRIBUTING.md)
 - [Security](SECURITY.md)
-- [License](LICENSE)
+- Code: Apache-2.0 ([LICENSE](LICENSE)); weights: non-commercial research and evaluation only (see each model card's license).

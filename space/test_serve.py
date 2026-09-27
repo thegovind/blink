@@ -487,6 +487,9 @@ class TestImageWire(unittest.TestCase):
         self.assertNotIn("VISION-v1.3-CARD-SOURCES.md", stage.ALLOWED)
         self.assertNotIn("LAYOUT-DECISION.md", stage.ALLOWED)
         self.assertNotIn("blink-mimo-9b-v1.3-facts.md", stage.ALLOWED)
+        self.assertIn("serve_vllm.py", stage.ALLOWED)
+        self.assertIn("VLLM.md", stage.ALLOWED)
+        self.assertNotIn("card-blink-4b.md", stage.ALLOWED)
 
     def test_layout_flag_and_environment_leave_text_answers_unchanged(self):
         inline = Server("--vision", "--image-layout", "inline", engine=FakeVisionEngine,
