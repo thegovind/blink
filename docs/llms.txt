@@ -11,6 +11,7 @@ Screenshots are opt-in on self-hosted v1.3 or later; see the [API example](https
 - [API](https://thegovind.github.io/blink/api.md): Send requests and read responses.
 - [Agent experience](https://thegovind.github.io/blink/agents.md): Install the skill and find agent-ready docs.
 - [Models](https://thegovind.github.io/blink/models.md): Pick a model and open its card.
+- [Computer use](https://thegovind.github.io/blink/computer-use.md): Try Screen click, set up screenshots and connect browser agents.
 
 ## Models
 

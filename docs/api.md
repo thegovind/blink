@@ -221,7 +221,7 @@ Image URLs are never fetched. In each string value in `state`, `data:image/` (an
 
 ## The Space
 
-For text-only requests, send `state` and `questions` to the demo Space with `gradio_client`. The demo Space does not serve screenshots and is not a TypeSafe endpoint.
+For text-only requests, send `state` and `questions` to the demo Space with `gradio_client`. In the Space, Screen click reads screenshots with blink-mimo-9b. The Space API endpoint stays text-only and is not a TypeSafe endpoint; the self-hosted server docs cover [screenshot input](#screenshots-servepy-only-opt-in).
 
 ```python
 # pip install gradio_client

@@ -5,7 +5,7 @@
     python3 site/check.py _site
     python3 -m http.server --bind 127.0.0.1 --directory _site 8000
 
-Four pages: docs/index.md (home), api.md, agents.md and models.md. Each is also served as
+Five pages: docs/index.md (home), api.md, agents.md, models.md and computer-use.md. Each is also served as
 Markdown at its path plus .md, for agents; docs/llms.txt is served at the root and
 skills/blink/SKILL.md beside it. Addresses that moved get redirect stubs. Every string the site
 adds is in site/strings.json; text it reuses verbatim is in site/strings-reused.json; links and
@@ -47,6 +47,7 @@ PAGES = (
     Page("api", "docs/api.md", "nav.api"),
     Page("agents", "docs/agents.md", "nav.agents"),
     Page("models", "docs/models.md", "nav.models"),
+    Page("computer-use", "docs/computer-use.md", "nav.cua"),
 )
 # addresses that moved: old page -> the page that has its content now
 REDIRECTS = {

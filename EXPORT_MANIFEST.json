@@ -758,7 +758,7 @@
   {
     "dest": "README.md",
     "reason": "repository scaffold",
-    "sha256": "815e0a52e4b30869d23ae502090f01f50928148f4d6d4c08ca88cfae628a8500",
+    "sha256": "5614864fa0a7687e3f7a23749c2f99ef28c15263dd2bc7bdf7273941cba9f941",
     "src": "<generated>",
     "transform": "generate"
   },
@@ -779,14 +779,14 @@
   {
     "dest": "docs/index.md",
     "reason": "repository scaffold",
-    "sha256": "c47f2a6b97d230c6584c5bdbc19842e847b43019ff0f6bbb494936857771ec39",
+    "sha256": "6da5cc0feb7e3d822eb1d7ced4007471fb2f572179481c5d36cc3b1799b48b63",
     "src": "<generated>",
     "transform": "generate"
   },
   {
     "dest": "docs/api.md",
     "reason": "repository scaffold",
-    "sha256": "85280f905efb2adfa13b722dcd6ba0418b60a80913e00500e89efc99df43ba92",
+    "sha256": "3e185ae650bec07454a3e8b2ca6b4f50af241878b6791a118964531b1f5129bd",
     "src": "<generated>",
     "transform": "generate"
   },
@@ -805,9 +805,16 @@
     "transform": "generate"
   },
   {
+    "dest": "docs/computer-use.md",
+    "reason": "repository scaffold",
+    "sha256": "17f1ff6d10726a2cf37905bcce13176a848bf3a5ace29849ff2afafdb8cadfe1",
+    "src": "<generated>",
+    "transform": "generate"
+  },
+  {
     "dest": "docs/llms.txt",
     "reason": "repository scaffold",
-    "sha256": "85c8a9dc09f4f0a1b977a395209f44e324548b770a8954d18d91599b51001cbb",
+    "sha256": "5ac1778026e50d666024dda10efcb67f1d993ce27c957368980abde5e9de0fad",
     "src": "<generated>",
     "transform": "generate"
   },
@@ -975,7 +982,7 @@
   {
     "dest": "site/build.py",
     "reason": "docs site",
-    "sha256": "bfe9c3d083a86009aafae666f380839f99bcb27ba856bc20b2442c1183b24c9a",
+    "sha256": "b6848faa250e930e8f240a20741c200ea5d65b95e44ac637bb7e75cac1d36567",
     "src": "<site>",
     "transform": "copy"
   },
@@ -1031,7 +1038,7 @@
   {
     "dest": "site/strings.json",
     "reason": "docs site",
-    "sha256": "f72daa1098f4f7578fd5fb0a6ca26d55439838eb1d781850a6f9272d718e64e2",
+    "sha256": "84cf11a4d9933560ff2fbc278988179b9d15acf50483e0847a87983fe8307db4",
     "src": "<site>",
     "transform": "copy"
   },
@@ -1073,7 +1080,7 @@
   {
     "dest": "site/test_build.py",
     "reason": "docs site",
-    "sha256": "479f460e50dc15f9e325f535588e3ce57a44089992fa2f49191ec410a2d24df1",
+    "sha256": "94ba4b290453a3c944c80b7345765f34120cef2ac14ef4b6453bd81156d0f10c",
     "src": "<site>",
     "transform": "copy"
   }

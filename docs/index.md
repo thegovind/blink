@@ -8,6 +8,8 @@ Probabilities are over the offered options only, not certified chances of being 
 
 Open the [Space](https://huggingface.co/spaces/thegovind/blink) to try blink or use its API tab.
 
+Try [Screen click](https://huggingface.co/spaces/thegovind/blink?tab=use-cases&case=screen) for screenshots, or open [Computer use](computer-use.md) for browser agents and self-hosted setup.
+
 ## Call the API
 
 Follow the [API guide](api.md) to send `noul`, `choice`, and `score` questions.
