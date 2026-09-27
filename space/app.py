@@ -21,6 +21,7 @@ import gradio as gr
 import author
 import blink
 import examples
+import screens
 import ui
 
 HERE = os.path.dirname(os.path.abspath(__file__))
@@ -567,6 +568,9 @@ def ask_tab():
             # a generator that yields nothing at all empties its own outputs
             yield {out: gr.skip()}
             return
+        if ui.carries_image(ask_text):
+            yield {note: ui.ask_error_html(ui.TEXT_ONLY_UI)}
+            return
         # gradio 6.28 drops a later visible=True if an earlier yield repeats visible=False
         yield {note: ui.ask_status_html(ui.ASK["drafting"])}
         try:
@@ -673,6 +677,266 @@ def use_case_tab(case: examples.UseCase):
     return model_in, out
 
 
+# --- next click on a screen ---------------------------------------------------------
+
+
+# Draw a box on a visitor's screenshot: drag with a mouse or a pen, or tap two corners on a
+# touch screen, where a drag scrolls the page. Every listener hangs off the component's own
+# root, so it survives each re-render; a drawn box's number removes it.
+SCREEN_DRAW = r"""
+const surface = (t) => (t && t.closest ? t.closest('.blk-shot[data-draw="1"] .blk-shot-frame') : null);
+const badgeOf = (t) => (t && t.closest ? t.closest('.blk-shot[data-draw="1"] .blk-somtag:not(.cell)') : null);
+let drag = null, corner = null, touch = false;
+const at = (frame, e) => {
+  const r = frame.getBoundingClientRect();
+  return { fx: Math.min(Math.max((e.clientX - r.left) / r.width, 0), 1),
+           fy: Math.min(Math.max((e.clientY - r.top) / r.height, 0), 1), w: r.width, h: r.height };
+};
+const big = (a, b) => Math.abs(a.fx - b.fx) * b.w >= 6 && Math.abs(a.fy - b.fy) * b.h >= 6;
+const ghost = (frame, a, b) => {
+  let g = frame.querySelector('.blk-ghost:not(.sent)');
+  if (!g) { g = document.createElement('span'); g.className = 'blk-ghost'; frame.appendChild(g); }
+  g.style.left = Math.min(a.fx, b.fx) * 100 + '%';
+  g.style.top = Math.min(a.fy, b.fy) * 100 + '%';
+  g.style.width = Math.abs(a.fx - b.fx) * 100 + '%';
+  g.style.height = Math.abs(a.fy - b.fy) * 100 + '%';
+  return g;
+};
+const send = (frame, a, b) => {
+  const W = Number(frame.dataset.w), H = Number(frame.dataset.h);
+  ghost(frame, a, b).classList.add('sent');
+  trigger('draw', { box: [a.fx * W, a.fy * H, b.fx * W, b.fy * H].map(Math.round) });
+};
+const unpin = () => { if (corner) { corner.dot.remove(); corner = null; } };
+const tap = (frame, p) => {
+  if (corner && corner.frame === frame && corner.dot.isConnected) {
+    const a = corner.p;
+    unpin();
+    if (big(a, p)) send(frame, a, p);
+    return;
+  }
+  unpin();
+  const dot = document.createElement('span');
+  dot.className = 'blk-corner';
+  dot.style.left = p.fx * 100 + '%';
+  dot.style.top = p.fy * 100 + '%';
+  frame.appendChild(dot);
+  corner = { frame, p, dot };
+};
+element.addEventListener('pointerdown', (e) => {
+  touch = e.pointerType === 'touch';
+  const frame = surface(e.target);
+  if (!frame || touch || e.button !== 0 || badgeOf(e.target)) return;
+  e.preventDefault();
+  drag = { frame, a: at(frame, e), id: e.pointerId, moved: false };
+  try { frame.setPointerCapture(e.pointerId); } catch (err) { /* capture is only a nicety */ }
+});
+element.addEventListener('pointermove', (e) => {
+  if (!drag || e.pointerId !== drag.id) return;
+  const b = at(drag.frame, e);
+  if (!drag.moved && (Math.abs(b.fx - drag.a.fx) * b.w >= 4 || Math.abs(b.fy - drag.a.fy) * b.h >= 4)) {
+    drag.moved = true;
+    unpin();
+  }
+  if (drag.moved) ghost(drag.frame, drag.a, b);
+});
+element.addEventListener('pointerup', (e) => {
+  if (!drag || e.pointerId !== drag.id) return;
+  const { frame, a, moved } = drag;
+  drag = null;
+  const b = at(frame, e);
+  frame.querySelectorAll('.blk-ghost:not(.sent)').forEach((g) => g.remove());
+  if (moved && big(a, b)) send(frame, a, b);
+  else if (!moved) tap(frame, b);
+});
+element.addEventListener('pointercancel', () => {
+  drag = null;
+  element.querySelectorAll('.blk-ghost:not(.sent)').forEach((g) => g.remove());
+});
+element.addEventListener('click', (e) => {
+  const badge = badgeOf(e.target);
+  if (badge) { unpin(); trigger('drop', { n: Number(badge.dataset.n) }); return; }
+  const frame = surface(e.target);
+  if (frame && touch) tap(frame, at(frame, e));
+});
+// while one screenshot is edited the card and its verdict row may grow but never shrink, so
+// nothing moves under the pointer; a different screenshot starts from its own heights
+let held = '', row = 0;
+watch('value', () => {
+  const card = element.querySelector('.blk-scr');
+  const shot = card ? card.dataset.shot : '';
+  const head = card ? card.querySelector('.blk-sv') : null;
+  if (shot !== held) { element.style.minHeight = ''; row = 0; held = shot; }
+  if (head) { row = Math.max(row, head.offsetHeight); head.style.minHeight = row + 'px'; }
+  element.style.minHeight = element.offsetHeight + 'px';
+});
+"""
+
+# every change to the screenshot card takes the next revision, so a slower answer can't
+# land on a newer request; Decide also dims the card while the model reads
+SCREEN_BUMP = r"""() => String(window.__blinkScreen = (window.__blinkScreen || 0) + 1)"""
+SCREEN_STAMP = r"""(...a) => { a[0] = String(window.__blinkScreen = (window.__blinkScreen || 0) + 1); return a; }"""
+SCREEN_BUSY = r"""() => {
+  const card = document.querySelector('#screen-out .blk-scr');
+  if (card) {
+    card.classList.add('busy');
+    const shot = card.querySelector('.blk-shot');
+    if (shot) shot.classList.add('busy');
+  }
+  return String(window.__blinkScreen = (window.__blinkScreen || 0) + 1);
+}"""
+
+
+def _grid(value) -> int:
+    try:
+        k = int(str(value).strip())
+    except (TypeError, ValueError):
+        return screens.GRIDS[0]
+    return k if k in screens.GRIDS else screens.GRIDS[0]
+
+
+def screen_request(picked, upload, task, boxes_text, grid):
+    """The screenshot on screen right now, marked as it will be sent, or what stops it."""
+    problems = screens.task_problems(task)
+    if picked:
+        return screens.with_task(screens.preset(picked), task), problems
+    shot, more = screens.upload_shot(upload, task, boxes_text, _grid(grid))
+    return shot, problems + more
+
+
+def screen_tab(at_shot):
+    """Next click on a screen. blink-mimo-9b answers here whatever the page's switch says.
+
+    `at_shot` holds the preset in view for the address ("" for a visitor's own screenshot)."""
+    shots = screens.presets()
+    first = shots[0]
+    gr.HTML(ui.screen_note())
+    with gr.Row(equal_height=False, elem_classes="blk-screenrow"):
+        with gr.Column(scale=5, elem_classes="blk-side"):
+            gr.HTML(ui.screen_model_chip())
+            with gr.Row(elem_classes="blk-chips"):
+                chips = [gr.Button(s.label, size="sm") for s in shots]
+                up_btn = gr.UploadButton(ui.SCREEN["upload"], file_types=["image"], file_count="single",
+                                         size="sm", elem_id="screen-upload", elem_classes="blk-upchip")
+            if ui.demo_label():
+                gr.HTML(ui.demo_label())
+            task = gr.Textbox(first.task, label=ui.SCREEN["task"], placeholder=ui.SCREEN["task_hint"],
+                              lines=2, max_lines=4, elem_id="screen-task", elem_classes="blk-task")
+            with gr.Group(visible=False, elem_classes="blk-upgroup") as up_group:
+                grid = gr.Radio(choices=list(ui.GRID_CHOICES), value=str(screens.GRIDS[0]),
+                                label=ui.SCREEN["grid"], show_label=False, container=False,
+                                elem_id="screen-grid", elem_classes="blk-gridseg")
+                boxes = gr.Textbox("", label=ui.SCREEN["boxes"], info=ui.SCREEN["boxes_hint"],
+                                   placeholder="120, 80, 360, 140", lines=2, max_lines=8,
+                                   elem_id="screen-boxes", elem_classes="blk-boxes")
+                clear = gr.Button(ui.SCREEN["clear"], size="sm", elem_classes="blk-clear")
+            trouble = gr.HTML(elem_classes="blk-trouble")
+            run_btn = gr.Button("Decide", variant="primary", elem_id="screen-run")
+        with gr.Column(scale=7, elem_classes="blk-main"):
+            # first render only: a saved run, since no device can be attached at startup
+            out = gr.HTML(ui.run_screen(first, prefer="saved"), js_on_load=SCREEN_DRAW,
+                          elem_id="screen-out", elem_classes="blk-screenout")
+    picked = gr.State(first.key)
+    upload = gr.State(None)
+    rev = gr.Textbox("0", visible=False)
+    seen = gr.State({})
+    run_in = [rev, seen, picked, upload, task, boxes, grid]
+    # none of this tab is API: it is the only handler that sends a screenshot, and the Space's
+    # API stays text-only. "private" keeps it off the API page and out of the Gradio clients.
+    hidden = {"api_visibility": "private"}
+
+    def screen_run(rev, seen, picked, upload, task, boxes_text, grid):
+        mine = ui.as_rev(rev)
+        if not ui.newest(seen, "screen", mine):
+            return gr.update(), gr.update()
+        shot, problems = screen_request(picked, upload, task, boxes_text, grid)
+        if problems:
+            if shot is None and upload is not None:
+                shot = screens.draft_shot(upload, boxes_text, _grid(grid))[0]
+            panel = ui.screen_panel(shot, draw=not picked, rev=mine) if shot is not None else gr.update()
+            return panel, ui.problems_html(problems)
+        answer = ui.run_screen(shot, draw=not picked, rev=mine)
+        if ui.applied(seen, "screen") != mine:
+            return gr.update(), gr.update()  # a newer change owns the card now
+        return answer, ""
+
+    def live(trigger):
+        return trigger.then(screen_run, run_in, [out, trouble], show_progress="minimal", **hidden)
+
+    def load_preset(rev, seen, key):
+        mine = ui.as_rev(rev)
+        ui.newest(seen, "screen", mine)
+        shot = screens.preset(key)
+        return [key, None, shot.task, gr.update(visible=False), "", "",
+                ui.screen_panel(shot, busy=True, rev=mine)]
+
+    for btn, shot in zip(chips, shots):
+        live(btn.click(None, None, rev, js=SCREEN_BUMP, queue=False, show_progress="hidden", **hidden).then(
+            lambda r, s, k=shot.key: load_preset(r, s, k), [rev, seen],
+            [picked, upload, task, up_group, boxes, trouble, out], queue=False, show_progress="hidden", **hidden))
+        btn.click(None, None, at_shot, js=f"() => {json.dumps(shot.key)}", queue=False, show_progress="hidden",
+                  **hidden)
+
+    def load_upload(rev, seen, path):
+        mine = ui.as_rev(rev)
+        ui.newest(seen, "screen", mine)
+        try:
+            up = screens.load_upload(path)
+        except screens.ScreenError as exc:
+            return [gr.update()] * 7 + [ui.problems_html([str(exc)]), gr.update()]
+        draft, _ = screens.draft_shot(up)
+        return ["", up, "", gr.update(visible=True), "", gr.update(value=str(screens.GRIDS[0]), interactive=True),
+                ui.screen_panel(draft, draw=True, rev=mine), "", ""]
+
+    up_btn.upload(None, None, rev, js=SCREEN_BUMP, queue=False, show_progress="hidden", **hidden).then(
+        load_upload, [rev, seen, up_btn], [picked, upload, task, up_group, boxes, grid, out, trouble, at_shot],
+        queue=False, show_progress="hidden", **hidden)
+
+    def redraw(rev, seen, upload, boxes_text, grid):
+        """The drawing surface after an edit to the boxes or the grid: nothing is sent yet."""
+        mine = ui.as_rev(rev)
+        ui.newest(seen, "screen", mine)
+        if upload is None:
+            return boxes_text, gr.update(), gr.update(), gr.update()
+        draft, problems = screens.draft_shot(upload, boxes_text, _grid(grid))
+        # boxes take over from the grid; the picker stays put, so nothing below it moves
+        return (boxes_text, gr.update(interactive=not str(boxes_text or "").strip()),
+                ui.problems_html(problems), ui.screen_panel(draft, draw=True, rev=mine))
+
+    edit_out = [boxes, grid, trouble, out]
+
+    def drawn(rev, seen, upload, boxes_text, grid, evt: gr.EventData):
+        if upload is None:
+            return redraw(rev, seen, upload, boxes_text, grid)
+        box = (getattr(evt, "_data", None) or {}).get("box")
+        return redraw(rev, seen, upload, screens.add_box(boxes_text, box, *upload.source_size), grid)
+
+    def dropped(rev, seen, upload, boxes_text, grid, evt: gr.EventData):
+        return redraw(rev, seen, upload, screens.drop_box(boxes_text, (getattr(evt, "_data", None) or {}).get("n")),
+                      grid)
+
+    edit_in = [rev, seen, upload, boxes, grid]
+    out.draw(drawn, edit_in, edit_out, js=SCREEN_STAMP, queue=False, show_progress="hidden", **hidden)
+    out.drop(dropped, edit_in, edit_out, js=SCREEN_STAMP, queue=False, show_progress="hidden", **hidden)
+    boxes.input(redraw, edit_in, edit_out, js=SCREEN_STAMP, queue=False, show_progress="hidden",
+                trigger_mode="always_last", **hidden)
+    grid.input(redraw, edit_in, edit_out, js=SCREEN_STAMP, queue=False, show_progress="hidden", **hidden)
+    clear.click(lambda r, s, u, _b, g: redraw(r, s, u, "", g), edit_in, edit_out, js=SCREEN_STAMP,
+                queue=False, show_progress="hidden", **hidden)
+    live(run_btn.click(None, None, rev, js=SCREEN_BUSY, queue=False, show_progress="hidden", **hidden))
+
+    def opened(raw):
+        """A link to one preset: its saved run, as a first render, and never a live run."""
+        key = ui.parse_shot(raw)
+        if key is None:
+            return [gr.update()] * 8
+        shot = screens.preset(key)
+        return [key, None, shot.task, gr.update(visible=False), "", "", ui.run_screen(shot, prefer="saved"), key]
+
+    return {"out": out, "opened": opened,
+            "opened_out": [picked, upload, task, up_group, boxes, trouble, out, at_shot]}
+
+
 # --- results and how it works -------------------------------------------------------
 
 
@@ -695,12 +959,36 @@ def api_tab():
 # --- api ----------------------------------------------------------------------------
 
 
+def image_refusal(value, root: list) -> str:
+    """serve.py's 422 body, as JSON, when a request to this Space's API carries an image; "" when it
+    carries none. The API stays text-only even where blink-mimo-9b's vision tower is on: only the
+    Screen click tab sends screenshots. Gradio can't send a status code, so this body is the message
+    of the Gradio error the caller gets, which is how the Space reports every refusal."""
+    if not ui.carries_image(value):
+        return ""
+    loc = list(root)
+    try:
+        found = blink.inspect_images(value)
+        where = found.loc if found is not None else None
+    except blink.BlinkError as exc:  # a malformed image header is still an image
+        where = getattr(exc, "loc", None)
+    if where and where[:2] == ["body", "state"]:
+        loc = [*root, *where[2:]]
+    return json.dumps({"error": ui.TEXT_ONLY_API,
+                       "detail": [{"loc": loc, "msg": ui.TEXT_ONLY_API, "type": "value_error"}]})
+
+
 def systemone(state: str, questions: dict, temperature: float | None = None,
               model: str | None = None) -> dict:
     """TypeSafe /v1/systemone-shaped endpoint: {state, questions, model?} -> {model, answers, usage, meta}.
     `state` may be text or JSON (a JSON-looking string is parsed); `questions` may also arrive as a JSON string.
     `model` picks a served blink model; TypeSafe's names (jev-latest, jev-1.13.0, ...) get the default one, as
-    serve.py answers every name. A request blink can't answer comes back as its reason."""
+    serve.py answers every name. A request blink can't answer comes back as its reason; one that
+    carries an image comes back as serve.py's 422 body with "this Space's API reads text only"."""
+    parsed = as_state(state)
+    refusal = image_refusal(parsed, ["body", "state"])
+    if refusal:
+        raise gr.Error(refusal)
     if isinstance(questions, str):
         try:
             questions = json.loads(questions)
@@ -709,7 +997,7 @@ def systemone(state: str, questions: dict, temperature: float | None = None,
     if isinstance(model, str) and model not in MODELS and TYPESAFE_NAME.match(model.strip()):
         model = None
     try:
-        out = blink.decide(as_state(state), questions, temperature=temperature, model=model)
+        out = blink.decide(parsed, questions, temperature=temperature, model=model)
     except blink.BlinkError as exc:
         raise gr.Error(str(exc)) from None
     meta = out["meta"]
@@ -720,11 +1008,18 @@ def systemone(state: str, questions: dict, temperature: float | None = None,
 def ask_api(ask: str, model: str | None = None) -> dict:
     """/v1/ask: a free-form ask -> the request that was drafted for it, and the decision.
 
-    The draft is the only step that generates text; `usage` is blink's own pass."""
+    The draft is the only step that generates text; `usage` is blink's own pass. Like /v1/systemone
+    it is text-only: an ask, or a drafted state, that carries an image is refused before blink runs."""
+    refusal = image_refusal(ask, ["body", "ask"])
+    if refusal:
+        raise gr.Error(refusal)
     try:
         req = author.draft(ask)
     except author.AuthorError as exc:
         raise gr.Error(str(exc)) from None
+    refusal = image_refusal(req["state"], ["body", "ask"])
+    if refusal:
+        raise gr.Error(refusal)
     try:
         out = blink.decide(req["state"], req["questions"], model=model)
     except blink.BlinkError as exc:
@@ -783,8 +1078,9 @@ BUMP_ASK_ARG = r"""(...a) => {
 }"""
 
 # Rewrite the address so a visitor can copy it, and tell an embedding page too. Replace,
-# never push: a tab click should not fill the back button.
-SYNC_URL = r"""(tab, sub) => {
+# never push: a tab click should not fill the back button. Screen click's preset rides along
+# while it is in view; a visitor's own screenshot has no link of its own.
+SYNC_URL = r"""(tab, sub, shot) => {
   if (!tab) return;
   const url = new URL(window.location.href);
   url.searchParams.set('tab', tab);
@@ -792,6 +1088,11 @@ SYNC_URL = r"""(tab, sub) => {
     url.searchParams.set('case', sub);
   } else {
     url.searchParams.delete('case');
+  }
+  if (shot && sub === %(screen)s && tab === %(case_tab)s) {
+    url.searchParams.set('shot', shot);
+  } else {
+    url.searchParams.delete('shot');
   }
   const next = url.pathname + url.search;
   if (next !== window.location.pathname + window.location.search || window.location.hash) {
@@ -803,10 +1104,19 @@ SYNC_URL = r"""(tab, sub) => {
       'https://huggingface.co'
     );
   } catch (e) { /* not embedded, or a parent that does not listen */ }
-}""" % {"case_tab": json.dumps(ui.CASE_TAB)}
+}""" % {"case_tab": json.dumps(ui.CASE_TAB), "screen": json.dumps(screens.KEY)}
 
 TOP_BY_LABEL = {label: slug for slug, label in ui.TABS}
 CASE_BY_TITLE = {case.title: case.key for case in examples.USE_CASES}
+if screens.available():
+    CASE_BY_TITLE[ui.SCREEN["title"]] = screens.KEY
+
+
+def masthead_for(tab: str, case: str | None, model) -> str:
+    """The masthead names the model answering the panel in view: on Screen click, the one that reads screens."""
+    if tab == ui.CASE_TAB and case == screens.KEY and screens.available():
+        return ui.masthead(screens.vision_model())
+    return ui.masthead(model, drafting=tab == ui.ASK_TAB)
 
 
 def picked_tab(evt: gr.SelectData) -> str:
@@ -865,8 +1175,13 @@ def open_from_url(raw: str):
 
 
 def build() -> gr.Blocks:
-    with gr.Blocks(title=TITLE, analytics_enabled=False, **BLOCKS_LOOK) as demo:
+    # a visitor's screenshot is read into memory at once; the upload gradio keeps on disk is
+    # purged within the hour rather than kept until the Space restarts
+    with gr.Blocks(title=TITLE, analytics_enabled=False, delete_cache=(1800, 1800), **BLOCKS_LOOK) as demo:
         mast = gr.HTML(ui.masthead())
+        # the Screen click preset in view, for the address; rendered with the other holders below
+        at_shot = gr.Textbox("", visible=False, render=False)
+        screen = None
         switches, panels = [], []
         ask = None
         with gr.Tabs() as tabs:
@@ -879,6 +1194,10 @@ def build() -> gr.Blocks:
                             case_switch, case_out = use_case_tab(case)
                             switches.append(case_switch)
                             panels.append(case_out)
+                    if screens.available():
+                        # no switch of its own: the screenshot is always read by blink-mimo-9b
+                        with gr.Tab(ui.SCREEN["title"], id=screens.KEY):
+                            screen = screen_tab(at_shot)
             if author.enabled():
                 with gr.Tab(TAB_LABEL[ui.ASK_TAB], id=ui.ASK_TAB):
                     ask_switch, ask = ask_tab()
@@ -898,60 +1217,65 @@ def build() -> gr.Blocks:
         here = gr.Textbox(visible=False)
         at_tab = gr.Textbox(ui.DEFAULT_TAB, visible=False)
         at_case = gr.Textbox("", visible=False)
+        at_shot.render()
         ask_box = ask["ask"] if ask else None
         opened = ([tabs, case_tabs, at_case, at_tab, mast, *pg["slots"]]
                   + ([ask_box] if ask_box is not None else []))
 
-        def go(slug, model):
+        def go(slug, model, case=""):
             """Moving is one call; putting the rows back is the next one.
 
             A Tabs update remounts the tab's children from the page's own config, so a
             restore sent with it is overwritten by the mount that follows."""
-            return [gr.update(selected=slug), slug,
-                    ui.masthead(model, drafting=slug == ui.ASK_TAB)]
+            return [gr.update(selected=slug), slug, masthead_for(slug, case, model)]
 
         def restore_rows(n, held):
             return _restore(n, bool((held or {}).get("locked")))
 
-        move_in = [first_switch]
+        # the case in view rides along, so the masthead can name the model answering it
+        move_in = [first_switch, at_case]
         move_out = [tabs, at_tab, mast]
         back_in = [pg["shown"], pg["req"]]
 
-        def opened_by_url(raw, model, n, held):
+        def opened_by_url(raw, model, _case, n, held):
             """A deep link lands on a tab without anyone selecting it.
 
             Both halves of the address are set here: leaving the case state empty makes
             the sync below drop the very case the link asked for."""
             tab, case = ui.parse_deep_link(raw)
-            moved = go(tab, model)
+            moved = go(tab, model, case)
             out = [moved[0], gr.update(selected=case) if case else gr.update(),
                    case or "", *moved[1:], *_restore(n, bool((held or {}).get("locked")))]
             return out + [gr.update(value=ui.parse_ask(raw))] if ask_box is not None else out
 
         demo.load(opened_by_url, [here, *move_in, *back_in], opened, js=READ_URL,
                   queue=False, show_progress="hidden")
+        if screen is not None:
+            demo.load(screen["opened"], [here], screen["opened_out"], js=READ_URL,
+                      queue=False, show_progress="hidden", api_visibility="private")
 
         # the selection is read from the event, never from a rendered tab button, so the
         # overflow menu a narrow window uses works exactly like the strip
-        def tab_selected(model, n, held, evt: gr.SelectData):
+        def tab_selected(model, case, n, held, evt: gr.SelectData):
             # select fires after the mount, so the restore can ride along here
-            return [*go(picked_tab(evt), model)[1:],
+            return [*go(picked_tab(evt), model, case)[1:],
                     *_restore(n, bool((held or {}).get("locked")))]
 
         tabs.select(tab_selected, [*move_in, *back_in], [*move_out[1:], *pg["slots"]],
                     queue=False, show_progress="hidden")
 
-        def case_selected(evt: gr.SelectData):
-            return picked_case(evt)
+        def case_selected(model, evt: gr.SelectData):
+            case = picked_case(evt)
+            return case, masthead_for(ui.CASE_TAB, case, model)
 
-        case_tabs.select(case_selected, None, at_case,
+        case_tabs.select(case_selected, [first_switch], [at_case, mast],
                          queue=False, show_progress="hidden")
-        for holder in (at_tab, at_case):
-            holder.change(None, [at_tab, at_case], None, js=SYNC_URL,
+        for holder in (at_tab, at_case, at_shot):
+            holder.change(None, [at_tab, at_case, at_shot], None, js=SYNC_URL,
                           queue=False, show_progress="hidden")
 
         for slug, btn in cards.items():
-            btn.click(lambda m, s=slug: go(s, m), move_in, move_out,
+            btn.click(lambda m, c, s=slug: go(s, m, c), move_in, move_out,
                       queue=False, show_progress="hidden").then(
                 restore_rows, back_in, pg["slots"],
                 queue=False, show_progress="hidden")
@@ -960,7 +1284,7 @@ def build() -> gr.Blocks:
             # two steps: the tab first, then the request. A Tabs update in the same call
             # remounts the rows and loses which of them are showing.
             ask["hand_off"].click(
-                lambda m: go("playground", m), move_in, move_out,
+                lambda m, c: go("playground", m, c), move_in, move_out,
                 queue=False, show_progress="hidden",
             ).then(
                 into_playground,
@@ -1037,6 +1361,10 @@ if __name__ == "__main__":
     # Gradio's selector scoping, so the layout rules lose to component defaults. Render client-side, as tested.
     if "ssr_mode" in inspect.signature(gr.Blocks.launch).parameters:
         extra["ssr_mode"] = False
+    # the only upload is Screen click's screenshot, which is refused over 8 MB anyway; a far
+    # larger file is turned away before it is written to disk
+    if "max_file_size" in inspect.signature(gr.Blocks.launch).parameters:
+        extra["max_file_size"] = "20mb"
     build().queue(max_size=32).launch(
         server_name=os.environ.get("BLINK_HOST")
         or os.environ.get("GRADIO_SERVER_NAME")

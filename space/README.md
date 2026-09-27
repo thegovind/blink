@@ -80,7 +80,7 @@ Eight public tasks, 250 items each, never used for training or model selection.
 Supervised fine-tuning with LoRA r16 on attention, DeltaNet, and MLP projections. Embeddings, norms, and heads stay frozen.
 
 - **blink-4b** and **blink-27b**: text-only weights.
-- **blink-mimo-9b**: fine-tune of MiMo-V2.6-Distill-Qwen-9B (based on Qwen3.5-9B). Retains the vision tower; omits MTP tensors. The app uses its text side only.
+- **blink-mimo-9b**: fine-tune of MiMo-V2.6-Distill-Qwen-9B (based on Qwen3.5-9B). Retains the vision tower; omits MTP tensors. Screen click uses that tower for screenshots. Everything else uses the text side.
 
 The model reads option letters directly. Details: [blink-4b](https://huggingface.co/thegovind/blink-4b) and [blink-27b](https://huggingface.co/thegovind/blink-27b) model cards.
 

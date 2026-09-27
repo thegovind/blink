@@ -1192,7 +1192,8 @@ class TestLiveExperience(unittest.TestCase):
         app = reload_app()
         src = inspect.getsource(app)
         self.assertIn('prefer="saved"', src)
-        self.assertEqual(src.count('prefer="saved"'), 2)
+        # the playground, a use case, the screenshot card, and a link to one screenshot
+        self.assertEqual(src.count('prefer="saved"'), 4)
         for chain in ("live(btn.click(", "live(run_btn.click("):
             self.assertIn(chain, src)
         self.assertNotIn('prefer="live"', src)
@@ -1562,7 +1563,11 @@ class TestDeepLinks(unittest.TestCase):
         self.assertEqual(self.ui.ASK_TAB, "ask")
         self.assertEqual(self.ui.CASE_TAB, "use-cases")
         self.assertEqual(self.ui.API_TAB, "api")
-        self.assertEqual(self.ui.CASE_IDS, tuple(c.key for c in examples.USE_CASES))
+        import screens
+
+        # the screenshot case comes last, wherever a model that reads screens is served
+        extra = (screens.KEY,) if screens.available() else ()
+        self.assertEqual(self.ui.CASE_IDS, tuple(c.key for c in examples.USE_CASES) + extra)
         self.assertIn("nextclick", self.ui.CASE_IDS)
 
     def test_query_and_hash_both_name_a_tab(self):
@@ -1651,8 +1656,9 @@ class TestDeepLinks(unittest.TestCase):
         self.assertIn("new URL(window.location.href)", app.SYNC_URL)  # keeps other params
         self.assertIn("searchParams.delete('case')", app.SYNC_URL)
         self.assertIn("catch", app.SYNC_URL)  # a parent that ignores it must not break us
-        # the id arrives as an argument; nothing here reads the rendered tab strip
-        self.assertIn("(tab, sub) =>", app.SYNC_URL)
+        # the ids arrive as arguments; nothing here reads the rendered tab strip
+        self.assertIn("(tab, sub, shot) =>", app.SYNC_URL)
+        self.assertIn("searchParams.delete('shot')", app.SYNC_URL)  # a Screen click preset only while in view
         for missing in ("role=\"tab\"", "aria-selected", "textContent"):
             self.assertNotIn(missing, app.SYNC_URL)
 
@@ -2425,7 +2431,7 @@ class TestAttributionAndRows(unittest.TestCase):
         src = inspect.getsource(app.build)
         self.assertIn("def restore_rows(n, held)", src)
         self.assertIn("restore_rows, back_in, pg[\"slots\"]", src)
-        move = src.split("def go(slug, model):")[1].split("def ")[0]
+        move = src.split('def go(slug, model, case=""):')[1].split("def ")[0]
         self.assertNotIn("_restore", move)  # the move itself never carries one
         self.assertIn("tabs.select(tab_selected", src)
 
@@ -2642,7 +2648,8 @@ class TestAttributionAndRows(unittest.TestCase):
         self.addCleanup(reload_app)
         app = reload_app()
         src = inspect.getsource(app.build)
-        self.assertIn("drafting=slug == ui.ASK_TAB", src)
+        self.assertIn("masthead_for(slug, case, model)", src)
+        self.assertIn("drafting=tab == ui.ASK_TAB", inspect.getsource(app.masthead_for))
 
 
 class TestLayout(unittest.TestCase):

@@ -590,7 +590,8 @@ footer {
 
 /* --- model switcher (a gradio radio, worn as a segmented control) --------------- */
 
-.blk-seg {
+.blk-seg,
+.blk-gridseg {
   border: 0 !important;
   background: transparent !important;
   padding: 0 !important;
@@ -600,7 +601,8 @@ footer {
   overflow: visible !important;
 }
 
-.blk-seg .wrap {
+.blk-seg .wrap,
+.blk-gridseg .wrap {
   display: inline-flex !important;
   flex-wrap: wrap;
   gap: 2px !important;
@@ -610,7 +612,8 @@ footer {
   background: var(--paper);
 }
 
-.blk-seg label {
+.blk-seg label,
+.blk-gridseg label {
   display: inline-flex;
   align-items: center;
   margin: 0 !important;
@@ -626,7 +629,8 @@ footer {
   transition: background-color 0.15s ease, color 0.15s ease, border-color 0.15s ease;
 }
 
-.blk-seg label input {
+.blk-seg label input,
+.blk-gridseg label input {
   position: absolute;
   width: 0;
   height: 0;
@@ -634,7 +638,8 @@ footer {
   pointer-events: none;
 }
 
-.blk-seg label span {
+.blk-seg label span,
+.blk-gridseg label span {
   font-family: var(--font-geist) !important;
   font-size: 13px !important;
   font-weight: 500 !important;
@@ -643,19 +648,28 @@ footer {
   color: inherit !important;
 }
 
-.blk-seg label:hover {
+.blk-seg label:hover,
+.blk-gridseg label:hover {
   color: var(--ink) !important;
 }
 
 /* the blink in use wears blink's colour, as the model tag in the masthead does */
-.blk-seg label.selected {
+.blk-seg label.selected,
+.blk-gridseg label.selected {
   background: var(--blink-tint) !important;
   border-color: var(--blink) !important;
   color: var(--blink-ink) !important;
 }
 
+/* the grid picker, while drawn boxes stand in for the grid */
+.blk-gridseg label:has(input:disabled) {
+  opacity: 0.45;
+  cursor: not-allowed;
+}
+
 /* keyboard focus only: a click on a segment is not a reason to ring it */
-.blk-seg label:has(input:focus-visible) {
+.blk-seg label:has(input:focus-visible),
+.blk-gridseg label:has(input:focus-visible) {
   outline: 2px solid var(--blink);
   outline-offset: 2px;
 }
@@ -2991,6 +3005,531 @@ body {
   }
 }
 
+/* --- next click on a screen --------------------------------------------------- */
+
+/* a probability the marks and rings animate between answers */
+@property --sp {
+  syntax: "<number>";
+  inherits: false;
+  initial-value: 0;
+}
+
+/* which model reads the screenshot: blink's own tag, worn where a switch sits elsewhere */
+.blk-eyechip {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  margin: 0 !important;
+  padding: 4px 12px 4px 10px;
+  border: 1px solid var(--blink);
+  border-radius: var(--radius-pill);
+  background: var(--blink-tint);
+  color: var(--blink-ink) !important;
+  font-size: 13px;
+  font-weight: 500;
+  line-height: 20px;
+}
+
+.blk-eyechip svg {
+  width: 16px;
+  height: 16px;
+  flex: none;
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 2;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+.blk-scr {
+  display: grid;
+  gap: 12px;
+  min-width: 0;
+}
+
+/* the verdict: one mark, one word */
+.blk-sv {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  min-width: 0;
+  background: var(--paper);
+  border: 1px solid var(--line);
+  border-radius: var(--radius-cards);
+  box-shadow: var(--shadow-subtle);
+  box-sizing: border-box;
+  min-height: 80px;
+  padding: 14px 18px;
+  animation: blk-rise 0.4s var(--ease) both;
+  transition: opacity 0.2s ease;
+}
+
+.blk-sv-mark {
+  flex: none;
+  display: grid;
+  place-items: center;
+  width: 40px;
+  height: 40px;
+  border-radius: 12px;
+  background: var(--flash);
+  color: var(--color-flash-ink);
+  font-family: var(--font-geist-mono);
+  font-size: 18px;
+  font-weight: 600;
+  animation: blk-pop 0.45s var(--ease) 0.1s both;
+}
+
+.blk-sv-mark svg {
+  width: 22px;
+  height: 22px;
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 2.6;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  stroke-dasharray: 24;
+  stroke-dashoffset: 24;
+  animation: blk-draw 0.5s var(--ease) 0.3s forwards;
+}
+
+/* hold: an open mark, as the other verdicts draw it */
+.blk-sv[data-act="ask"] .blk-sv-mark,
+.blk-sv[data-act="unsure"] .blk-sv-mark {
+  background: transparent;
+  box-shadow: inset 0 0 0 2px var(--ink-soft);
+  color: var(--ink);
+}
+
+.blk-sv-text {
+  min-width: 0;
+}
+
+.gradio-container .blk-sv h3 {
+  margin: 0;
+  font-family: var(--font-geist);
+  font-size: var(--text-heading-sm);
+  font-weight: 600;
+  line-height: 1.25;
+  letter-spacing: -0.025em;
+  color: var(--ink);
+}
+
+.blk-sv h3 .blk-tag {
+  margin-left: 10px;
+  vertical-align: middle;
+  white-space: nowrap;
+}
+
+.blk-sv h3 .blk-saved {
+  margin-left: 6px;
+  border-style: dashed;
+  border-color: var(--blink-light);
+  color: var(--blink-ink);
+}
+
+.gradio-container .blk-sv p {
+  margin: 2px 0 0;
+  font-size: 13px;
+  line-height: 1.45;
+  color: var(--mid);
+  overflow-wrap: anywhere;
+}
+
+.blk-sv-wait .blk-sv-mark {
+  background: var(--track);
+  animation: blk-shimmer 1.2s ease-in-out infinite;
+}
+
+/* before an answer: an open mark and one quiet line, at the verdict's own height */
+.blk-sv-idle .blk-sv-mark {
+  background: transparent;
+  box-shadow: inset 0 0 0 2px var(--line-strong);
+  animation: none;
+}
+
+.gradio-container .blk-sv-idle p {
+  margin: 0;
+  font-size: var(--text-body);
+  color: var(--mid-c);
+}
+
+/* the screenshot, exactly as blink reads it, with the page's own marks laid on top */
+.gradio-container .blk-shot {
+  margin: 0;
+  min-width: 0;
+}
+
+.blk-shot-frame {
+  position: relative;
+  overflow: hidden;
+  container-type: inline-size;
+  width: 100%;
+  border-radius: 16px;
+  background: var(--alt);
+  box-shadow: 0 0 0 1px var(--line), var(--shadow-subtle);
+  touch-action: manipulation;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.gradio-container .blk-shot-frame img {
+  display: block;
+  width: 100%;
+  height: 100%;
+  max-width: none;
+  margin: 0 !important;
+  object-fit: fill;
+  border-radius: 0;
+  user-select: none;
+  -webkit-user-select: none;
+  -webkit-user-drag: none;
+  pointer-events: none;
+}
+
+.blk-marks {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+}
+
+/* every mark sits on the box blink reads; answered, it glows by its probability */
+.blk-som {
+  position: absolute;
+  left: var(--sx);
+  top: var(--sy);
+  width: var(--sw);
+  height: var(--sh);
+  z-index: 2;
+  border-radius: 3px;
+  box-shadow: inset 0 0 0 2px var(--blink), 0 0 0 1px rgba(255, 255, 255, 0.9);
+  transition: --sp 0.7s var(--ease), box-shadow 0.5s var(--ease), background-color 0.5s var(--ease);
+}
+
+.blk-shot.answered .blk-som {
+  background: rgba(36, 71, 245, calc(var(--sp) * 0.12));
+  box-shadow:
+    inset 0 0 0 2px var(--blink),
+    0 0 0 1px rgba(255, 255, 255, 0.9),
+    0 0 0 calc(2px + var(--sp) * 5px) rgba(36, 71, 245, calc(0.08 + var(--sp) * 0.3)),
+    0 0 calc(6px + var(--sp) * 30px) calc(var(--sp) * 6px) rgba(36, 71, 245, calc(var(--sp) * 0.55));
+  animation: blk-fill 0.9s var(--ease) 0.1s backwards;
+}
+
+/* the one blink picked: lit in the flash colour, the rest of the screen dimmed a little */
+.blk-shot.answered .blk-som.win {
+  z-index: 1;
+  background: rgba(212, 245, 92, 0.18);
+  box-shadow:
+    inset 0 0 0 2px var(--blink),
+    0 0 0 3px var(--flash),
+    0 0 0 4px rgba(10, 10, 10, 0.32),
+    0 0 28px 6px rgba(212, 245, 92, 0.85),
+    0 0 0 200vmax rgba(10, 10, 10, 0.07);
+}
+
+.blk-shot.answered .blk-som.win::after {
+  content: "";
+  position: absolute;
+  inset: -2px;
+  border-radius: 6px;
+  border: 2px solid var(--flash);
+  opacity: 0;
+  animation: blk-ping 1s var(--ease) 0.35s both;
+}
+
+/* a finished task: nothing is lit, the marks fade back */
+.blk-shot[data-act="done"] .blk-som {
+  opacity: 0.55;
+}
+
+.blk-som.cell {
+  border-radius: 0;
+  box-shadow: inset 0 0 0 1px rgba(36, 71, 245, 0.45);
+}
+
+/* a grid answers as a heat map */
+.blk-shot.answered .blk-som.cell {
+  background: rgba(36, 71, 245, calc(var(--sp) * 0.42));
+  box-shadow: inset 0 0 0 1px rgba(36, 71, 245, 0.45);
+}
+
+.blk-shot.answered .blk-som.cell.win {
+  background: rgba(212, 245, 92, 0.3);
+  box-shadow: inset 0 0 0 3px var(--flash), inset 0 0 0 4px rgba(10, 10, 10, 0.45);
+}
+
+.blk-shot.answered .blk-som.cell.win::after {
+  display: none;
+}
+
+/* each number covers the one burned into the image, and grows away from its box to stay legible;
+   its drawn size is known (--tc characters of a monospaced face), so it never leaves the screenshot */
+.blk-somtag {
+  --w: max(var(--tw), 22px, calc(12px + var(--tc, 1) * 1ch + var(--tg, 0px)));
+  --h: max(var(--th), 20px);
+  position: absolute;
+  z-index: 3;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 4px;
+  box-sizing: border-box;
+  min-width: var(--w);
+  height: var(--h);
+  padding: 0 6px;
+  border-radius: 4px;
+  background: var(--blink);
+  color: #ffffff;
+  font-family: var(--font-geist-mono);
+  font-size: clamp(11px, calc(var(--tr) * 64cqw), 15px);
+  font-weight: 600;
+  line-height: 1;
+  white-space: nowrap;
+  pointer-events: none;
+  transition: background-color 0.4s var(--ease), color 0.4s var(--ease);
+}
+
+.blk-somtag.above {
+  left: clamp(0px, var(--tx), calc(100% - var(--w)));
+  top: max(0px, calc(var(--ty) + var(--th) - var(--h)));
+}
+
+.blk-somtag.left {
+  left: max(0px, calc(var(--tx) + var(--tw) - var(--w)));
+  top: clamp(0px, var(--ty), calc(100% - var(--h)));
+}
+
+.blk-somtag.inside {
+  left: clamp(0px, var(--tx), calc(100% - var(--w)));
+  top: clamp(0px, var(--ty), calc(100% - var(--h)));
+}
+
+.blk-somtag i {
+  font-style: normal;
+  font-weight: 500;
+  font-size: 0.92em;
+  opacity: 0.82;
+}
+
+.blk-somtag.win {
+  background: var(--flash);
+  color: var(--color-flash-ink);
+  box-shadow: 0 0 0 1px rgba(10, 10, 10, 0.5);
+  animation: blk-flash 0.5s ease-out 0.38s both;
+}
+
+.blk-somtag.win i {
+  opacity: 1;
+}
+
+.blk-shot-pill {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  z-index: 4;
+  padding: 1px 10px;
+  border-radius: var(--radius-pill);
+  background: rgba(255, 255, 255, 0.94);
+  box-shadow: var(--shadow-subtle);
+  font-size: var(--text-caption);
+  font-weight: 500;
+  line-height: 20px;
+  color: var(--ink-soft);
+  pointer-events: none;
+}
+
+/* while blink reads: a sweep down the screenshot, the marks breathing */
+.blk-shot.busy .blk-shot-frame::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: 5;
+  pointer-events: none;
+  background: linear-gradient(180deg, rgba(36, 71, 245, 0) 0%, rgba(36, 71, 245, 0.08) 40%,
+    rgba(36, 71, 245, 0.26) 49.5%, rgba(36, 71, 245, 0) 50.5%);
+  background-size: 100% 200%;
+  animation: blk-scan 1.6s linear infinite;
+}
+
+.blk-shot.busy .blk-som {
+  animation: blk-shimmer 1.2s ease-in-out infinite;
+}
+
+.blk-scr.busy .blk-sv:not(.blk-sv-wait),
+.blk-scr.busy .blk-meters,
+.blk-scr.busy .blk-answer-foot {
+  opacity: 0.45;
+}
+
+/* drawing on a visitor's own screenshot */
+.blk-shot[data-draw="1"] .blk-shot-frame {
+  cursor: crosshair;
+}
+
+.blk-shot[data-draw="1"] .blk-somtag:not(.cell) {
+  pointer-events: auto;
+  cursor: pointer;
+}
+
+.blk-shot[data-draw="1"] .blk-somtag:not(.cell):hover {
+  background: var(--ink);
+  color: #ffffff;
+}
+
+.blk-ghost {
+  position: absolute;
+  z-index: 4;
+  border: 2px dashed var(--blink);
+  border-radius: 3px;
+  background: rgba(36, 71, 245, 0.1);
+  pointer-events: none;
+}
+
+.blk-ghost.sent {
+  animation: blk-shimmer 1s ease-in-out infinite;
+}
+
+.blk-corner {
+  position: absolute;
+  z-index: 4;
+  width: 14px;
+  height: 14px;
+  margin: -7px 0 0 -7px;
+  border-radius: 50%;
+  background: var(--flash);
+  box-shadow: 0 0 0 2px var(--blink), 0 0 0 6px rgba(36, 71, 245, 0.2);
+  pointer-events: none;
+  animation: blk-pop 0.25s var(--ease) both;
+}
+
+/* the two checks, as rings */
+.blk-meters {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  transition: opacity 0.2s ease;
+}
+
+.blk-meter {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  padding: 6px 16px 6px 6px;
+  background: var(--paper);
+  border: 1px solid var(--line);
+  border-radius: 999px;
+  box-shadow: var(--shadow-subtle);
+  animation: blk-rise 0.4s var(--ease) 0.15s both;
+}
+
+.blk-ring {
+  --ring: var(--blink-light);
+  position: relative;
+  display: grid;
+  place-items: center;
+  width: 40px;
+  height: 40px;
+  flex: none;
+  border-radius: 50%;
+  background: conic-gradient(var(--ring) calc(var(--sp) * 1turn), var(--track) 0);
+  transition: --sp 0.8s var(--ease);
+  animation: blk-fill 0.9s var(--ease) 0.2s backwards;
+}
+
+.blk-ring::before {
+  content: "";
+  position: absolute;
+  inset: 5px;
+  border-radius: 50%;
+  background: var(--paper);
+}
+
+.blk-ring b {
+  position: relative;
+  font-family: var(--font-geist-mono);
+  font-size: 11px;
+  font-weight: 600;
+  color: var(--ink);
+  font-variant-numeric: tabular-nums;
+}
+
+.blk-meter .k {
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--ink-soft);
+}
+
+.blk-meter.empty {
+  box-shadow: none;
+  animation: none;
+}
+
+.blk-meter.empty .blk-ring b,
+.blk-meter.empty .k {
+  color: var(--mid);
+}
+
+.blk-meter.on[data-kind="done"] .blk-ring {
+  --ring: var(--color-blink-deep);
+}
+
+.blk-meter.on[data-kind="done"] {
+  border-color: var(--flash);
+  box-shadow: 0 0 0 2px var(--flash), var(--shadow-subtle);
+}
+
+.blk-meter.on[data-kind="risky"] .blk-ring {
+  --ring: var(--ink);
+}
+
+.blk-meter.on[data-kind="risky"] {
+  border-color: var(--ink-soft);
+}
+
+.gradio-container .blk-read {
+  display: block;
+  width: 100%;
+  max-width: 480px;
+  margin: 8px 0 0 !important;
+  border-radius: 10px;
+  box-shadow: 0 0 0 1px var(--line);
+}
+
+/* nothing to fix takes no room */
+.blk-screenrow .blk-trouble:has(.prose:empty) {
+  display: none !important;
+}
+
+/* the visitor's screenshot: its grid and its boxes, together under the task, on blink's own paper */
+.gradio-container .blk-upgroup {
+  gap: 8px !important;
+  padding: 12px 16px !important;
+  margin: 0 0 12px !important;
+  border: 1px solid var(--line) !important;
+  border-radius: var(--radius-cards) !important;
+  background: var(--paper) !important;
+  box-shadow: var(--shadow-subtle) !important;
+}
+
+/* gradio draws a group twice; the inner copy and its wrapper stay flat */
+.gradio-container .blk-upgroup .blk-upgroup,
+.gradio-container .blk-upgroup .styler {
+  border: 0 !important;
+  padding: 0 !important;
+  margin: 0 !important;
+  background: transparent !important;
+  box-shadow: none !important;
+}
+
+.gradio-container .blk-upgroup .block {
+  background: transparent !important;
+  padding: 0 !important;
+}
+
+.blk-upgroup .blk-clear {
+  align-self: flex-start;
+  width: auto !important;
+}
+
 /* --- keyframes ----------------------------------------------------------------- */
 
 @keyframes blk-rise {
@@ -3069,6 +3608,35 @@ body {
   }
   50% {
     opacity: 0.35;
+  }
+}
+
+/* a probability fills in from nothing, once */
+@keyframes blk-fill {
+  from {
+    --sp: 0;
+  }
+}
+
+/* the picked mark sends one ring out */
+@keyframes blk-ping {
+  from {
+    inset: -2px;
+    opacity: 0.95;
+  }
+  to {
+    inset: -16px;
+    opacity: 0;
+  }
+}
+
+/* the reading sweep, top to bottom */
+@keyframes blk-scan {
+  from {
+    background-position: 0 100%;
+  }
+  to {
+    background-position: 0 0;
   }
 }
 

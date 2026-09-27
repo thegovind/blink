@@ -1,0 +1,318 @@
+{
+ "about": "Screen click presets: local browser-test fixture pages, marked by build_screens.py.",
+ "viewport": [
+  960,
+  576
+ ],
+ "scale": 1.5,
+ "pad_css_px": 6,
+ "style": {
+  "stroke": 4,
+  "halo": 2,
+  "tag": 34,
+  "font": 24
+ },
+ "fixtures": {
+  "catalog.html": "a8628f8df28b66cf87ab5a9245d4158816c89e80561c454bc47a796e8eb601a2",
+  "directory.html": "3a78ee5618e095fc76041c2a3110b055475df352f1c7425ef27b9edd45932714",
+  "lookup.html": "0c404bab8cb732f27cd30444f8bbde8826ff26e3092719748570250aa8395bd9",
+  "style.css": "f80d1f66d9a9d464faf8acc98460d926528220a9d3d11bbb37af29bcd18ad62d"
+ },
+ "presets": [
+  {
+   "key": "catalog",
+   "label": "Open the result",
+   "page": "catalog.html",
+   "task": "Search the Maps category, then open Atlas Field Guide from the results.",
+   "image": "catalog.png",
+   "size": [
+    1440,
+    864
+   ],
+   "bytes": 52966,
+   "sha256": "f3693390e84618c67962bb7a6d2ea3e40b2eec48646ff23864e40c2c9448470d",
+   "boxes": [
+    {
+     "n": 1,
+     "box": [
+      205,
+      378,
+      397,
+      452
+     ],
+     "tag": [
+      201,
+      340,
+      235,
+      374
+     ],
+     "at": "above",
+     "role": "select",
+     "name": "Book category: Maps"
+    },
+    {
+     "n": 2,
+     "box": [
+      418,
+      375,
+      658,
+      455
+     ],
+     "tag": [
+      414,
+      337,
+      448,
+      371
+     ],
+     "at": "above",
+     "role": "button",
+     "name": "Search catalog"
+    },
+    {
+     "n": 3,
+     "box": [
+      134,
+      650,
+      458,
+      700
+     ],
+     "tag": [
+      130,
+      612,
+      164,
+      646
+     ],
+     "at": "above",
+     "role": "link",
+     "name": "Open Atlas Field Guide"
+    }
+   ],
+   "expect": {
+    "element": "3",
+    "done": "no",
+    "risky": "no"
+   }
+  },
+  {
+   "key": "directory",
+   "label": "Filter first",
+   "page": "directory.html",
+   "task": "Filter workshops to Remote and Morning only, then open Blue Workshop.",
+   "image": "directory.png",
+   "size": [
+    1440,
+    864
+   ],
+   "bytes": 54384,
+   "sha256": "d9b3a5c3f437f28ce13345ba69321162d05479732ec172c5e662e340ff353021",
+   "boxes": [
+    {
+     "n": 1,
+     "box": [
+      177,
+      375,
+      351,
+      449
+     ],
+     "tag": [
+      173,
+      337,
+      207,
+      371
+     ],
+     "at": "above",
+     "role": "select",
+     "name": "Workshop format: Remote"
+    },
+    {
+     "n": 2,
+     "box": [
+      372,
+      383,
+      603,
+      441
+     ],
+     "tag": [
+      368,
+      345,
+      402,
+      379
+     ],
+     "at": "above",
+     "role": "checkbox",
+     "name": "Morning only"
+    },
+    {
+     "n": 3,
+     "box": [
+      134,
+      644,
+      434,
+      694
+     ],
+     "tag": [
+      130,
+      606,
+      164,
+      640
+     ],
+     "at": "above",
+     "role": "link",
+     "name": "Open Blue Workshop"
+    },
+    {
+     "n": 4,
+     "box": [
+      134,
+      703,
+      456,
+      752
+     ],
+     "tag": [
+      96,
+      699,
+      130,
+      733
+     ],
+     "at": "left",
+     "role": "link",
+     "name": "Open Green Workshop"
+    }
+   ],
+   "expect": {
+    "element": "2",
+    "done": "no",
+    "risky": "no"
+   }
+  },
+  {
+   "key": "lookup",
+   "label": "Pick a topic",
+   "page": "lookup.html",
+   "task": "Select Transit, submit Find articles, then open Blue Line timetable.",
+   "image": "lookup.png",
+   "size": [
+    1440,
+    864
+   ],
+   "bytes": 38714,
+   "sha256": "8384b4a85056a40b329c32bccf38cd25360228792d38428228e9d4c059b4c7f0",
+   "boxes": [
+    {
+     "n": 1,
+     "box": [
+      74,
+      386,
+      204,
+      444
+     ],
+     "tag": [
+      70,
+      348,
+      104,
+      382
+     ],
+     "at": "above",
+     "role": "radio",
+     "name": "Parks"
+    },
+    {
+     "n": 2,
+     "box": [
+      225,
+      386,
+      372,
+      444
+     ],
+     "tag": [
+      221,
+      348,
+      255,
+      382
+     ],
+     "at": "above",
+     "role": "radio",
+     "name": "Transit"
+    },
+    {
+     "n": 3,
+     "box": [
+      393,
+      375,
+      594,
+      455
+     ],
+     "tag": [
+      389,
+      337,
+      423,
+      371
+     ],
+     "at": "above",
+     "role": "button",
+     "name": "Find articles"
+    }
+   ],
+   "expect": {
+    "element": "2",
+    "done": "no",
+    "risky": "no"
+   }
+  },
+  {
+   "key": "done",
+   "label": "Already done",
+   "page": "catalog.html",
+   "task": "Search the Maps category, then open Atlas Field Guide from the results.",
+   "image": "done.png",
+   "size": [
+    1440,
+    864
+   ],
+   "bytes": 39999,
+   "sha256": "ce5ea2280fe977c5c4b82493a9ce659307d76038f9f2dd40d4e8ccf446921cdb",
+   "boxes": [
+    {
+     "n": 1,
+     "box": [
+      36,
+      45,
+      1404,
+      341
+     ],
+     "tag": [
+      32,
+      7,
+      66,
+      41
+     ],
+     "at": "above",
+     "role": "heading",
+     "name": "Book catalog"
+    },
+    {
+     "n": 2,
+     "box": [
+      36,
+      347,
+      1404,
+      643
+     ],
+     "tag": [
+      32,
+      343,
+      66,
+      377
+     ],
+     "at": "inside",
+     "role": "article",
+     "name": "Atlas Field Guide"
+    }
+   ],
+   "expect": {
+    "done": "yes",
+    "risky": "no"
+   }
+  }
+ ]
+}

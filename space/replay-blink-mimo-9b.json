@@ -4,6 +4,102 @@
  "engine": "TorchEngine (bf16 weights, FP32 label projection)",
  "recorded_utc": "2026-09-24T14:58:33Z",
  "requests": {
+  "91b29f88b0c6754fd3149b130d7abd0f": {
+   "names": [
+    "screen/catalog"
+   ],
+   "logits": {
+    "element": [
+     18.24346,
+     20.08395,
+     20.72604
+    ],
+    "done": [
+     19.42663,
+     20.89621
+    ],
+    "risky": [
+     17.88031,
+     21.61052
+    ]
+   },
+   "input_tokens": 4132,
+   "latency_ms": 792.8,
+   "image_pixels": 1244160,
+   "visual_tokens": 1215
+  },
+  "6087733294370503e651d1b923b8e9cd": {
+   "names": [
+    "screen/directory"
+   ],
+   "logits": {
+    "element": [
+     19.18105,
+     20.40341,
+     19.4509,
+     16.57263
+    ],
+    "done": [
+     19.88128,
+     21.14348
+    ],
+    "risky": [
+     18.19956,
+     21.5229
+    ]
+   },
+   "input_tokens": 4143,
+   "latency_ms": 744.7,
+   "image_pixels": 1244160,
+   "visual_tokens": 1215
+  },
+  "bdaf9d1b45126d03dd269130a7aeb994": {
+   "names": [
+    "screen/lookup"
+   ],
+   "logits": {
+    "element": [
+     18.16123,
+     21.68541,
+     17.36375
+    ],
+    "done": [
+     19.17911,
+     21.1473
+    ],
+    "risky": [
+     18.90457,
+     21.2113
+    ]
+   },
+   "input_tokens": 4129,
+   "latency_ms": 743.2,
+   "image_pixels": 1244160,
+   "visual_tokens": 1215
+  },
+  "bafcfbb9c12b515a7ab7f36ffda9af05": {
+   "names": [
+    "screen/done"
+   ],
+   "logits": {
+    "element": [
+     19.00932,
+     20.6175
+    ],
+    "done": [
+     21.16027,
+     20.10031
+    ],
+    "risky": [
+     18.30955,
+     21.60043
+    ]
+   },
+   "input_tokens": 4118,
+   "latency_ms": 744.1,
+   "image_pixels": 1244160,
+   "visual_tokens": 1215
+  },
   "1084c1658b5fa583afb3cca211a5aa82": {
    "logits": {
     "queue": [
@@ -626,5 +722,7 @@
     "playground/Invoice email"
    ]
   }
- }
+ },
+ "screens_recorded_utc": "2026-09-27T19:00:03Z",
+ "screens_blink_py_sha256": "acacc4026c7f80e2956bcfffa49084fa97b33bcae0d599e88d06f553d7f6fd25"
 }

@@ -7,6 +7,7 @@ rendered by one code path whichever way it is served.
 
 from __future__ import annotations
 
+import hashlib
 import json
 import urllib.parse
 
@@ -14,6 +15,7 @@ import api_doc
 import blink
 import examples
 import results
+import screens
 
 DATA = results.load()
 PLAYGROUND_PRESETS = examples.PLAYGROUND_PRESETS
@@ -44,7 +46,8 @@ CASE_TAB = "use-cases"
 ASK_TAB = "ask"
 HOME_TAB = "home"
 API_TAB = "api"
-CASE_IDS = tuple(case.key for case in examples.USE_CASES)
+# the screenshot case sits last, after the text next click, where a model that reads screens is served
+CASE_IDS = tuple(case.key for case in examples.USE_CASES) + ((screens.KEY,) if screens.available() else ())
 DEFAULT_CASE = CASE_IDS[0]
 
 
@@ -68,6 +71,20 @@ def parse_deep_link(raw) -> tuple[str, str | None]:
     if not tab and (params.get("ask") or [""])[0].strip():
         tab = ASK_TAB  # an ask link lands where the ask box is
     return (tab or DEFAULT_TAB), (case if tab == CASE_TAB else None)
+
+
+def parse_shot(raw) -> str | None:
+    """A Screen click link's preset: "?tab=use-cases&case=screen&shot=done" -> "done".
+
+    Only a link that opens Screen click carries one; an unknown shot falls back to the first preset."""
+    if parse_deep_link(raw)[1] != screens.KEY:
+        return None
+    search = raw.partition("#")[0]
+    asked = (urllib.parse.parse_qs(search.lstrip("?")).get("shot") or [""])[0].strip().lower()
+    if not asked:
+        return None
+    keys = [shot.key for shot in screens.presets()]
+    return asked if asked in keys else keys[0]
 
 
 def esc(s) -> str:
@@ -142,6 +159,17 @@ def error_html(msg: str) -> str:
     return f'<div class="blk-warn">{esc(msg)}</div>'
 
 
+# Only Screen click sends a screenshot: every other tab, and the Space's API, stay text-only
+# even where blink-mimo-9b's vision tower is on (BLINK_VISION=1).
+TEXT_ONLY_UI = "Screenshots go in Screen click."
+TEXT_ONLY_API = "this Space's API reads text only"
+
+
+def carries_image(state) -> bool:
+    """Whether a state holds a data:image/ URI, well formed or not."""
+    return blink.contains_image_uri(state)
+
+
 def notice_html(msg: str) -> str:
     return f'<div class="blk-notice"><span class="blk-dotmark"></span><p>{esc(msg)}</p></div>'
 
@@ -176,6 +204,23 @@ def _headline(ans: dict) -> tuple[str, str]:
     return f"{ans['score']:.2f}", f"of {top} · most likely level {ans['choice']}"
 
 
+def timing_html(meta: dict) -> str:
+    """How long the answer took, and whether it is a saved run or a live one."""
+    if meta.get("engine") == "replay":
+        return f'<span><b>{meta["latency_ms"]:.1f}</b> ms recorded call \u00b7 saved run</span>'
+    if meta.get("model_ms") is not None:
+        return f'<span><b>{meta["model_ms"]:.1f}</b> ms model time \u00b7 live</span>'
+    return f'<span><b>{meta["latency_ms"]:.1f}</b> ms</span>'
+
+
+def answered_by_html(meta: dict) -> str:
+    return (
+        f'<span class="blk-by"><b>{esc(short_model(meta["model"]))}</b></span>'
+        if meta.get("model")
+        else ""
+    )
+
+
 def render_answers(state, questions: dict, out: dict, author: dict | None = None) -> str:
     blocks = []
     for i, (qkey, q) in enumerate(questions.items()):
@@ -194,17 +239,8 @@ def render_answers(state, questions: dict, out: dict, author: dict | None = None
             "</section>"
         )
     meta = out["meta"]
-    if meta.get("engine") == "replay":
-        timing = f'<span><b>{meta["latency_ms"]:.1f}</b> ms recorded call \u00b7 saved run</span>'
-    elif meta.get("model_ms") is not None:
-        timing = f'<span><b>{meta["model_ms"]:.1f}</b> ms model time \u00b7 live</span>'
-    else:
-        timing = f'<span><b>{meta["latency_ms"]:.1f}</b> ms</span>'
-    answered_by = (
-        f'<span class="blk-by"><b>{esc(short_model(meta["model"]))}</b></span>'
-        if meta.get("model")
-        else ""
-    )
+    timing = timing_html(meta)
+    answered_by = answered_by_html(meta)
     stats = (
         '<div class="blk-stats">'
         + answered_by
@@ -562,6 +598,8 @@ def run_questions(state, questions: dict, model: str | None = None,
                   prefer: str = "live", author: dict | None = None) -> str:
     """The form's answer path: a questions dict rather than a blob of JSON."""
     parsed = blink.as_state(state)
+    if carries_image(parsed):
+        return error_html(TEXT_ONLY_UI)
     try:
         out = blink.decide(parsed, questions, bias=BIAS_BY_STATE.get(str(state).strip()),
                            prefer=prefer, model=model)
@@ -809,6 +847,8 @@ def run_playground(state: str, questions_text: str, model: str | None = None,
     if not isinstance(questions, dict):
         return error_html("Questions must be a JSON object keyed by question name.")
     parsed = blink.as_state(state)
+    if carries_image(parsed):
+        return error_html(TEXT_ONLY_UI)
     try:
         out = blink.decide(parsed, questions, bias=BIAS_BY_STATE.get(state.strip()),
                            prefer=prefer, model=model)
@@ -823,6 +863,8 @@ def run_playground(state: str, questions_text: str, model: str | None = None,
 
 def run_use_case(case: examples.UseCase, state: str, model: str | None = None,
                  prefer: str = "live") -> str:
+    if carries_image(state):
+        return error_html(TEXT_ONLY_UI)
     try:
         out = blink.decide(state, case.questions, bias=BIAS_BY_STATE.get(state),
                            prefer=prefer, model=model)
@@ -1093,7 +1135,9 @@ def how_blocks() -> list[str]:
         '<p class="blk-note">LoRA r16 updates every layer’s attention, DeltaNet and MLP projections; '
         "embeddings, norms and the output head stay frozen. blink-4b and blink-27b ship text-only weights. "
         "blink-mimo-9b keeps MiMo's unchanged vision tower; its checkpoint has no MTP tensors. "
-        "The app uses its text side only, reading option-letter scores without generating text.</p>",
+        + (SCREEN["how"].format(title=SCREEN["title"]) if screens.available() else
+           "The app uses its text side only, reading option-letter scores without generating text.")
+        + "</p>",
         '<p class="blk-note">Jev’s RLCD recipe isn’t public, so it wasn’t copied; this is supervised fine-tuning '
         "on decision data. Full details: "
         + " · ".join(f'<a href="{esc(href)}" target="_blank" rel="noopener">{esc(name)} card</a>'
@@ -1250,3 +1294,228 @@ def api_blocks() -> list[str]:
         + _api_fold(c["diff"], diff)
         + "</div>",
     ]
+
+
+# --- next click on a screen -----------------------------------------------------------
+# Every string the screenshot card shows, in one place. The verdicts are screens.verdict's.
+SCREEN = {
+    "title": "Screen click",
+    "blurb": "Pick the next click on a screenshot.",
+    "model": "Screenshots use {model}",
+    "upload": "Screenshot",
+    "task": "Task",
+    "task_hint": "What should the agent do here?",
+    "grid": "Grid",
+    "boxes": "Boxes",
+    "boxes_hint": "Drag to draw boxes, or type x1, y1, x2, y2 per line.",
+    "clear": "Clear boxes",
+    "grid_pill": "Grid {k}\u00d7{k}",
+    "done": "Done?",
+    "risky": "Risky?",
+    "saved": "saved run",
+    "not_run": "Not run yet. Click Decide.",
+    "draw": "Drag or tap two corners to draw a box.",
+    "miss": "No saved run for this screenshot. Try a preset as is.",
+    "off": "Screenshot input is off here.",
+    "questions": "Questions",
+    "rule": "Decision rule",
+    "rule_note": "Marks label page elements. This demo never clicks.",
+    "raw": "Raw response",
+    "read": "What blink read",
+    "alt": "Screenshot with {n} numbered {unit}",
+    "image_tokens": "image tokens",
+    "how": "{title} uses that tower for screenshots. Every other tab uses the text side. Either way, "
+           "blink reads option-letter scores and generates no text.",
+    "docs": "Run it yourself",
+}
+# where the card points to run the same thing on one's own server; opens in a new tab
+SCREEN_DOCS_URL = "https://thegovind.github.io/blink/computer-use/"
+GRID_CHOICES = tuple((SCREEN["grid_pill"].format(k=k), str(k)) for k in screens.GRIDS)
+
+_EYE = ('<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M2 12s3.6-7 10-7 10 7 10 7-3.6 7-10 7S2 12 2 12Z"/>'
+        '<circle cx="12" cy="12" r="3"/></svg>')
+_CHECK = '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12.5 10 17.5 19 7"/></svg>'
+
+
+def screen_note() -> str:
+    return f'<p class="blk-note">{esc(SCREEN["blurb"])}</p>'
+
+
+def screen_model_chip(model: str | None = None) -> str:
+    """Which model reads the screenshot, whatever the page's switch says."""
+    name = short_model(model or screens.vision_model() or screens.VISION_NAME)
+    return (f'<p class="blk-eyechip" title="{esc(SCREEN["model"].format(model=name))}">{_EYE}'
+            f'<span>{esc(SCREEN["model"].format(model=name))}</span></p>')
+
+
+def _share(v: float, total: float) -> str:
+    return f"{v / total * 100:.3f}%"
+
+
+def screen_stage(shot: screens.Shot, answers: dict | None = None, *, busy: bool = False,
+                 draw: bool = False, act: str | None = None) -> str:
+    """The screenshot, and over it a mark for every numbered box laid exactly on the one blink reads.
+
+    Answered, each mark glows by its probability and the chosen one is lit in the flash colour."""
+    W, H = shot.size
+    sw, sh = shot.source_size or shot.size
+    s = screens.style(W)
+    pad = 0 if shot.grid else s["stroke"] + s["halo"]
+    probs = (answers or {}).get("element", {}).get("probabilities", {})
+    win = answers["element"]["choice"] if answers and act in ("click", "ask", "unsure") else None
+    marks = []
+    for b in shot.boxes:
+        n = str(b.n)
+        x1, y1 = max(0, b.box[0] - pad), max(0, b.box[1] - pad)
+        x2, y2 = min(W, b.box[2] + pad), min(H, b.box[3] + pad)
+        p = probs.get(n)
+        on = " win" if win == n else ""
+        box_style = (f"--sx:{_share(x1, W)};--sy:{_share(y1, H)};--sw:{_share(x2 - x1, W)};--sh:{_share(y2 - y1, H)}"
+                     + (f";--sp:{p:.4f}" if p is not None else ""))
+        title = n + (f" \u00b7 {b.role}: {b.name}" if b.name else "")
+        tx1, ty1, tx2, ty2 = b.tag
+        shown = p is not None and (not shot.grid or p >= 0.05 or on)
+        pct = f"<i>{p:.0%}</i>" if shown else ""
+        # how many characters of its monospaced face the number takes, so the page can keep it inside
+        chars = len(n) + (len(f"{p:.0%}") if shown else 0)
+        tag_style = (f"--tx:{_share(tx1, W)};--ty:{_share(ty1, H)};--tw:{_share(tx2 - tx1, W)};"
+                     f"--th:{_share(ty2 - ty1, H)};--tr:{(ty2 - ty1) / W:.5f};--tc:{chars:g}"
+                     + (";--tg:4px" if shown else ""))
+        marks.append(
+            f'<span class="blk-som{" cell" if shot.grid else ""}{on}" data-n="{n}" style="{box_style}"'
+            f' title="{esc(title)}"></span>'
+            f'<span class="blk-somtag {esc(b.at)}{" cell" if shot.grid else ""}{on}" data-n="{n}"'
+            f' style="{tag_style}"><b>{n}</b>{pct}</span>'
+        )
+    pill = (f'<span class="blk-shot-pill">{esc(SCREEN["grid_pill"].format(k=shot.grid))}</span>'
+            if shot.grid else "")
+    alt = SCREEN["alt"].format(n=len(shot.boxes), unit="cells" if shot.grid else "boxes")
+    classes = "blk-shot" + (" busy" if busy else "") + (" answered" if answers else "")
+    return (
+        f'<figure class="{classes}" data-draw="{1 if draw else 0}" data-act="{esc(act or "")}">'
+        f'<div class="blk-shot-frame" data-w="{sw}" data-h="{sh}" style="aspect-ratio:{W} / {H}">'
+        f'<img src="{shot.view or shot.uri}" alt="{esc(alt)}" draggable="false">'
+        f'<div class="blk-marks">{"".join(marks)}</div>{pill}</div></figure>'
+    )
+
+
+def _screen_verdict(shot: screens.Shot, answers: dict, meta: dict) -> tuple[str, str]:
+    tone, act, headline, detail = screens.verdict(answers)
+    choice = answers["element"]["choice"]
+    box = next((b for b in shot.boxes if str(b.n) == choice), None)
+    mark = {"click": esc(choice), "ask": esc(choice), "unsure": "?", "done": _CHECK}[act]
+    line = f"{box.role} \u00b7 {box.name}" if act in ("click", "ask") and box is not None and box.name else ""
+    tags = '<em class="blk-tag">simulated</em>'
+    if meta.get("engine") == "replay":
+        tags += f'<em class="blk-tag blk-saved">{esc(SCREEN["saved"])}</em>'
+    return act, (
+        f'<div class="blk-sv {esc(tone)}" data-act="{esc(act)}" title="{esc(detail)}">'
+        f'<span class="blk-sv-mark" aria-hidden="true">{mark}</span>'
+        f'<div class="blk-sv-text"><h3>{esc(headline)}{tags}</h3>'
+        + (f"<p>{esc(line)}</p>" if line else "")
+        + "</div></div>"
+    )
+
+
+def _screen_meter(label: str, p: float | None, on: bool, kind: str) -> str:
+    """A ring for one yes/no check; empty until answered, so it fills in when the answer lands."""
+    shown = "\u2013" if p is None else f"{p:.0%}"
+    return (
+        f'<div class="blk-meter{" on" if on else ""}{" empty" if p is None else ""}" data-kind="{kind}">'
+        f'<span class="blk-ring" style="--sp:{p or 0:.4f}" role="img" aria-label="{esc(label)} {shown}">'
+        f'<b>{shown}</b></span><span class="k">{esc(label)}</span></div>'
+    )
+
+
+def _screen_meters(answers: dict | None = None) -> str:
+    done = answers["done"]["noul"] if answers else None
+    risky = answers["risky"]["noul"] if answers else None
+    return (
+        '<div class="blk-meters">'
+        + _screen_meter(SCREEN["done"], done, done is not None and done >= screens.DONE_AT, "done")
+        + _screen_meter(SCREEN["risky"], risky, risky is not None and risky >= screens.RISKY_AT, "risky")
+        + "</div>"
+    )
+
+
+def _shot_id(shot: screens.Shot) -> str:
+    """Which screenshot the card holds: a new one may be shorter, the same one edited may not jump."""
+    if not shot.upload:
+        return shot.key
+    return "upload-" + hashlib.sha256(shot.view[-4096:].encode("ascii")).hexdigest()[:12]
+
+
+def _elided(shot: screens.Shot, state: dict) -> dict:
+    return {**state, "screenshot": f"data:image/png;base64,\u2026 ({len(shot.png):,} bytes)"}
+
+
+def _idle_row(text: str) -> str:
+    """Where the verdict goes before there is one: the same height, so the screenshot never moves."""
+    return (f'<div class="blk-sv blk-sv-idle"><span class="blk-sv-mark" aria-hidden="true"></span>'
+            f'<div class="blk-sv-text"><p>{esc(text)}</p></div></div>')
+
+
+def screen_panel(shot: screens.Shot, out: dict | None = None, *, busy: bool = False, draw: bool = False,
+                 note: str = "", notice: str = "", rev=0) -> str:
+    """The answer column: the verdict, the marked screenshot, then the two checks and the details.
+
+    Every state keeps the rows above the screenshot, so drawing on it never makes it jump. `rev`
+    changes with every request, so a repeat answer still clears the busy state it replaces."""
+    act, head, foot = None, "", notice
+    if out is not None:
+        answers, meta = out["answers"], out["meta"]
+        act, head = _screen_verdict(shot, answers, meta)
+        state, qs = screens.request(shot)
+        stats = (
+            '<div class="blk-stats">' + answered_by_html(meta) + timing_html(meta)
+            + f'<span><b>{meta["input_tokens"]:,}</b> input tokens</span>'
+            + (f'<span><b>{meta["visual_tokens"]:,}</b> {esc(SCREEN["image_tokens"])}</span>'
+               if meta.get("visual_tokens") else "")
+            + f'<span><b>{meta["generated_tokens"]}</b> generated</span>'
+            f'<span><b>{len(qs)}</b> questions</span>'
+            f'<span>temperature <b>{meta["temperature"]:g}</b></span></div>'
+        )
+        raw = json.dumps({"state": _elided(shot, state), "questions": qs, **out}, indent=2, ensure_ascii=False)
+        more = (
+            f'<details class="blk-more"><summary>{esc(SCREEN["rule"])}</summary>'
+            f'<div class="blk-pre">{esc(screens.rule_source())}</div>'
+            f'<p>{esc(SCREEN["rule_note"])}</p></details>'
+            f'<details class="blk-more"><summary>{esc(SCREEN["questions"])}</summary>'
+            f'<div class="blk-pre">{esc(json.dumps(qs, indent=2))}</div></details>'
+            f'<details class="blk-more"><summary>{esc(SCREEN["raw"])}</summary>'
+            f'<div class="blk-pre">{esc(raw)}</div></details>'
+        )
+        if shot.upload:
+            more += (f'<details class="blk-more"><summary>{esc(SCREEN["read"])}</summary>'
+                     f'<img class="blk-read" src="{screens.thumb(shot)}" alt="{esc(SCREEN["read"])}"></details>')
+        foot = _screen_meters(answers) + f'<div class="blk-answer-foot">{stats}{more}</div>'
+    elif busy:
+        head = ('<div class="blk-sv blk-sv-wait" aria-busy="true"><span class="blk-sv-mark"></span>'
+                f'<div class="blk-sv-text"><span class="blk-run">{esc(PENDING_LABEL)}</span></div></div>')
+    else:
+        head = _idle_row(note or SCREEN["draw" if draw else "not_run"])
+    if out is None:
+        foot = _screen_meters() + foot
+    stage = screen_stage(shot, out["answers"] if out is not None else None, busy=busy, draw=draw, act=act)
+    banner = mock_banner()
+    docs = links_html(((SCREEN["docs"], SCREEN_DOCS_URL),), cls="blk-links blk-runit")
+    return (f'<div class="blk-scr{" busy" if busy else ""}" data-rev="{esc(rev)}" data-shot="{_shot_id(shot)}">'
+            f"{banner}{head}{stage}{foot}{docs}</div>")
+
+
+def run_screen(shot: screens.Shot, prefer: str = "live", draw: bool = False, rev=0) -> str:
+    """Ask blink-mimo-9b about this screenshot; whatever goes wrong is said in the answer column."""
+    try:
+        out = screens.decide(shot, prefer=prefer)
+    except screens.ScreenMiss:
+        live = getattr(blink.engine(screens.vision_model()), "name", "") != "replay"
+        return screen_panel(shot, draw=draw, note=SCREEN["not_run" if live else "miss"], rev=rev)
+    except blink.ImageError as exc:
+        if "reads text only" in str(exc):
+            return screen_panel(shot, draw=draw, note=SCREEN["off"], rev=rev)
+        return screen_panel(shot, draw=draw, notice=error_html(str(exc)), rev=rev)
+    except blink.BlinkError as exc:
+        return screen_panel(shot, draw=draw, notice=error_html(str(exc)), rev=rev)
+    except Exception as exc:  # the live model failed: keep gradio's own errors, soften the rest
+        return screen_panel(shot, draw=draw, notice=_live_failure(exc), rev=rev)
+    return screen_panel(shot, out, draw=draw, rev=rev)
