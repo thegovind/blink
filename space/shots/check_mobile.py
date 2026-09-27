@@ -17,6 +17,8 @@ URL = os.environ.get("BLINK_URL", "http://127.0.0.1:7911/").rstrip("/")
 OUT = os.path.dirname(os.path.abspath(__file__))
 PHONE = {"width": 390, "height": 844}
 DESK = {"width": 1456, "height": 900}
+# the home cards, in their order on the page (ui.HOME_LINKS)
+CARDS = ["use-cases", "ask", "playground", "results", "how-it-works"]
 
 SELECTED = """() => Array.from(
     document.querySelectorAll('button[role="tab"][aria-selected="true"]')
@@ -38,8 +40,9 @@ async def settle(page, timeout: int = 25000) -> None:
                                      timeout=timeout)
     except Exception:  # noqa: BLE001 - a refused request never shows one
         pass
-    await page.wait_for_selector(".blk-q .blk-q-head h4, .blk-problems, .blk-empty",
-                                 timeout=timeout)
+    # visible only: tabs opened earlier keep their own answers, hidden, before this one
+    await page.wait_for_selector(
+        ".blk-q .blk-q-head h4:visible, .blk-problems:visible, .blk-empty:visible", timeout=timeout)
     await page.wait_for_timeout(700)
 
 
@@ -86,8 +89,7 @@ async def run(pw, size, ok) -> None:
                         ("playground", "Playground")):
         await open_tab(page, "Home")
         await page.wait_for_timeout(500)
-        card = page.locator("button.blk-tile-hit").nth(
-            ["playground", "ask", "use-cases", "results", "how-it-works"].index(slug))
+        card = page.locator("button.blk-tile-hit").nth(CARDS.index(slug))
         await card.scroll_into_view_if_needed()
         await card.click()
         await page.wait_for_timeout(1100)
@@ -147,8 +149,9 @@ async def run(pw, size, ok) -> None:
     # and neither must the way in through a home card
     await open_tab(page, "Home")
     await page.wait_for_timeout(700)
-    await page.locator("button.blk-tile-hit").first.scroll_into_view_if_needed()
-    await page.locator("button.blk-tile-hit").first.click()
+    play_card = page.locator("button.blk-tile-hit").nth(CARDS.index("playground"))
+    await play_card.scroll_into_view_if_needed()
+    await play_card.click()
     await page.wait_for_timeout(1400)
     rows = await page.evaluate(ROW_NAMES)
     ok(f"{tag} the rows survive a card round trip: {rows}", rows == ["answer"])

@@ -31,9 +31,9 @@ BIAS_BY_STATE[examples.PLAYGROUND_STATE] = examples.PLAYGROUND_BIAS
 # (slug, tab label). The slug is what a link carries; the label is what the tab shows.
 TABS = (
     ("home", "Home"),
-    ("playground", "Playground"),
-    ("ask", "Ask"),
     ("use-cases", "Use cases"),
+    ("ask", "Ask"),
+    ("playground", "Playground"),
     ("results", "Results"),
     ("how-it-works", "How it works"),
     ("api", "API"),
@@ -592,9 +592,9 @@ HOME = {
 
 # (slug or url, title, one line). A slug switches tab; a url opens in a new tab.
 HOME_LINKS = (
-    ("playground", "Try it", "Enter a state and questions."),
-    ("ask", "Ask a question", "A model drafts options; blink scores."),
     ("use-cases", "Use cases", "Sort requests or choose next steps."),
+    ("ask", "Ask a question", "A model drafts options; blink scores."),
+    ("playground", "Try it", "Enter a state and questions."),
     ("results", "All results", "Scores and how they were measured."),
     ("how-it-works", "How it works", "How blink scores each option."),
 )

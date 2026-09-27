@@ -14,8 +14,8 @@ from playwright.async_api import async_playwright
 URL = os.environ.get("BLINK_URL", "http://127.0.0.1:7896/")
 OUT = os.path.dirname(os.path.abspath(__file__))
 SIZES = [(1456, 900), (1920, 1080), (1280, 800), (390, 844)]
-TABS = [("Home", "home"), ("Playground", "play"), ("Ask", "ask"),
-        ("Use cases", "case"), ("Results", "results")]
+TABS = [("Home", "home"), ("Use cases", "case"), ("Ask", "ask"),
+        ("Playground", "play"), ("Results", "results")]
 
 
 async def open_tab(page, label: str) -> None:
@@ -62,12 +62,17 @@ async def main() -> int:
                         top: x('.blk-top'), rule: x('.blk-rule'), note: x('.blk-note'),
                         seg: x('.blk-seg .wrap'), chips: x('.blk-chips'), demo: x('.blk-demo'),
                         state: x('.blk-state textarea'), decide: x('.blk-decide'),
+                        answers: x('.blk-play .blk-main'),
                         sum: x('.blk-qsum'), acc: x('.blk-acc'), qrow: x('.blk-qblock')};
             }""")
             print(f"  grid@{w}: {json.dumps(grid)}")
-            lefts = {k: v[0] for k, v in grid.items() if isinstance(v, list) and k != "container"}
+            # Decide leads the answer column, so it keeps that column's edge, not the inputs'
+            lefts = {k: v[0] for k, v in grid.items()
+                     if isinstance(v, list) and k not in ("container", "decide", "answers")}
             if len(set(lefts.values())) > 1:
                 problems.append(f"{w}px ragged left edge: {lefts}")
+            if grid["decide"] and grid["answers"] and grid["decide"][0] != grid["answers"][0]:
+                problems.append(f"{w}px Decide is off the answers' edge: {grid['decide']} vs {grid['answers']}")
             # the home page shares the same left edge, and its chips stay on one line
             await open_tab(page, "Home")
             await page.wait_for_timeout(900)

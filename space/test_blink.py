@@ -1555,7 +1555,7 @@ class TestDeepLinks(unittest.TestCase):
     def test_the_slugs_cover_every_tab_and_case(self):
         self.assertEqual(
             self.ui.TAB_IDS,
-            ("home", "playground", "ask", "use-cases", "results", "how-it-works", "api"),
+            ("home", "use-cases", "ask", "playground", "results", "how-it-works", "api"),
         )
         self.assertEqual(self.ui.DEFAULT_TAB, "home")
         self.assertEqual(self.ui.HOME_TAB, "home")
@@ -1779,10 +1779,14 @@ class TestHomeAndAskTabs(unittest.TestCase):
             self.assertIn("home", tabs)
             ask = next(b for b in demo.blocks.values()
                        if getattr(b, "elem_id", None) == "ask-input")
-            play = min((b for b in demo.blocks.values()
-                        if "blk-state" in (getattr(b, "elem_classes", None) or [])),
-                       key=lambda b: b._id)
-            self.assertLess(play._id, ask._id)  # the playground stays the first working tab
+            play = next(b for b in demo.blocks.values()
+                        if "blk-state" in (getattr(b, "elem_classes", None) or []))
+            at = {b.id: b._id for b in demo.blocks.values() if isinstance(b, gr.Tab)}
+            # the use cases are the first working tab, then Ask, then the playground
+            self.assertLess(at["use-cases"], at["ask"])
+            self.assertLess(at["ask"], ask._id)
+            self.assertLess(ask._id, at["playground"])
+            self.assertLess(at["playground"], play._id)
         finally:
             demo.close()
 
@@ -1794,10 +1798,14 @@ class TestHomeAndAskTabs(unittest.TestCase):
         try:
             ask = next(b for b in demo.blocks.values()
                        if getattr(b, "elem_id", None) == "ask-input")
-            decide = min((b for b in demo.blocks.values()
-                          if isinstance(b, gr.Button) and b.value == "Decide"),
-                         key=lambda b: b._id)
-            self.assertLess(decide._id, ask._id)
+            at = {b.id: b._id for b in demo.blocks.values() if isinstance(b, gr.Tab)}
+            decide = next(b for b in demo.blocks.values()
+                          if "blk-decide" in (getattr(b, "elem_classes", None) or []))
+            self.assertEqual(decide.value, "Decide")
+            # the playground runs from its tab to the next one; the ask box is not in it
+            self.assertLess(at["playground"], decide._id)
+            self.assertLess(decide._id, at["results"])
+            self.assertFalse(at["playground"] < ask._id < at["results"])
         finally:
             demo.close()
 
@@ -2680,7 +2688,7 @@ class TestLayout(unittest.TestCase):
 
     def test_the_state_then_the_questions_then_decide(self):
         """The owner read an answer as being about the state; the order has to say otherwise."""
-        gr = need_gradio(self)
+        need_gradio(self)
         self.addCleanup(reload_app)
         app = reload_app()
         demo = app.build()
@@ -2690,17 +2698,15 @@ class TestLayout(unittest.TestCase):
                  if "blk-qrow" in (getattr(b, "elem_classes", None) or [])),
                 key=lambda b: b._id,
             )
-            decide = min(
-                (b for b in demo.blocks.values()
-                 if isinstance(b, gr.Button) and b.value == "Decide"),
-                key=lambda b: b._id,
-            )
-            state = min((b for b in demo.blocks.values() if isinstance(b, gr.Textbox)),
-                        key=lambda b: b._id)
+            decide = next(b for b in demo.blocks.values()
+                          if "blk-decide" in (getattr(b, "elem_classes", None) or []))
+            state = next(b for b in demo.blocks.values()
+                         if "blk-state" in (getattr(b, "elem_classes", None) or []))
             acc = next(b for b in demo.blocks.values()
                        if "blk-acc" in (getattr(b, "elem_classes", None) or []))
             self.assertLess(state._id, rows[0]._id)
             self.assertLess(rows[0]._id, decide._id)
+            self.assertLess(acc._id, decide._id)  # Decide comes after every input
             self.assertFalse(acc.open)  # only the JSON view is folded
         finally:
             demo.close()

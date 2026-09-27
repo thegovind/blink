@@ -2,7 +2,7 @@
   {
     "dest": "space/app.py",
     "reason": "",
-    "sha256": "d728c3b29854235c1d6cf3c1169134fae41ac58e0f6d32e56a99b5bb9238a8dc",
+    "sha256": "7b37f5691e7769ca013fd8a969513fdb103c8bb590645abc01546ff90bb4a715",
     "src": "space/app.py",
     "transform": "scrub_python"
   },
@@ -23,7 +23,7 @@
   {
     "dest": "space/ui.py",
     "reason": "",
-    "sha256": "3b2ad3a1c39082d7a1caf7c146350ed1a076fcd317079f86bd3f5101f916cb89",
+    "sha256": "0acba0ac136d4a5461b211f4de8f56de978ebc51956ab1da3747d5fe594f8bb5",
     "src": "space/ui.py",
     "transform": "scrub_python"
   },
@@ -51,7 +51,7 @@
   {
     "dest": "space/style.css",
     "reason": "",
-    "sha256": "7995810c42339dbbc37d829750cabc9ea7680a901e0c0092254c0496137a331c",
+    "sha256": "cd2c62325f223e794f56d2e8cd0d77d024c81cad870e4af24285548b787c2159",
     "src": "space/style.css",
     "transform": "scrub"
   },
@@ -93,7 +93,7 @@
   {
     "dest": "space/test_blink.py",
     "reason": "",
-    "sha256": "2e3a144c210da2044e236539fc451cb524a0a07885a617e29ed0ac31ce612b74",
+    "sha256": "a924442707f2a57e0870f728aa34a95ddf501c0428581154d1851e2daf2a502b",
     "src": "space/test_blink.py",
     "transform": "scrub_python"
   },
@@ -135,7 +135,7 @@
   {
     "dest": "space/shots/capture_layout.py",
     "reason": "browser check",
-    "sha256": "dcbf7c81ddb0eb004ae778d4973926da948b124d6bde8808496ffd90d960b051",
+    "sha256": "128f6cb308a63d39efa3141dbf40ec7188ba15c678a0ae1a3907955d8a977bcd",
     "src": "space/shots/capture_layout.py",
     "transform": "scrub_python"
   },
@@ -177,7 +177,7 @@
   {
     "dest": "space/shots/check_dark.py",
     "reason": "browser check",
-    "sha256": "cb506dda04ce616be2522056c5c799e11ab5477ac149b2fb7e5a91a59eba356c",
+    "sha256": "f926c76ecf692236adbe9f75d8f5e813d53363b86d88c7017d109d1aae2d9d2e",
     "src": "space/shots/check_dark.py",
     "transform": "scrub_python"
   },
@@ -198,14 +198,14 @@
   {
     "dest": "space/shots/check_links.py",
     "reason": "browser check",
-    "sha256": "0073c6b2bceb03bbfc845b3c5315638c714f5a3bd05a7b3d0929580d27f3c8be",
+    "sha256": "efa16a1da5b36aa0ac65bfb1c8a14a8ad322de0747fc0b9b754e30a584ff1c64",
     "src": "space/shots/check_links.py",
     "transform": "scrub_python"
   },
   {
     "dest": "space/shots/check_mobile.py",
     "reason": "browser check",
-    "sha256": "d984c6c8bf9917bdb58f5f6dd4c08ae0c7de4c01e021effd29c68df8dd333d3a",
+    "sha256": "93654d2d0b03ce89148b93e8af8077a736096d8951309f5deb6e0b00361a46df",
     "src": "space/shots/check_mobile.py",
     "transform": "scrub_python"
   },

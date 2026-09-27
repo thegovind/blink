@@ -2669,11 +2669,108 @@ body {
   color: var(--color-error) !important;
 }
 
-.gradio-container button.blk-decide {
-  position: sticky;
-  bottom: 12px;
-  z-index: 4;
-  margin-top: 12px !important;
+/* --- the playground, compact ----------------------------------------------------- */
+/* Unprefixed on purpose: gradio adds a scoped copy of each of these rules, and only an
+   unprefixed selector outranks the scoped copies of the rules it adjusts. */
+
+/* Decide leads the answers: beside the inputs on a desk, right under them on a phone */
+.blk-play button.blk-decide {
+  align-self: flex-start;
+  width: auto !important;
+  min-width: 168px !important;
+  padding: 0 32px !important;
+  margin: 0 !important;
+}
+
+/* one rhythm down the inputs: a heading sits on its field, a section is one gap away */
+.blk-play .blk-side {
+  gap: 10px !important;
+}
+
+.blk-play .blk-seg {
+  margin: 0 !important;
+}
+
+.blk-play .blk-head .html-container {
+  padding: 0 !important;
+}
+
+.blk-play .blk-head .blk-form-head {
+  margin: 6px 0 0 !important;
+}
+
+.blk-play .blk-state {
+  padding: 0 !important;
+}
+
+/* an empty problem strip takes no room at all */
+.blk-play .blk-trouble:has(.prose:empty) {
+  display: none !important;
+}
+
+.blk-play .blk-qblock {
+  padding: 2px 16px !important;
+}
+
+.blk-play .blk-qrow {
+  padding: 10px 0 6px !important;
+}
+
+/* gradio draws each group twice; only the outer copy carries the spacing */
+.blk-play .blk-qblock .blk-qblock,
+.blk-play .blk-qrow .blk-qrow {
+  padding: 0 !important;
+}
+
+/* the options fold closes the name-and-type line instead of taking a line of its own */
+.blk-play .blk-qrow .styler {
+  display: grid !important;
+  grid-template-columns: minmax(0, 1fr) auto;
+  column-gap: 12px !important;
+  row-gap: 2px !important;
+  align-items: center;
+}
+
+.blk-play .blk-qrow .styler > *,
+.blk-play .blk-qhead > * {
+  grid-column: 1 / -1;
+}
+
+.blk-play .blk-qhead {
+  display: contents !important;
+}
+
+.blk-play .blk-qhead > .blk-qmeta {
+  grid-column: 1;
+  grid-row: 2;
+}
+
+.blk-play .blk-qrow .styler > .blk-qmore {
+  grid-column: 2;
+  grid-row: 2;
+  margin: 0 !important;
+}
+
+.blk-play .blk-qmore > button.label-wrap {
+  padding: 3px 0 !important;
+}
+
+.blk-play .blk-optchips {
+  margin: 4px 0 0 !important;
+  gap: 4px 6px !important;
+}
+
+.blk-play button.blk-qadd {
+  margin-top: 0 !important;
+}
+
+.blk-play .blk-acc {
+  padding: 0 !important;
+  margin: 0 !important;
+}
+
+.blk-play .blk-acc .label-wrap {
+  padding: 8px 0 !important;
 }
 
 /* --- the finished edge of an answer --------------------------------------------- */
@@ -2742,6 +2839,12 @@ body {
   .row:has(> .blk-side) > .column {
     width: 100% !important;
     min-width: 0 !important;
+  }
+
+  /* stacked, Decide spans the column right under the inputs */
+  .row.blk-play button.blk-decide {
+    align-self: stretch;
+    width: 100% !important;
   }
 
   /* the name and its number on one line, the bar under them */
@@ -2860,6 +2963,31 @@ body {
 
   .blk-headline-rows .blk-row strong {
     font-size: var(--text-heading);
+  }
+
+  /* too narrow for the options fold beside a long name: each question stacks again */
+  .blk-play .blk-qrow .styler,
+  .blk-play .blk-qhead {
+    display: flex !important;
+  }
+
+  .blk-play .blk-qrow {
+    padding: 8px 0 4px !important;
+  }
+
+  .blk-play .blk-qrow .blk-qrow {
+    padding: 0 !important;
+  }
+
+  .blk-play .blk-optchips li {
+    padding: 1px 8px !important;
+    line-height: 18px;
+  }
+
+  /* the state grows to eight lines here and scrolls past them */
+  .blk-play .blk-state textarea {
+    max-height: 188px !important;
+    overflow-y: auto !important;
   }
 }
 

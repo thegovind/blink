@@ -26,7 +26,7 @@ URL = os.environ.get("BLINK_URL", "http://127.0.0.1:7911/").rstrip("/")
 OUT = os.environ.get("BLINK_SHOTS") or HERE
 DESK = {"width": 1456, "height": 900}
 PHONE = {"width": 390, "height": 844}
-TABS = (("home", "Home"), ("playground", "Playground"), ("ask", "Ask"), ("use-cases", "Use cases"),
+TABS = (("home", "Home"), ("use-cases", "Use cases"), ("ask", "Ask"), ("playground", "Playground"),
         ("results", "Results"), ("how-it-works", "How it works"), ("api", "API"))
 PROJECT = [["GitHub", "https://github.com/thegovind/blink"], ["Docs", "https://thegovind.github.io/blink/"]]
 WIRE = [["API docs", "https://thegovind.github.io/blink/api/"]]
@@ -159,7 +159,8 @@ async def main() -> int:
                     problems.append(f"{name} click {label}: address {search!r}, header links {found}")
             await open_tab(page, "Playground")
             await page.wait_for_timeout(700)
-            seg = page.locator(".blk-seg label").filter(has_text="blink-mimo-9b")
+            # the tabs visited above keep their own switches, hidden, earlier in the page
+            seg = page.locator(".blk-seg label").filter(has_text="blink-mimo-9b").filter(visible=True)
             if await seg.count():
                 await seg.first.click()
                 # the live Space redraws the header about 1.6 s after the switch; give it up to 10 s

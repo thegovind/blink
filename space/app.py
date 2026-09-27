@@ -301,7 +301,7 @@ def question_form(rows: list[dict]):
 def playground_tab():
     gr.HTML(ui.playground_note())
     start_rows = ui.questions_to_rows(json.loads(examples.PLAYGROUND_QUESTIONS))
-    with gr.Row(equal_height=False):
+    with gr.Row(equal_height=False, elem_classes="blk-play"):
         with gr.Column(scale=5, elem_classes="blk-side"):
             model_in = model_switch()
             with gr.Row(elem_classes="blk-chips"):
@@ -311,12 +311,12 @@ def playground_tab():
             state = gr.Textbox(
                 value=examples.PLAYGROUND_STATE,
                 show_label=False,
-                lines=9,
+                lines=4,
                 max_lines=22,
                 elem_classes="blk-state",
             )
             groups, fields, removers, add_btn = question_form(start_rows)
-            trouble = gr.HTML()
+            trouble = gr.HTML(elem_classes="blk-trouble")
             touched = gr.Textbox("", visible=False)
             rev = gr.Textbox("0", visible=False)
             with gr.Accordion(ui.FORM["json"], open=False, elem_classes="blk-acc"):
@@ -327,8 +327,10 @@ def playground_tab():
                     lines=12,
                     wrap_lines=True,
                 )
-            run_btn = gr.Button("Decide", variant="primary", elem_classes="blk-decide")
         with gr.Column(scale=7, elem_classes="blk-main"):
+            # after every input in reading order, and at the top of the answers: on a desk it
+            # sits beside the inputs, on a phone right under them
+            run_btn = gr.Button("Decide", variant="primary", elem_classes="blk-decide")
             # first render only: a saved run, since no device can be attached at startup
             out = gr.HTML(run_playground(examples.PLAYGROUND_STATE,
                                          examples.PLAYGROUND_QUESTIONS, prefer="saved"))
@@ -870,15 +872,6 @@ def build() -> gr.Blocks:
         with gr.Tabs() as tabs:
             with gr.Tab(TAB_LABEL[ui.HOME_TAB], id=ui.HOME_TAB):
                 cards = home_tab()
-            with gr.Tab(TAB_LABEL["playground"], id="playground"):
-                first_switch, pg = playground_tab()
-                switches.append(first_switch)
-                panels.append(pg["out"])
-            if author.enabled():
-                with gr.Tab(TAB_LABEL[ui.ASK_TAB], id=ui.ASK_TAB):
-                    ask_switch, ask = ask_tab()
-                    switches.append(ask_switch)
-                    panels.append(ask["out"])
             with gr.Tab(TAB_LABEL[ui.CASE_TAB], id=ui.CASE_TAB):
                 with gr.Tabs() as case_tabs:
                     for case in examples.USE_CASES:
@@ -886,6 +879,15 @@ def build() -> gr.Blocks:
                             case_switch, case_out = use_case_tab(case)
                             switches.append(case_switch)
                             panels.append(case_out)
+            if author.enabled():
+                with gr.Tab(TAB_LABEL[ui.ASK_TAB], id=ui.ASK_TAB):
+                    ask_switch, ask = ask_tab()
+                    switches.append(ask_switch)
+                    panels.append(ask["out"])
+            with gr.Tab(TAB_LABEL["playground"], id="playground"):
+                first_switch, pg = playground_tab()
+                switches.append(first_switch)
+                panels.append(pg["out"])
             with gr.Tab(TAB_LABEL["results"], id="results"):
                 results_tab()
             with gr.Tab(TAB_LABEL["how-it-works"], id="how-it-works"):
