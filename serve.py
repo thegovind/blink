@@ -1,13 +1,19 @@
 """blink server: a Jev-compatible decision endpoint (the TypeSafe API's wire format).
 
     pip install "torch==2.13.0" "transformers==5.17.0" "flash-linear-attention==0.5.2" accelerate safetensors huggingface_hub
+    pip install "torchvision==0.28.0"  # required when image input is enabled
     hf download thegovind/blink-4b --revision v1.0 --local-dir blink-4b
     python blink-4b/serve.py --model ./blink-4b --port 8000
 
-POST /v1/systemone  {"state": ..., "model": ..., "questions": {...}}  ->  {"model", "answers", "usage"}
-GET  /v1/models     ->  {"models": [{"name", "description", "release_date"}]}
+POST /v1/systemone  {"state": ..., "model": ..., "questions": {...}, "images": [...]}  ->
+                    {"model", "answers", "usage"}
+GET  /v1/models     ->  {"models": [{"name", "description", "release_date", "accepts_images"}]}
 GET  /healthz       ->  {"ok", "model", "revision", "weights_verified", "hub_offline", "warmup", "kernels", "versions",
-                         "batching", "api_key_required"}
+                         "batching", "api_key_required", "accepts_images"}
+
+Image data URIs in state and the sibling images list are self-host extensions, not fields supported by hosted
+TypeSafe models. Image requests alone add image_pixels and visual_tokens (for the shared image prefix) to usage;
+answers keep their ordinary noul, choice and score fields. Text-only responses stay unchanged.
 
 A client written for the TypeSafe API works unchanged against this server once its base URL points here (for the
 official SDKs: TYPESAFE_BASE_URL=http://127.0.0.1:8000). The request's "model" is accepted and not used: this
@@ -118,6 +124,13 @@ def api_key(value: str):
     return key
 
 
+def tower_spec(value: str) -> str:
+    repo, separator, revision = value.rpartition("@")
+    if not separator or not repo or not revision:
+        raise argparse.ArgumentTypeError("must be a repo@revision")
+    return value
+
+
 def bearer(header) -> str | None:
     """The token of an "Authorization: Bearer <token>" header, else None."""
     scheme, _, token = (header or "").strip().partition(" ")
@@ -146,6 +159,8 @@ def error_loc(blink, req: dict, message: str) -> list:
 def main() -> None:
     ap = argparse.ArgumentParser(description="Serve blink over a Jev-compatible HTTP API.")
     ap.add_argument("--model", default=os.environ.get("BLINK_MODEL", "thegovind/blink-4b"))
+    ap.add_argument("--model-name", default=os.environ.get("BLINK_MODEL_NAME") or None,
+                    help="logical model family when the checkpoint is stored in a renamed directory (BLINK_MODEL_NAME)")
     ap.add_argument("--revision", default=os.environ.get("BLINK_REVISION"))
     ap.add_argument("--host", default="127.0.0.1")
     ap.add_argument("--port", type=int, default=8000)
@@ -161,8 +176,28 @@ def main() -> None:
     ap.add_argument("--api-key", type=api_key, default=os.environ.get("BLINK_API_KEY", ""),
                     help="require 'Authorization: Bearer <key>' on /v1/systemone and /v1/models (default: open, any "
                          "Authorization header is accepted and ignored); BLINK_API_KEY keeps it out of the process list")
+    ap.add_argument("--vision", action="store_true",
+                    default=os.environ.get("BLINK_VISION", "0").lower() in ("1", "true", "on", "yes"),
+                    help="accept images with this model's own vision tower (BLINK_VISION=1)")
+    ap.add_argument("--vision-tower", type=tower_spec, default=os.environ.get("BLINK_VISION_TOWER") or None,
+                    help="opt-in a matching text model's base vision tower from repo@revision (BLINK_VISION_TOWER)")
+    ap.add_argument("--image-layout", choices=("inline", "first"),
+                    default=os.environ.get("BLINK_IMAGE_LAYOUT") or None,
+                    help="place image tokens at state placeholders or before the user text (BLINK_IMAGE_LAYOUT)")
+    ap.add_argument("--max-images", type=int_range(1, 8), default=os.environ.get("BLINK_MAX_IMAGES", "2"))
+    ap.add_argument("--max-image-bytes", type=int_range(1024, 32 * 1024 * 1024),
+                    default=os.environ.get("BLINK_MAX_IMAGE_BYTES", str(8 * 1024 * 1024)))
+    ap.add_argument("--max-image-pixels", type=int_range(65_536, 16_777_216),
+                    default=os.environ.get("BLINK_MAX_IMAGE_PIXELS", str(1920 * 1088)))
+    ap.add_argument("--max-image-source-pixels", type=int_range(65_536, 64_000_000),
+                    default=os.environ.get("BLINK_MAX_IMAGE_SOURCE_PIXELS", "20000000"))
     a = ap.parse_args()
 
+    model_name = a.model_name or a.model.rstrip("/").split("/")[-1]
+    if a.vision and not a.vision_tower and model_name not in (
+        "blink-mimo-9b", "Qwen3.5-4B"
+    ):
+        ap.error("--vision needs a model with its own vision tower or --vision-tower for a text model")
     local = os.path.isdir(a.model)
     if local:
         # the Hub libraries read these once, when they are first imported, so they must be set before that
@@ -172,6 +207,14 @@ def main() -> None:
     sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
     import blink
 
+    if a.image_layout is not None and a.image_layout not in blink.IMAGE_LAYOUTS:
+        ap.error("--image-layout must be inline or first")
+    if a.vision_tower:
+        try:
+            blink.vision_source(model_name, a.vision_tower)
+        except blink.BlinkError as exc:
+            ap.error(str(exc))
+    limits = blink.ImageLimits(a.max_images, a.max_image_bytes, a.max_image_pixels, a.max_image_source_pixels)
     busy = getattr(blink, "BlinkBusy", ())  # an older blink.py has no batching (and no BlinkBusy)
 
     if local:
@@ -183,7 +226,10 @@ def main() -> None:
     verified, bad = verify(root)
     if verified is False:
         sys.exit(f"weights.sha256 mismatch: {', '.join(bad)}")
-    engine = blink.TorchEngine(root, None, blink.TEMPERATURE)
+    options = ({"vision": a.vision, "vision_tower": a.vision_tower, "limits": limits,
+                "model_name": model_name, "image_layout": a.image_layout}
+               if a.vision or a.vision_tower else {})
+    engine = blink.TorchEngine(root, None, blink.TEMPERATURE, **options)
     blink._ENGINE = engine
     first = blink.decide(*WARMUP)["answers"]
     repeat_identical = blink.decide(*WARMUP)["answers"] == first
@@ -197,7 +243,9 @@ def main() -> None:
         hub_offline = None
     health = {"ok": True, "model": a.model, "revision": a.revision, "weights_verified": verified,
               "hub_offline": hub_offline, "warmup": {"repeat_identical": repeat_identical}, "kernels": kernels,
-              "versions": ver}
+              "versions": ver, "accepts_images": bool(getattr(engine, "accepts_images", False))}
+    if health["accepts_images"]:
+        health["image_layout"] = getattr(engine, "image_layout", a.image_layout or blink.IMAGE_LAYOUT_DEFAULT)
     lock = threading.Lock()
     batcher = (blink.Batcher(a.batch_window_ms / 1000.0, a.max_batch_requests, max_queued=a.max_queued_requests)
                if a.batch_window_ms > 0 else None)
@@ -210,6 +258,7 @@ def main() -> None:
         "description": "blink: typed decisions (noul, choice, score) with option probabilities from one forward pass. "
                        "This server serves one model; a request's model field is accepted and not used.",
         "release_date": "",
+        "accepts_images": health["accepts_images"],
     }]}
 
     def current_health() -> dict:
@@ -287,21 +336,34 @@ def main() -> None:
             if not isinstance(req, dict):
                 return self._refused(400, "the body must be a JSON object", ["body"], "value_error")
             try:
+                opts = {}
+                if "images" in req or blink.contains_image_uri(req.get("state")):
+                    if "images" in req:
+                        opts["images"] = req["images"]
+                    opts["limits"] = limits
                 if batcher is not None:
-                    out = batcher.submit(req.get("state"), req.get("questions"))
+                    out = batcher.submit(req.get("state"), req.get("questions"), **opts)
                 else:
                     with lock:
-                        out = blink.decide(req.get("state"), req.get("questions"))
+                        out = blink.decide(req.get("state"), req.get("questions"), **opts)
             except blink.BlinkError as exc:
-                return self._refused(422, str(exc), error_loc(blink, req, str(exc)), "value_error")
+                location = exc.loc if isinstance(exc, blink.ImageError) else error_loc(blink, req, str(exc))
+                return self._refused(422, str(exc), location, "value_error")
             except busy as exc:
                 return self._fail(529, str(exc), headers={"Retry-After": "1"}, status_text="Overloaded")
             except Exception as exc:  # noqa: BLE001 - report, keep serving
                 return self._fail(500, f"{type(exc).__name__}: {exc}")
+            usage = {"input_tokens": out["meta"]["input_tokens"], "output_tokens": 0}
+            if "image_pixels" in out["meta"]:
+                usage["image_pixels"] = out["meta"]["image_pixels"]
+                usage["visual_tokens"] = out["meta"]["visual_tokens"]
+            for name in ("image_preprocess_ms", "vision_encoder_ms", "lm_prefill_ms"):
+                if name in out["meta"]:
+                    usage[name] = out["meta"][name]
             return self._send(200, {
                 "model": a.model,
                 "answers": out["answers"],
-                "usage": {"input_tokens": out["meta"]["input_tokens"], "output_tokens": 0},
+                "usage": usage,
             })
 
     server = ThreadingHTTPServer((a.host, a.port), Handler)

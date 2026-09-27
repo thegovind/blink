@@ -22,7 +22,7 @@ SPACE_ID = "thegovind/blink"
 SPACE_URL = "https://thegovind-blink.hf.space"
 WIRE_FORMAT_URL = "https://thegovind.github.io/blink/api/"  # the docs site's full reference for this tab
 SERVED_AS = "./blink-4b"  # what the answers name as the model after `serve.py --model ./blink-4b`
-CODE_REVISION = "v1.2"  # the model repos' code revision with this serve.py and blink.py
+CODE_REVISION = "v1.3"  # the model repos' code revision with this serve.py and blink.py
 
 COPY = {
     "heading": "Use blink with TypeSafe clients",
@@ -54,6 +54,7 @@ COPY = {
         "Off by default: one request at a time.",
         "Set --batch-window-ms 5 for a 5 ms collection window, with --max-batch-requests capping each "
         "batch. A full queue returns 529 with Retry-After, which TypeSafe's SDKs retry.",
+        "Image requests run separately, including multiple questions about the same image.",
     ),
     "client": "Point a TypeSafe client at it",
     "client_notes": (
@@ -86,7 +87,8 @@ COPY = {
     "error_note": "No 429: the server has no rate limit. Error bodies repeat the reason in error and "
                   "detail.",
     "limits": "255 choice options · 2 to 10 score levels · 131,072 tokens per question · 512 questions "
-              "per request. Over a limit gets 422. Nothing is cut.",
+              "per request. Images (self-host opt-in): 2 per request, 8 MiB each, at most 2,088,960 resized pixels. "
+              "Over a limit gets 422.",
     "models": "Model list",
     "space": "Call this Space",
     "space_notes": (
@@ -108,6 +110,8 @@ COPY = {
         "Score legends are text, including structured level descriptions as JSON text.",
         "A score needs at least two levels; a one-level score gets 422.",
         "The model list has one entry, the served model, with a blank release_date.",
+        "The model list and health report accepts_images; it is false unless image support is enabled.",
+        "Image requests alone add image_pixels and visual_tokens to usage; these are self-host extensions.",
         "Responses from /v1/systemone and /v1/models carry an x-typesafe-request-id header.",
         "Cross-origin browser calls are unsupported; the server sends no CORS headers.",
     ),
@@ -316,6 +320,7 @@ MODELS_BODY = {
         "description": "blink: typed decisions (noul, choice, score) with option probabilities from one forward "
                        "pass. This server serves one model; a request's model field is accepted and not used.",
         "release_date": "",
+        "accepts_images": False,
     }],
 }
 

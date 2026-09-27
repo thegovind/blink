@@ -20,7 +20,7 @@ Copy the blink skill, then follow the [agent experience guide](agents.md).
 
 ```sh
 pip install "torch==2.13.0" "transformers==5.17.0" "flash-linear-attention==0.5.2" "accelerate>=1.1.0" safetensors huggingface_hub
-hf download thegovind/blink-4b --revision v1.2 --local-dir blink-4b
+hf download thegovind/blink-4b --revision v1.3 --local-dir blink-4b
 python blink-4b/serve.py --model ./blink-4b --port 8000
 ```
 

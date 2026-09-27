@@ -3486,13 +3486,13 @@ class TestApiTab(unittest.TestCase):
 
     def test_downloads_pin_the_code_revision(self):
         """Every model download the tab shows gets the code revision that has this serve.py and blink.py."""
-        self.assertEqual(self.d.CODE_REVISION, "v1.2")
+        self.assertEqual(self.d.CODE_REVISION, "v1.3")
         texts = [v for v in vars(self.d).values() if isinstance(v, str)]
         texts += [s for v in self.d.COPY.values() for s in (v if isinstance(v, tuple) else (v,)) if isinstance(s, str)]
         lines = [line for t in texts for line in t.splitlines() if "hf download" in line or "hf_hub_download" in line]
         self.assertTrue(lines)
         for line in lines:
-            self.assertIn("--revision v1.2", line)
+            self.assertIn("--revision v1.3", line)
 
     def test_the_how_it_works_snippet_uses_the_same_revision(self):
         """How it works runs blink.py in-process; it downloads the same code revision the API tab pins."""

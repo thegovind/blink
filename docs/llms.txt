@@ -4,6 +4,8 @@
 
 Use blink for yes/no (`noul`), choice, and ordered score questions. Probabilities are over the offered options only, not certified chances of being right. Point a TypeSafe SDK or plain HTTP client at the server, or use `gradio_client` for the Space.
 
+Screenshots are opt-in on self-hosted v1.3; see the [API example](https://thegovind.github.io/blink/api.md#screenshots-opt-in).
+
 ## Docs
 
 - [API](https://thegovind.github.io/blink/api.md): Send requests and read responses.

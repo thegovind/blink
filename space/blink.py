@@ -19,20 +19,31 @@ recording is only used by the model that made it.
 
 from __future__ import annotations
 
+import base64
+import binascii
 import hashlib
+import io
 import itertools
 import json
 import math
 import os
 import re
+import secrets
 import string
 import time
+from dataclasses import dataclass, replace
+from typing import TYPE_CHECKING, Iterator
+
+if TYPE_CHECKING:
+    from PIL import Image
 
 # --- constants the deployment sets -------------------------------------------------
 
 MODEL_ID = os.environ.get("BLINK_MODEL") or "thegovind/blink-4b"
 MODEL_ID_27B = "thegovind/blink-27b"
 MODEL_REVISION = os.environ.get("BLINK_REVISION") or None
+VISION_BASES = {"blink-4b": "Qwen/Qwen3.5-4B", "blink-27b": "Qwen/Qwen3.8-27B"}
+NATIVE_VISION_MODELS = {"blink-mimo-9b", "Qwen3.5-4B"}
 
 
 def _model_specs() -> list[tuple[str, str | None]]:
@@ -62,6 +73,10 @@ TOKEN_BUDGET = int(os.environ.get("BLINK_TOKEN_BUDGET", "32768"))  # padded toke
 # multi-question documents, but on ~18k-token documents blink-4b's bf16 answers drift slightly further from an FP32
 # reference than the plain path's do, so it is off by default (experiments/t5/PREREG.md, gate A').
 PREFIX_CACHE = os.environ.get("BLINK_PREFIX_CACHE", "0").lower() in ("1", "true", "on", "yes")
+VISION = os.environ.get("BLINK_VISION", "0").lower() in ("1", "true", "on", "yes")
+VISION_TOWER = os.environ.get("BLINK_VISION_TOWER") or None
+IMAGE_LAYOUTS = ("inline", "first")
+IMAGE_LAYOUT_DEFAULT = "first"
 
 
 def _prefix_setting(name: str, default: int) -> int:
@@ -111,6 +126,332 @@ class BlinkError(ValueError):
 
 class ReplayMiss(BlinkError):
     """Replay mode has no recorded output for this request."""
+
+
+class ImageError(BlinkError):
+    """Invalid image input, with its location in the request body."""
+
+    def __init__(self, message: str, loc: list):
+        super().__init__(message)
+        self.loc = loc
+
+
+@dataclass(frozen=True)
+class ImageLimits:
+    max_images: int = 2
+    max_bytes: int = 8 * 1024 * 1024
+    max_pixels: int = 1920 * 1088
+    max_source_pixels: int = 20_000_000
+    min_pixels: int = 65_536
+    factor: int = 32
+
+
+@dataclass(frozen=True)
+class ImageRequest:
+    state: object
+    marked_state: object
+    images: tuple[Image.Image, ...]
+    markers: tuple[str, ...]
+    limits: ImageLimits
+    loc: list
+
+
+_NO_IMAGES = object()
+
+
+@dataclass(frozen=True)
+class ImageSubmission:
+    state: object
+    images: object
+    limits: ImageLimits
+    loc: list
+
+
+MAX_HEADER = 256
+_IMAGE_PREFIX = "data:image/"
+_CANONICAL_IMAGE_URI = re.compile(r"data:image/(?:png|jpeg|webp);base64,[A-Za-z0-9+/]*={0,2}",
+                                  re.IGNORECASE)
+_IMAGE_DATA = re.compile(r"data:(image/(?:png|jpeg|webp));base64,([A-Za-z0-9+/]+={0,2})\Z", re.IGNORECASE)
+_IMAGE_FORMATS = {"image/png": "PNG", "image/jpeg": "JPEG", "image/webp": "WEBP"}
+_CANONICAL_IMAGE_HEADERS = {f"data:{mime};base64" for mime in _IMAGE_FORMATS}
+
+
+def _scan_image_uris(value: str) -> Iterator[tuple[int, int, str | None]]:
+    """Yield canonical URI spans or invalid-header errors with bounded header lookahead."""
+    low = value.lower()
+    if len(low) != len(value):
+        # Unicode lowercasing can expand; retain the original offsets for payload extraction.
+        low = "".join(char.lower() if len(char.lower()) == 1 else char for char in value)
+    pos = 0
+    while True:
+        start = low.find(_IMAGE_PREFIX, pos)
+        if start < 0:
+            return
+        comma = low.find(",", start, start + MAX_HEADER)
+        if comma < 0:
+            pos = start + len(_IMAGE_PREFIX)
+            continue
+        header = low[start:comma]
+        compact = "".join(header.split())
+        if not compact.endswith(";base64"):
+            pos = start + len(_IMAGE_PREFIX)
+            continue
+        if compact not in _CANONICAL_IMAGE_HEADERS or header != compact:
+            error = ("image data URI parameters or whitespace are not supported"
+                     if header != compact or compact.count(";") > 1
+                     else "image must be a data:image/png, image/jpeg, or image/webp URI with base64 data")
+            yield start, comma + 1, error
+            pos = comma + 1
+            continue
+        match = _CANONICAL_IMAGE_URI.match(value, start)
+        if match is None:
+            yield start, comma + 1, "image must be a data:image/png, image/jpeg, or image/webp URI with base64 data"
+            pos = comma + 1
+            continue
+        yield start, match.end(), None
+        pos = match.end()
+
+
+def image_limits() -> ImageLimits:
+    """Read image-only settings lazily, without changing the text-only path."""
+    settings = {
+        "MAX_IMAGES": ("max_images", 1, 8),
+        "MAX_IMAGE_BYTES": ("max_bytes", 1024, 32 * 1024 * 1024),
+        "MAX_IMAGE_PIXELS": ("max_pixels", 65_536, 16_777_216),
+        "MAX_IMAGE_SOURCE_PIXELS": ("max_source_pixels", 65_536, 64_000_000),
+    }
+    defaults = ImageLimits()
+    values = {}
+    for key, (field, lo, hi) in settings.items():
+        name = f"BLINK_{key}"
+        try:
+            n = int(os.environ.get(name, str(getattr(defaults, field))))
+        except ValueError:
+            raise BlinkError(f"{name} must be an integer from {lo} to {hi}") from None
+        if not lo <= n <= hi:
+            raise BlinkError(f"{name} must be from {lo} to {hi}")
+        values[field] = n
+    return replace(defaults, **values)
+
+
+def vision_source(model_name: str, spec: str) -> tuple[str, str]:
+    """Only graft a text checkpoint with its own base model's vision tower."""
+    expected = VISION_BASES.get(model_name)
+    if expected is None:
+        raise BlinkError("--vision-tower is only supported for blink-4b and blink-27b")
+    source, separator, revision = spec.rpartition("@")
+    if not separator or not source or not revision:
+        raise BlinkError("--vision-tower must be a repo@revision")
+    if source != expected and not (
+        os.path.isdir(source) and os.path.basename(os.path.normpath(source)) == expected.split("/")[-1]
+    ):
+        raise BlinkError(f"--vision-tower for {model_name} must use {expected}@revision")
+    return source, revision
+
+
+def _image_size(height: int, width: int, limits: ImageLimits) -> tuple[int, int]:
+    """Use the vision processor's factor-aligned min/max pixel resize policy."""
+    factor = limits.factor
+    if max(height, width) / min(height, width) > 200:
+        raise BlinkError("image aspect ratio must be at most 200:1")
+    h, w = round(height / factor) * factor, round(width / factor) * factor
+    if h * w > limits.max_pixels:
+        scale = math.sqrt(height * width / limits.max_pixels)
+        h = max(factor, math.floor(height / scale / factor) * factor)
+        w = max(factor, math.floor(width / scale / factor) * factor)
+    elif h * w < limits.min_pixels:
+        scale = math.sqrt(limits.min_pixels / (height * width))
+        h, w = math.ceil(height * scale / factor) * factor, math.ceil(width * scale / factor) * factor
+    if not limits.min_pixels <= h * w <= limits.max_pixels:
+        raise BlinkError(f"image cannot fit between {limits.min_pixels} and {limits.max_pixels} pixels")
+    return h, w
+
+
+def _decode_image(uri: str, index: int, loc: list, limits: ImageLimits) -> Image.Image:
+    from PIL import Image, ImageOps, UnidentifiedImageError
+
+    match = _IMAGE_DATA.fullmatch(uri)
+    if match is None:
+        raise ImageError("image must be a data:image/png, image/jpeg, or image/webp URI with base64 data", loc)
+    mime, payload = match.group(1).lower(), match.group(2)
+    if len(payload) > 4 * math.ceil(limits.max_bytes / 3):
+        raise ImageError(f"image {index} exceeds {limits.max_bytes} decoded bytes", loc)
+    try:
+        raw = base64.b64decode(payload, validate=True)
+    except binascii.Error:
+        raise ImageError(f"image {index} has invalid base64 data", loc) from None
+    if not raw or len(raw) > limits.max_bytes:
+        raise ImageError(f"image {index} must contain 1-{limits.max_bytes} decoded bytes", loc)
+    try:
+        with Image.open(io.BytesIO(raw)) as opened:
+            if opened.format != _IMAGE_FORMATS[mime]:
+                raise ImageError(f"image {index} does not match its {mime} MIME type", loc)
+            width, height = opened.size
+            if not width or not height or width * height > limits.max_source_pixels:
+                raise ImageError(f"image {index} exceeds {limits.max_source_pixels} source pixels", loc)
+            img = ImageOps.exif_transpose(opened)
+            try:
+                new_height, new_width = _image_size(img.height, img.width, limits)
+            except BlinkError as exc:
+                raise ImageError(f"image {index}: {exc}", loc) from exc
+            img = img.convert("RGB")
+            if img.size != (new_width, new_height):
+                img = img.resize((new_width, new_height), Image.Resampling.BICUBIC)
+            return img
+    except ImageError:
+        raise
+    except (OSError, UnidentifiedImageError, Image.DecompressionBombError, ValueError) as exc:
+        raise ImageError(f"image {index} cannot be decoded: {exc}", loc) from exc
+
+
+def contains_image_uri(value) -> bool:
+    pending = [value]
+    while pending:
+        item = pending.pop()
+        if isinstance(item, str) and next(_scan_image_uris(item), None) is not None:
+            return True
+        if isinstance(item, dict):
+            pending.extend(item.values())
+        elif isinstance(item, list):
+            pending.extend(item)
+    return False
+
+
+def _map_state_values(value, loc: list, transform):
+    if not isinstance(value, (dict, list)):
+        return transform(value, loc)
+    result = {} if isinstance(value, dict) else [None] * len(value)
+
+    def entries(node):
+        return iter(node.items()) if isinstance(node, dict) else iter(enumerate(node))
+
+    pending = [(entries(value), result, loc)]
+    while pending:
+        children, target, parent_loc = pending[-1]
+        try:
+            key, child = next(children)
+        except StopIteration:
+            pending.pop()
+            continue
+        child_loc = [*parent_loc, key]
+        if isinstance(child, (dict, list)):
+            nested = {} if isinstance(child, dict) else [None] * len(child)
+            target[key] = nested
+            pending.append((entries(child), nested, child_loc))
+        else:
+            target[key] = transform(child, child_loc)
+    return result
+
+
+def inspect_images(state, images=_NO_IMAGES, limits: ImageLimits | None = None) -> ImageSubmission | None:
+    """Locate and count image submissions without decoding pixels or base64."""
+    if images is _NO_IMAGES and not contains_image_uri(state):
+        return None
+    if images is not _NO_IMAGES and not isinstance(images, list):
+        raise ImageError("images must be a list of data URIs", ["body", "images"])
+    count, first_loc, resolved = 0, None, limits
+
+    def record(loc: list) -> None:
+        nonlocal count, first_loc, resolved
+        if resolved is None:
+            resolved = image_limits()
+        count += 1
+        if count > resolved.max_images:
+            raise ImageError(f"at most {resolved.max_images} images per request", loc)
+        if first_loc is None:
+            first_loc = loc
+
+    pending = [(state, ["body", "state"])]
+    while pending:
+        value, loc = pending.pop()
+        if isinstance(value, str):
+            for _, _, error in _scan_image_uris(value):
+                if error is not None:
+                    raise ImageError(error, loc)
+                record(loc)
+        elif isinstance(value, dict):
+            pending.extend((child, [*loc, key]) for key, child in reversed(tuple(value.items())))
+        elif isinstance(value, list):
+            pending.extend((value[i], [*loc, i]) for i in range(len(value) - 1, -1, -1))
+    if images is not _NO_IMAGES:
+        for i, uri in enumerate(images):
+            loc = ["body", "images", i]
+            if not isinstance(uri, str):
+                raise ImageError(f"image {count + 1} must be a data URI", loc)
+            first = next(_scan_image_uris(uri), None)
+            if first is None or first[0] != 0:
+                raise ImageError("image must be a data:image/png, image/jpeg, or image/webp URI with base64 data", loc)
+            if first[2] is not None:
+                raise ImageError(first[2], loc)
+            record(loc)
+    return ImageSubmission(state, images, resolved, first_loc) if count else None
+
+
+def extract_images(state, images=_NO_IMAGES, limits: ImageLimits | None = None) -> ImageRequest | None:
+    """Lift inline or top-level data URIs; keep unique internal markers for exact image placement."""
+    submission = inspect_images(state, images, limits)
+    if submission is None:
+        return None
+    limits = submission.limits
+    found: list[Image.Image] = []
+    markers: list[str] = []
+    first_loc = None
+    nonce = secrets.token_hex(16)
+
+    def add(uri: str, loc: list) -> str:
+        nonlocal first_loc
+        index = len(found) + 1
+        if index > limits.max_images:
+            raise ImageError(f"at most {limits.max_images} images per request", loc)
+        decoded = _decode_image(uri, index, loc, limits)
+        marker = f"BLINK_IMAGE_{nonce}_{index}_END"
+        found.append(decoded)
+        markers.append(marker)
+        if first_loc is None:
+            first_loc = loc
+        return marker
+
+    def lift(value, loc: list):
+        if isinstance(value, str):
+            parts = []
+            offset = 0
+            for start, end, error in _scan_image_uris(value):
+                if error is not None:
+                    raise ImageError(error, loc)
+                parts.extend((value[offset:start], add(value[start:end], loc)))
+                offset = end
+            if parts:
+                parts.append(value[offset:])
+                return "".join(parts)
+        return value
+
+    marked = _map_state_values(state, ["body", "state"], lift)
+    if images is not _NO_IMAGES:
+        attachments = []
+        for i, uri in enumerate(images):
+            if not isinstance(uri, str):
+                raise ImageError(f"image {len(found) + 1} must be a data URI", ["body", "images", i])
+            attachments.append(add(uri, ["body", "images", i]))
+        if attachments:
+            if isinstance(marked, str):
+                marked = marked + ("\n" if marked else "") + "\n".join(attachments)
+            elif isinstance(marked, list):
+                marked = [*marked, *attachments]
+            else:
+                marked = {"state": marked, "images": attachments}
+    if not found:
+        return None
+    names = {marker: f"[image {i}]" for i, marker in enumerate(markers, 1)}
+
+    def visible(value, _loc):
+        if isinstance(value, str):
+            for marker, placeholder in names.items():
+                value = value.replace(marker, placeholder)
+            return value
+        return value
+
+    return ImageRequest(_map_state_values(marked, ["body", "state"], visible),
+                        marked, tuple(found), tuple(markers), limits, first_loc)
 
 
 # --- rendering (pure python; the model was trained on exactly this) -----------------
@@ -375,7 +716,9 @@ class TorchEngine:
     name = "torch"
 
     def __init__(self, model_id: str = MODEL_ID, revision=None, temperature: float = TEMPERATURE,
-                 token_budget: int = TOKEN_BUDGET):
+                 token_budget: int = TOKEN_BUDGET, vision: bool = False, vision_tower: str | None = None,
+                 limits: ImageLimits | None = None, model_name: str | None = None,
+                 image_layout: str | None = None):
         import torch
         from transformers import AutoModelForCausalLM, AutoTokenizer
 
@@ -384,18 +727,101 @@ class TorchEngine:
         self.token_budget = int(token_budget)
         self.tok = AutoTokenizer.from_pretrained(model_id, revision=revision)
         load = dict(revision=revision, dtype=torch.bfloat16, attn_implementation="sdpa")
-        if _on_zero_gpu():
-            # ZeroGPU: load on the host, then place on cuda at module level (emulated until
-            # a @spaces.GPU call attaches a real device).
-            self.model = AutoModelForCausalLM.from_pretrained(model_id, **load).to("cuda")
+        model_name = (model_name or model_id).rstrip("/").split("/")[-1]
+        if vision_tower:
+            source, source_rev = vision_source(model_name, vision_tower)
+        if vision and not vision_tower and model_name not in NATIVE_VISION_MODELS:
+            raise BlinkError("--vision needs a model with its own vision tower or --vision-tower for a text model")
+        self.accepts_images = bool(vision or vision_tower)
+        self.image_layout = IMAGE_LAYOUT_DEFAULT if image_layout is None else image_layout
+        if self.image_layout not in IMAGE_LAYOUTS:
+            raise BlinkError("image_layout must be inline or first")
+        if self.accepts_images:
+            self.image_timing = os.environ.get("BLINK_IMAGE_TIMING", "0").lower() in ("1", "true", "on", "yes")
+        if not self.accepts_images:
+            if _on_zero_gpu():
+                # ZeroGPU: load on the host, then place on cuda at module level (emulated until
+                # a @spaces.GPU call attaches a real device).
+                self.model = AutoModelForCausalLM.from_pretrained(model_id, **load).to("cuda")
+            else:
+                device = "cuda" if torch.cuda.is_available() else "cpu"
+                self.model = AutoModelForCausalLM.from_pretrained(model_id, device_map=device, **load)
         else:
-            device = "cuda" if torch.cuda.is_available() else "cpu"
-            self.model = AutoModelForCausalLM.from_pretrained(model_id, device_map=device, **load)
+            from transformers import AutoConfig, AutoModelForImageTextToText, AutoProcessor
+
+            if not vision_tower:
+                source, source_rev = model_id, revision
+            config = AutoConfig.from_pretrained(source, revision=source_rev)
+            if getattr(config, "vision_config", None) is None:
+                raise BlinkError("the selected vision tower has no vision configuration")
+            self.processor = AutoProcessor.from_pretrained(source, revision=source_rev)
+            if vision_tower:
+                text_config = AutoConfig.from_pretrained(model_id, revision=revision)
+                self._validate_graft_config(text_config, config)
+            image_processor = self.processor.image_processor
+            size = image_processor.size
+            self.image_limits = replace(limits or image_limits(), min_pixels=int(size["shortest_edge"]),
+                                        factor=int(image_processor.patch_size * image_processor.merge_size))
+            if self.image_limits.max_pixels < self.image_limits.min_pixels:
+                raise BlinkError(f"max-image-pixels must be at least {self.image_limits.min_pixels}")
+            vision_load = dict(dtype=torch.bfloat16, attn_implementation="sdpa", revision=source_rev)
+            if _on_zero_gpu():
+                self.model = AutoModelForImageTextToText.from_pretrained(source, **vision_load).to("cuda")
+            else:
+                device = "cuda" if torch.cuda.is_available() else "cpu"
+                self.model = AutoModelForImageTextToText.from_pretrained(source, device_map=device, **vision_load)
+            if vision_tower:
+                self._graft_text(model_id, revision)
         self.model.eval()
         self.pad_id = self.tok.pad_token_id if self.tok.pad_token_id is not None else 0
         self.labels, self.label_ids = self._verify_labels()
+        if self.accepts_images:
+            self._verify_image_labels()
         self.key = id(self)
         _LIVE[self.key] = self
+
+    def _validate_graft_config(self, text_config, base_config) -> None:
+        base_text = getattr(base_config, "text_config", None)
+        fields = ("model_type", "hidden_size", "num_hidden_layers", "intermediate_size",
+                  "num_attention_heads", "num_key_value_heads", "head_dim", "vocab_size",
+                  "tie_word_embeddings", "layer_types")
+        for field in fields:
+            text_value = getattr(text_config, field, None)
+            if text_value is None or text_value != getattr(base_text, field, None):
+                raise BlinkError(f"incompatible vision tower: text {field} differs from the checkpoint")
+        if getattr(base_config.vision_config, "out_hidden_size", None) != text_config.hidden_size:
+            raise BlinkError("incompatible vision tower: visual output does not match text hidden size")
+        for token, field in (("<|image_pad|>", "image_token_id"),
+                             ("<|vision_start|>", "vision_start_token_id"),
+                             ("<|vision_end|>", "vision_end_token_id")):
+            expected = getattr(base_config, field, None)
+            if (not isinstance(expected, int) or not 0 <= expected < text_config.vocab_size
+                    or self.tok.convert_tokens_to_ids(token) != expected
+                    or self.processor.tokenizer.convert_tokens_to_ids(token) != expected):
+                raise BlinkError(f"incompatible vision tower: {field} differs from the text tokenizer")
+
+    def _graft_text(self, model_id: str, revision) -> None:
+        from graft_keys import text_to_parent
+        from transformers import AutoModelForCausalLM
+
+        text_model = AutoModelForCausalLM.from_pretrained(model_id, revision=revision, device_map="cpu",
+                                                          dtype=self.model.dtype, attn_implementation="sdpa")
+        target = self.model.state_dict()
+        copied = {}
+        for name, value in text_model.state_dict().items():
+            try:
+                dest = text_to_parent(name)
+            except ValueError as exc:
+                raise BlinkError(str(exc)) from exc
+            if dest not in target or target[dest].shape != value.shape or dest in copied:
+                raise BlinkError(f"text weight {name!r} cannot be grafted onto the vision model")
+            copied[dest] = value
+        missing, unexpected = self.model.load_state_dict(copied, strict=False)
+        unfilled = [name for name in missing if name.startswith("model.language_model.") or name == "lm_head.weight"]
+        if unexpected or unfilled:
+            raise BlinkError(f"incomplete text graft: {len(unfilled)} missing language weights, "
+                             f"{len(unexpected)} unexpected weights")
+        del text_model, copied, target
 
     def _wrap(self, user: str) -> str:
         return self.tok.apply_chat_template(
@@ -427,6 +853,18 @@ class TorchEngine:
             raise BlinkError(f"only {len(labels)} verified single-token labels")
         return labels, ids
 
+    def _verify_image_labels(self) -> None:
+        prompt = self.processor.apply_chat_template(
+            [{"role": "system", "content": SYSTEM}, {"role": "user", "content": [{"type": "text", "text": "x"}]}],
+            tokenize=False, add_generation_prompt=True, enable_thinking=False,
+        )
+        tok = self.processor.tokenizer
+        base = tok(prompt, add_special_tokens=False)["input_ids"]
+        for label, expected in zip(self.labels, self.label_ids):
+            got = tok(prompt + label, add_special_tokens=False)["input_ids"]
+            if got[:len(base)] != base or got[len(base):] != [expected]:
+                raise BlinkError(f"vision processor does not preserve the option-label token for {label}")
+
     def render(self, state, questions: dict):
         work = []
         for qkey, q in questions.items():
@@ -450,6 +888,88 @@ class TorchEngine:
                 }
             )
         return work
+
+    def render_images(self, request: ImageRequest, questions: dict):
+        if not self.accepts_images:
+            raise ImageError("this model reads text only", request.loc)
+        # The training renderer also uses this method on an uninitialized engine.
+        layout = getattr(self, "image_layout", IMAGE_LAYOUT_DEFAULT)
+        if layout not in IMAGE_LAYOUTS:
+            raise BlinkError("image_layout must be inline or first")
+        started = time.perf_counter() if getattr(self, "image_timing", False) else None
+        work = []
+        split = re.compile("(" + "|".join(map(re.escape, request.markers)) + ")")
+        lookup = dict(zip(request.markers, request.images))
+        visible_markers = {marker: f"[image {i}]" for i, marker in enumerate(request.markers, 1)}
+        for qkey, q in questions.items():
+            items = question_options(q)
+            if len(items) > len(self.labels):
+                raise BlinkError(f"{len(items)} options per choice; {len(self.labels)} labels verified")
+            labels = self.labels[: len(items)]
+            user = user_message(request.marked_state, q, labels, items)
+            if layout == "first":
+                images = list(request.images)
+                content = [{"type": "image", "image": image} for image in images]
+                content.append({"type": "text", "text": split.sub(
+                    lambda match: visible_markers[match.group()], user)})
+            else:
+                content, images = [], []
+                for part in split.split(user):
+                    if part in lookup:
+                        content.append({"type": "image", "image": lookup[part]})
+                        images.append(lookup[part])
+                    elif part:
+                        content.append({"type": "text", "text": part})
+            prompt = self.processor.apply_chat_template(
+                [{"role": "system", "content": SYSTEM}, {"role": "user", "content": content}],
+                tokenize=False, add_generation_prompt=True, enable_thinking=False,
+            )
+            inputs = self.processor(text=[prompt], images=images, return_tensors="pt")
+            ids = inputs["input_ids"]
+            if ids.shape[1] > MAX_INPUT_TOKENS:
+                raise BlinkError(f"question {qkey!r} renders to {ids.shape[1]} tokens, over the maximum context "
+                                 f"length of {MAX_INPUT_TOKENS}")
+            grids = inputs["image_grid_thw"]
+            if len(grids) != len(images):
+                raise BlinkError(f"question {qkey!r} has mismatched image patches")
+            patch = int(self.processor.image_processor.patch_size)
+            merge = int(self.processor.image_processor.merge_size)
+            patches = [int(grid[0] * grid[1] * grid[2]) for grid in grids]
+            if any(count % merge**2 for count in patches):
+                raise BlinkError(f"question {qkey!r} has an unaligned image patch grid")
+            if any(count * patch**2 > self.image_limits.max_pixels for count in patches):
+                raise BlinkError(f"question {qkey!r} exceeds {self.image_limits.max_pixels} processed image pixels")
+            work.append({"qkey": qkey, "keys": [k for k, _ in items], "inputs": inputs,
+                         "cand": self.label_ids[: len(items)], "image_pixels": sum(patches) * patch**2,
+                         "visual_tokens": sum(count // merge**2 for count in patches)})
+        if started is not None:
+            self.last_image_processor_ms = (time.perf_counter() - started) * 1000
+        return work
+
+    def logits_images(self, request: ImageRequest, questions: dict) -> tuple[dict[str, list[float]], int]:
+        out, n_tokens = {}, 0
+        model_ms = processor_ms = encoder_ms = lm_ms = 0.0
+        for qkey, question in questions.items():
+            work = self.render_images(request, {qkey: question})
+            item = work[0]
+            if not out:
+                self.last_image_pixels = item["image_pixels"]
+                self.last_visual_tokens = item["visual_tokens"]
+            n_tokens += int(item["inputs"]["input_ids"].shape[1])
+            if getattr(self, "image_timing", False):
+                processor_ms += self.last_image_processor_ms
+            rows, elapsed, encoder, prefill = _forward_images(self.key, work)
+            out[qkey] = rows[0]
+            model_ms += elapsed
+            encoder_ms += encoder
+            lm_ms += prefill
+            del work, item, rows
+        self.last_model_ms = round(model_ms, 1)
+        self.last_image_processor_ms = processor_ms
+        self.last_vision_encoder_ms = round(encoder_ms, 3)
+        self.last_lm_prefill_ms = round(lm_ms, 3)
+        self.last_prefill_tokens = n_tokens
+        return out, n_tokens
 
     def logits(self, state, questions: dict, bias: dict | None = None) -> tuple[dict[str, list[float]], int]:
         del bias  # demo-only shaping; the trained model reads the evidence instead
@@ -583,17 +1103,19 @@ def _padded(seqs, rows, pad_id):
     return ids
 
 
-def _forward_shared(model, head, seqs, cands, prefix_len: int, pad_id: int, budget: int, out, device) -> None:
+def _forward_shared(model, head, seqs, cands, prefix_len: int, pad_id: int, budget: int, out, device,
+                    backbone=None) -> None:
     """Encode seqs[0][:prefix_len] once, then run every tail against an expanded copy of that cache."""
     import torch
 
+    backbone = backbone if backbone is not None else model.model
     prefix = torch.tensor([seqs[0][:prefix_len]], dtype=torch.long, device=device)
-    cache = model.model(input_ids=prefix, use_cache=True).past_key_values
+    cache = backbone(input_ids=prefix, use_cache=True).past_key_values
     tails = [s[prefix_len:] for s in seqs]
     rows_cap = max(1, PREFIX_KV_TOKENS // (prefix_len + max(len(t) for t in tails)))
     for b in _batches([len(t) for t in tails], budget, max_rows=rows_cap):
         ids = _padded(tails, b, pad_id).to(device)
-        h = model.model(input_ids=ids, past_key_values=_expand_cache(cache, len(b)), use_cache=True).last_hidden_state
+        h = backbone(input_ids=ids, past_key_values=_expand_cache(cache, len(b)), use_cache=True).last_hidden_state
         _read(model, head, h, [len(tails[i]) for i in b], cands, b, out, device)
 
 
@@ -608,20 +1130,87 @@ def _forward(key: int, seqs: list[list[int]], cands: list[list[int]]):
     model = engine.model
     device = next(model.parameters()).device
     head = model.lm_head.weight
+    backbone = model.model.language_model if getattr(engine, "accepts_images", False) else model.model
     budget = getattr(engine, "token_budget", TOKEN_BUDGET)
     out: list = [None] * len(seqs)
     t0 = time.perf_counter()
     with torch.no_grad():
         shared = _shared_prefix_len(seqs) if getattr(engine, "prefix_cache", PREFIX_CACHE) else 0
         if shared > 0 and shared >= PREFIX_MIN_TOKENS:
-            _forward_shared(model, head, seqs, cands, shared, engine.pad_id, budget, out, device)
+            _forward_shared(model, head, seqs, cands, shared, engine.pad_id, budget, out, device, backbone)
         else:
             for b in _batches([len(s) for s in seqs], budget):
                 ids = _padded(seqs, b, engine.pad_id).to(device)
-                h = model.model(input_ids=ids, use_cache=False).last_hidden_state
+                h = backbone(input_ids=ids, use_cache=False).last_hidden_state
                 _read(model, head, h, [len(seqs[i]) for i in b], cands, b, out, device)
     return out, round((time.perf_counter() - t0) * 1000, 1)
 
+
+def _timed_image_model(model, inputs, device):
+    import torch
+
+    use_cuda = device.type == "cuda"
+    starts, sections = {"encoder": [], "lm": []}, {"encoder": [], "lm": []}
+
+    def begin(name):
+        stamp = torch.cuda.Event(enable_timing=True) if use_cuda else time.perf_counter()
+        if use_cuda:
+            stamp.record()
+        starts[name].append(stamp)
+
+    def end(name):
+        start = starts[name].pop()
+        stamp = torch.cuda.Event(enable_timing=True) if use_cuda else time.perf_counter()
+        if use_cuda:
+            stamp.record()
+        sections[name].append((start, stamp) if use_cuda else (stamp - start) * 1000)
+
+    handles = [
+        model.model.visual.register_forward_pre_hook(lambda _mod, _args: begin("encoder")),
+        model.model.visual.register_forward_hook(lambda _mod, _args, _out: end("encoder")),
+        model.model.language_model.register_forward_pre_hook(lambda _mod, _args: begin("lm")),
+        model.model.language_model.register_forward_hook(lambda _mod, _args, _out: end("lm")),
+    ]
+    try:
+        hidden = model.model(**inputs, use_cache=False).last_hidden_state
+    finally:
+        for handle in handles:
+            handle.remove()
+    if not sections["encoder"] or not sections["lm"]:
+        raise RuntimeError("image forward did not run both visual and language modules")
+    if use_cuda:
+        torch.cuda.synchronize(device)
+        elapsed = lambda name: sum(start.elapsed_time(end) for start, end in sections[name])
+    else:
+        elapsed = lambda name: sum(sections[name])
+    return hidden, elapsed("encoder"), elapsed("lm")
+
+
+@_gpu(GPU_DURATION)
+def _forward_images(key: int, work: list):
+    import torch
+
+    engine = _LIVE[key]
+    model = engine.model
+    device = next(model.parameters()).device
+    out = []
+    t0 = time.perf_counter()
+    encoder_ms = lm_ms = 0.0
+    with torch.no_grad():
+        for item in work:
+            inputs = {k: v.to(device) if hasattr(v, "to") else v for k, v in item["inputs"].items()}
+            if getattr(engine, "image_timing", False):
+                hidden, encoder, lm = _timed_image_model(model, inputs, device)
+                encoder_ms += encoder
+                lm_ms += lm
+            else:
+                hidden = model.model(**inputs, use_cache=False).last_hidden_state
+            length = (int(inputs["attention_mask"][0].sum().item()) if "attention_mask" in inputs
+                      else int(inputs["input_ids"].shape[1]))
+            row = [None]
+            _read(model, model.lm_head.weight, hidden, [length], [item["cand"]], [0], row, device)
+            out.append(row[0])
+    return out, round((time.perf_counter() - t0) * 1000, 1), round(encoder_ms, 3), round(lm_ms, 3)
 
 # --- hybrid engine ------------------------------------------------------------------
 
@@ -636,6 +1225,7 @@ class HybridEngine:
         self.replay, self.live = replay, live
         self.model_id = live.model_id
         self.temperature = live.temperature
+        self.accepts_images = getattr(live, "accepts_images", False)
         self.hardware = replay.hardware if replay is not None else ""
         self.last_source = None
         self.last = None
@@ -700,9 +1290,13 @@ def _build(model_id: str):
         return MockEngine(model_id)
     if kind == "replay":
         return ReplayEngine(replay_path(model_id), TEMPERATURE)
+    model_name = model_id.rstrip("/").split("/")[-1]
+    vision = VISION and model_name in NATIVE_VISION_MODELS
+    tower = VISION_TOWER if model_name in VISION_BASES else None
+    options = {"vision": vision, "vision_tower": tower} if vision or tower else {}
     if kind == "hybrid":
-        return HybridEngine(_matching_replay(model_id), TorchEngine(model_id, revision, TEMPERATURE))
-    return TorchEngine(model_id, revision, TEMPERATURE)
+        return HybridEngine(_matching_replay(model_id), TorchEngine(model_id, revision, TEMPERATURE, **options))
+    return TorchEngine(model_id, revision, TEMPERATURE, **options)
 
 
 def engine(model: str | None = None):
@@ -724,8 +1318,24 @@ def warm() -> list:
     return [engine(m) for m in models()]
 
 
+def _prepare_images(state, images, eng, limits: ImageLimits | None):
+    live = getattr(eng, "live", eng)
+    if isinstance(state, ImageRequest):
+        if not getattr(live, "accepts_images", False):
+            raise ImageError("this model reads text only", state.loc)
+        return state
+    submission = (state if isinstance(state, ImageSubmission)
+                  else inspect_images(state, images, limits or getattr(live, "image_limits", None)))
+    if submission is None:
+        return state
+    if not getattr(live, "accepts_images", False):
+        raise ImageError("this model reads text only", submission.loc)
+    return extract_images(submission.state, submission.images, submission.limits)
+
+
 def decide(state, questions: dict, temperature: float | None = None, bias: dict | None = None,
-           prefer: str = "live", model: str | None = None) -> dict:
+           prefer: str = "live", model: str | None = None, images=_NO_IMAGES,
+           limits: ImageLimits | None = None) -> dict:
     """{state, questions} -> {answers, meta}. One forward pass, zero generated tokens.
 
     `bias` shapes the mock engine so the bundled examples read realistically without a
@@ -739,7 +1349,19 @@ def decide(state, questions: dict, temperature: float | None = None, bias: dict 
     if T <= 0:
         raise BlinkError("temperature must be positive")
     t0 = time.perf_counter()
-    if isinstance(eng, HybridEngine):
+    if isinstance(state, (ImageRequest, ImageSubmission)) or images is not _NO_IMAGES or contains_image_uri(state):
+        live = getattr(eng, "live", eng)
+        decode_started = time.perf_counter() if getattr(live, "image_timing", False) else None
+        prepared = _prepare_images(state, images, eng, limits)
+        decode_ms = (time.perf_counter() - decode_started) * 1000 if decode_started is not None else 0.0
+    else:
+        prepared = state
+    if isinstance(prepared, ImageRequest):
+        live = getattr(eng, "live", eng)
+        raw, n_tokens = live.logits_images(prepared, questions)
+        if isinstance(eng, HybridEngine):
+            eng.last_source = "torch"
+    elif isinstance(eng, HybridEngine):
         raw, n_tokens = eng.logits(state, questions, bias, prefer=prefer)
     else:
         raw, n_tokens = eng.logits(state, questions, bias)
@@ -757,6 +1379,13 @@ def decide(state, questions: dict, temperature: float | None = None, bias: dict 
         "generated_tokens": 0,
         "latency_ms": latency_ms,
     }
+    if isinstance(prepared, ImageRequest):
+        meta["image_pixels"] = live.last_image_pixels
+        meta["visual_tokens"] = live.last_visual_tokens
+        if getattr(live, "image_timing", False):
+            meta["image_preprocess_ms"] = round(decode_ms + live.last_image_processor_ms, 3)
+            meta["vision_encoder_ms"] = live.last_vision_encoder_ms
+            meta["lm_prefill_ms"] = live.last_lm_prefill_ms
     if source == "replay":
         meta["latency_ms"] = float(eng.last["latency_ms"])
         if eng.hardware:
@@ -781,6 +1410,26 @@ def decide_many(requests: list, temperature: float | None = None, model: str | N
     T = float(temperature if temperature is not None else eng.temperature)
     if T <= 0:
         raise BlinkError("temperature must be positive")
+    if any(len(req) == 3 or isinstance(req[0], (ImageRequest, ImageSubmission))
+           or contains_image_uri(req[0]) for req in requests):
+        out = [None] * len(requests)
+        text_indices = [i for i, req in enumerate(requests)
+                        if len(req) == 2 and not isinstance(req[0], (ImageRequest, ImageSubmission))
+                        and not contains_image_uri(req[0])]
+        if text_indices:
+            text_results = decide_many([requests[i] for i in text_indices], temperature, model)
+            for i, result in zip(text_indices, text_results):
+                out[i] = result
+        text_indices = set(text_indices)
+        for i, req in enumerate(requests):
+            if i in text_indices:
+                continue
+            try:
+                out[i] = decide(req[0], req[1], temperature=temperature, model=model,
+                                **({"images": req[2]} if len(req) == 3 else {}))
+            except Exception as exc:  # noqa: BLE001 - isolate each image request, as for text rendering
+                out[i] = exc
+        return out
     live = getattr(eng, "live", eng)
     packed = hasattr(live, "logits_rendered")
     out: list = [None] * len(requests)
@@ -859,11 +1508,20 @@ class Batcher:
     def alive(self) -> bool:
         return self.worker.is_alive()
 
-    def submit(self, state, questions: dict) -> dict:
+    def submit(self, state, questions: dict, images=_NO_IMAGES, limits: ImageLimits | None = None) -> dict:
         import concurrent.futures
         import queue
 
         validate(questions)  # a malformed request fails at once and never takes a place in the queue
+        if images is not _NO_IMAGES or isinstance(state, (ImageRequest, ImageSubmission)) or contains_image_uri(state):
+            eng = engine(self.model)
+            live = getattr(eng, "live", eng)
+            pending = (state if isinstance(state, (ImageRequest, ImageSubmission))
+                       else inspect_images(state, images, limits or getattr(live, "image_limits", None)))
+            if pending is not None:
+                if not getattr(live, "accepts_images", False):
+                    raise ImageError("this model reads text only", pending.loc)
+                state = pending
         if not self.worker.is_alive():
             raise RuntimeError("the batching worker has stopped")
         fut = concurrent.futures.Future()

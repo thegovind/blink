@@ -4,7 +4,7 @@
 #   curl -s http://127.0.0.1:8000/healthz     # weights_verified, warmup.repeat_identical, kernels
 FROM pytorch/pytorch:2.13.0-cuda12.6-cudnn9-runtime
 ENV PIP_BREAK_SYSTEM_PACKAGES=1 PIP_NO_CACHE_DIR=1 PIP_DISABLE_PIP_VERSION_CHECK=1
-RUN pip install "transformers==5.17.0" "flash-linear-attention==0.5.2" "accelerate>=1.0" "safetensors>=0.4" "huggingface_hub>=1.0"
+RUN pip install "transformers==5.17.0" "torchvision==0.28.0" "flash-linear-attention==0.5.2" "accelerate>=1.0" "safetensors>=0.4" "huggingface_hub>=1.0"
 COPY . /blink
 ENV HF_HUB_OFFLINE=1 TRANSFORMERS_OFFLINE=1 HF_HUB_DISABLE_TELEMETRY=1
 EXPOSE 8000

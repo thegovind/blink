@@ -16,6 +16,11 @@ import argparse
 import json
 import os
 import shutil
+import sys
+from pathlib import Path
+sys.path.insert(0, str(Path(__file__).resolve().parents[2] / "space"))
+from graft_keys import text_to_parent as _text_to_parent  # noqa: E402
+
 import torch
 from huggingface_hub import snapshot_download
 from safetensors import safe_open
@@ -52,12 +57,10 @@ def load_all(d: str, keys) -> dict[str, torch.Tensor]:
 
 
 def text_to_parent(k: str) -> str:
-    # transformers 5 saves a text-only model in its source layout, so both spellings occur
-    if k == "lm_head.weight" or k.startswith("model.language_model."):
-        return k
-    if k.startswith("model."):
-        return "model.language_model." + k[len("model."):]
-    raise SystemExit(f"unexpected key in the text checkpoint: {k}")
+    try:
+        return _text_to_parent(k)
+    except ValueError as exc:
+        raise SystemExit(str(exc)) from None
 
 
 def main() -> None:

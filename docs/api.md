@@ -179,9 +179,42 @@ Limits: 255 options per choice, 2-10 score levels, 131,072 tokens per question, 
 
 Set an optional key with `--api-key` or `BLINK_API_KEY`. Enable batching with `--batch-window-ms 5`.
 
+## Screenshots (opt-in)
+
+Image input is off by default and works only on a self-hosted server. TypeSafe's hosted Jev is text-only and its API has no image field. Text-only requests keep the byte-identical pre-image prompt and numeric path.
+
+Put a `data:image/png;base64,...` URI (JPEG and WebP work too) in a string in `state`, or send data URIs in a top-level `images` list. Replace `<base64 PNG omitted>` with actual base64 before sending:
+
+```json
+{
+  "state": "Screenshot: data:image/png;base64,<base64 PNG omitted>",
+  "questions": {"save_visible": {"type": "noul", "instructions": "Is a Save button visible?"}}
+}
+```
+
+Image mode needs `torchvision==0.28.0`; install it before starting the server. For downloaded 4B or 27B folders, cache the matching base model at the pinned revision below before serving; local-folder mode is offline. Download the full v1.3 model repository so `graft_keys.py` sits beside `blink.py`.
+
+Enable screenshots with the flag for your model:
+- `blink-mimo-9b`: `--vision` (its own tower).
+- `blink-4b`: `--vision-tower Qwen/Qwen3.5-4B@851bf6e806efd8d0a36b00ddf55e13ccb7b8cd0a`.
+- `blink-27b`: `--vision-tower Qwen/Qwen3.8-27B@1d4bf0f2ff6012fd82039f2fa52739d0dd7c60c0`.
+
+`--image-layout first` is the default and places images before the user text; `--image-layout inline` places them at image placeholders in the rendered state. Neither option enables images. For renamed folders or Docker's `/blink`, set `--model-name` to `blink-4b`, `blink-mimo-9b`, or `blink-27b`, matching the checkpoint.
+
+Defaults: 2 images, 8 MiB decoded per image, 20 MP source, 2,088,960 pixels after resizing. Raise these with `--max-images`, `--max-image-bytes`, `--max-image-source-pixels`, and `--max-image-pixels`.
+
+Image URLs are never fetched. In each string value in `state`, `data:image/` (any case) starts a check. The first comma after that prefix must fall within 256 characters (counting `d` through comma); the header before it must end in `;base64` after whitespace is removed.
+
+| Input | Result |
+|---|---|
+| `data:image/png;base64,`, `data:image/jpeg;base64,` or `data:image/webp;base64,` (any case, no spaces or parameters) with valid data | Image |
+| Other recognized headers (such as GIF, parameters or spaces after `data:image/`), or invalid image data | `422` |
+| Bare MIME text or unrecognized headers in `state` (changed prefix, missing or late comma, missing `;base64`) | Text |
+| Top-level `images` entry | Must be a complete supported data URI; otherwise `422` |
+
 ## The Space
 
-Send the same fields to the Space with `gradio_client`. The Space is not a TypeSafe endpoint.
+For text-only requests, send `state` and `questions` to the demo Space with `gradio_client`. The demo Space does not serve screenshots and is not a TypeSafe endpoint.
 
 ```python
 # pip install gradio_client

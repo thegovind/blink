@@ -3,10 +3,12 @@ and usage with batching off (the release path) and on; an overloaded batching qu
 the server before anything loads. The wire tests hold serve.py to the TypeSafe API's format (answers, usage, model
 list, Bearer key, error bodies, request id) and to v1.1: every v1.1 response comes back byte for byte, apart from
 the fields added since (confidence on score answers, detail on error bodies). TestOfficialSDK runs TypeSafe's own
-Python SDK against the server when it's installed (uv run --with typesafe-sdk ...).
+Python SDK against the server when it's installed (uv run --with typesafe-sdk ...). Image-free regressions also
+compare HTTP answers, usage and errors to the archived v1.2 handler in both batching modes.
 
   cd release && BLINK_MOCK=1 python -m unittest test_serve
 """
+import base64
 import concurrent.futures
 import contextlib
 import hashlib
@@ -21,6 +23,7 @@ import tempfile
 import threading
 import time
 import unittest
+from pathlib import Path
 from unittest import mock
 
 HERE = os.path.dirname(os.path.abspath(__file__))
@@ -96,9 +99,13 @@ class Server:
     """serve.main() in a daemon thread, with FakeBatchEngine (or `engine`) in place of the torch engine. The newest
     server's engine is blink._ENGINE, which is the one blink.decide() compares against."""
 
-    def __init__(self, *argv: str, engine=None, env: dict | None = None):
+    def __init__(self, *argv: str, engine=None, env: dict | None = None, model_name: str | None = None):
         self.port = free_port()
-        args = ["serve.py", "--model", tempfile.mkdtemp(), "--port", str(self.port), *argv]
+        root = tempfile.mkdtemp()
+        if model_name is not None:
+            root = os.path.join(root, model_name)
+            os.mkdir(root)
+        args = ["serve.py", "--model", root, "--port", str(self.port), *argv]
         with mock.patch.object(blink, "TorchEngine", engine or FakeBatchEngine), mock.patch.object(sys, "argv", args), \
                 mock.patch.dict(os.environ, env or {}), contextlib.redirect_stdout(io.StringIO()):
             threading.Thread(target=serve.main, daemon=True).start()
@@ -130,8 +137,9 @@ class TestServe(unittest.TestCase):
         srv = Server()
         self.assertIsNone(srv.health["batching"])
         self.assertEqual(set(srv.health), {"ok", "model", "revision", "weights_verified", "hub_offline", "warmup",
-                                           "kernels", "versions", "batching", "api_key_required"})
+                                           "kernels", "versions", "batching", "api_key_required", "accepts_images"})
         self.assertIs(srv.health["api_key_required"], False)
+        self.assertIs(srv.health["accepts_images"], False)
         jobs = [REQS[0], SCHEMA_BAD, EXPLODE, REQS[1], REQS[2]]
         with concurrent.futures.ThreadPoolExecutor(len(jobs)) as pool:
             got = list(pool.map(lambda j: post(srv.port, *j), jobs))
@@ -185,7 +193,14 @@ class TestServe(unittest.TestCase):
         bad = (["--batch-window-ms", "inf"], ["--batch-window-ms", "nan"], ["--batch-window-ms", "-1"],
                ["--batch-window-ms", "1001"], ["--batch-window-ms", "5", "--max-batch-requests", "0"],
                ["--max-batch-requests", "65"], ["--max-queued-requests", "0"],
-               ["--api-key", "two words"], ["--api-key", "caf\u00e9"], ["--api-key", "tab\there"])
+               ["--api-key", "two words"], ["--api-key", "caf\u00e9"], ["--api-key", "tab\there"],
+               ["--max-images", "0"], ["--max-image-bytes", "not-a-number"],
+               ["--max-image-bytes", str(32 * 1024 * 1024 + 1)],
+               ["--max-image-pixels", "65000"], ["--max-image-source-pixels", "0"],
+               ["--vision"], ["--vision", "--model-name", "not-supported"],
+               ["--vision-tower", "unversioned"],
+               ["--image-layout", "middle"], ["--image-layout", "probe_equivalent"],
+               ["--vision-tower", "Qwen/Qwen3.5-4B@fixed"])
         with mock.patch.object(blink, "TorchEngine", load), mock.patch.dict(os.environ), \
                 contextlib.redirect_stderr(io.StringIO()):
             for argv in bad:
@@ -207,6 +222,15 @@ class TestServe(unittest.TestCase):
             with mock.patch.object(sys, "argv", ["serve.py", "--model", root, "--api-key", "ok-key"]):
                 with self.assertRaises(Loaded):  # an explicit key wins over a bad environment value
                     serve.main()
+            del os.environ["BLINK_API_KEY"]
+            os.environ["BLINK_IMAGE_LAYOUT"] = "middle"
+            with mock.patch.object(sys, "argv", ["serve.py", "--model", root]):
+                with self.assertRaises(SystemExit):
+                    serve.main()
+            with mock.patch.object(sys, "argv", ["serve.py", "--model", root, "--image-layout", "first"]):
+                with self.assertRaises(Loaded):
+                    serve.main()
+            del os.environ["BLINK_IMAGE_LAYOUT"]
 
 
 # --- the wire format: TypeSafe's API, and v1.1 byte for byte ---------------------------------------------------------
@@ -219,6 +243,26 @@ class PathFreeEngine(FakeBatchEngine):
 
     def __init__(self, *args, **kwargs):
         super().__init__(blink.MODEL_ID)
+
+
+class FakeVisionEngine(PathFreeEngine):
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.accepts_images = bool(kwargs.get("vision") or kwargs.get("vision_tower"))
+        self.image_layout = kwargs.get("image_layout") or blink.IMAGE_LAYOUT_DEFAULT
+        self.image_timing = os.environ.get("BLINK_IMAGE_TIMING") == "1"
+        self.image_limits = kwargs["limits"]
+        self.seen = []
+
+    def logits_images(self, request, questions):
+        self.seen.append(request)
+        self.last_image_pixels = sum(image.width * image.height for image in request.images)
+        self.last_visual_tokens = self.last_image_pixels // request.limits.factor**2
+        if self.image_timing:
+            self.last_image_processor_ms = 0.25
+            self.last_vision_encoder_ms = 0.5
+            self.last_lm_prefill_ms = 0.75
+        return self.logits(request.state, questions)
 
 
 def call(port: int, method: str, path: str, body=None, headers: dict | None = None):
@@ -235,6 +279,364 @@ def call(port: int, method: str, path: str, body=None, headers: dict | None = No
 
 def J(obj) -> str:
     return json.dumps(obj, ensure_ascii=False)
+
+
+class TestImageWire(unittest.TestCase):
+    # Archived v1.2 release/out/blink-4b HTTP responses with PathFreeEngine, Python 3.12.
+    # SHA-256 of sorted {"answers", "usage"} keeps the full answer probabilities in the comparison.
+    V12_TEXT_DIGESTS = {
+        "mime_prose": "8de90189dbb4ba5e5100073eaa47261094a2f82be140dd9202903318dfbc823c",
+        "mime_field": "e1fce99a605e5faf50925c8adede6272c6a0a1ebf7fd89fa7e245cf69bd5242b",
+        "nested_text": "c95a44dc4e11cc4d7fa7a6f0921a7e7576ce46f594312595f86a96a61ac860ff",
+    }
+    # b397863 HTTP answers/usage for PNG URIs enclosed in text, both layouts and batch windows 0/1.
+    B397_WRAPPED_DIGESTS = {
+        "backtick": "57170e6a2c343ec585ca76b1171f15b06c06e2ecef3892ba0e07719a506b27ff",
+        "quote": "201009de6ad02fcf8614136e8b12870f636071552130bbbdaa80af84ad2f3047",
+        "parentheses": "03c1df36b945d5c7368f0239c89feb585d8e25968f0d4445771af4a8a51ae973",
+    }
+    B397_INLINE_GIF_ERROR = "370471451bbb6ee93093a7f5055c47d0b96a99abd72f2a88a60d466d0a4f0e37"
+
+    @staticmethod
+    def response_digest(body, fields):
+        selected = {key: body[key] for key in fields}
+        return hashlib.sha256(json.dumps(selected, sort_keys=True).encode()).hexdigest()
+
+    def assert_v12_text_response(self, body, case):
+        self.assertEqual(self.response_digest(body, ("answers", "usage")), self.V12_TEXT_DIGESTS[case])
+
+    @classmethod
+    def setUpClass(cls):
+        from PIL import Image
+
+        data = io.BytesIO()
+        Image.new("RGB", (32, 32), "navy").save(data, format="PNG")
+        cls.png = "data:image/png;base64," + base64.b64encode(data.getvalue()).decode("ascii")
+        data = io.BytesIO()
+        Image.new("RGB", (32, 32), "navy").save(data, format="GIF")
+        cls.gif = "data:image/gif;base64," + base64.b64encode(data.getvalue()).decode("ascii")
+        cls.questions = {"go": {"type": "choice", "instructions": "Which?", "criteria": {"A": "first", "B": "second"}},
+                         "done": {"type": "noul", "instructions": "Done?"}}
+
+    @staticmethod
+    def request(port: int, state, images=blink._NO_IMAGES, questions=None):
+        body = {"state": state, "questions": questions or TestImageWire.questions}
+        if images is not blink._NO_IMAGES:
+            body["images"] = images
+        status, _, raw = call(port, "POST", "/v1/systemone", J(body))
+        return status, json.loads(raw)
+
+    def test_off_by_default_with_located_422s(self):
+        srv = Server(engine=PathFreeEngine)
+        self.assertIs(srv.health["accepts_images"], False)
+        for state, images, loc in (("text", [self.png], ["body", "images", 0]),
+                                   ({"messages": [{"content": self.png}]}, blink._NO_IMAGES,
+                                    ["body", "state", "messages", 0, "content"])):
+            with self.subTest(state=state):
+                status, body = self.request(srv.port, state, images)
+                self.assertEqual(status, 422)
+                self.assertEqual(body["error"], "this model reads text only")
+                self.assertEqual(body["detail"], [{"loc": loc, "msg": body["error"], "type": "value_error"}])
+        self.assertIs(json.loads(call(srv.port, "GET", "/v1/models")[2])["models"][0]["accepts_images"], False)
+
+    def test_mime_prose_is_text_at_both_batch_settings(self):
+        states = (("mime_prose", "The manual explains the data:image URI scheme."),
+                  ("mime_field", {"mime": "data:image/png"}))
+        questions = {"q": {"type": "noul", "instructions": "Visible?"}}
+        for flags in ((), ("--batch-window-ms", "1")):
+            srv = Server(*flags, engine=PathFreeEngine)
+            for case, state in states:
+                with self.subTest(case=case, flags=flags):
+                    status, body = self.request(srv.port, state, questions=questions)
+                    self.assertEqual(status, 200)
+                    self.assert_v12_text_response(body, case)
+
+    def test_nested_text_and_question_error_precedence_at_both_batch_settings(self):
+        state = "leaf"
+        for _ in range(500):
+            state = [state]
+        questions = {"q": {"type": "noul", "instructions": "Visible?"}}
+        for flags in ((), ("--batch-window-ms", "1")):
+            srv = Server(*flags, engine=PathFreeEngine)
+            with self.subTest(flags=flags):
+                status, body = self.request(srv.port, state, questions=questions)
+                self.assertEqual(status, 200)
+                self.assert_v12_text_response(body, "nested_text")
+                code, _, raw = call(srv.port, "POST", "/v1/systemone", J({"state": state, "questions": {}}))
+                self.assertEqual(code, 422)
+                reason = "questions must be a non-empty object"
+                self.assertEqual(json.loads(raw), {"error": reason, "detail": [
+                    {"loc": ["body", "questions"], "msg": reason, "type": "value_error"}]})
+
+    def test_text_only_http_refusal_skips_decoder(self):
+        srv = Server(engine=PathFreeEngine)
+        with mock.patch.object(blink, "_decode_image", side_effect=AssertionError("decoded")) as decoder:
+            status, body = self.request(srv.port, {"screen": self.png})
+            self.assertEqual(status, 422)
+            self.assertEqual(body["error"], "this model reads text only")
+            decoder.assert_not_called()
+
+    def test_wrapped_images_and_unsupported_gif_match_b397_in_both_layouts_and_batch_modes(self):
+        wrappers = (("backtick", "`", "`"), ("quote", '"', '"'), ("parentheses", "(", ")"))
+        for flags in ((), ("--batch-window-ms", "1")):
+            for layout in ("first", "inline"):
+                srv = Server("--vision", "--image-layout", layout, *flags,
+                             engine=FakeVisionEngine, model_name="blink-mimo-9b")
+                self.assertEqual(srv.health["image_layout"], layout)
+                for name, left, right in wrappers:
+                    with self.subTest(flags=flags, layout=layout, wrapper=name):
+                        status, body = self.request(srv.port, f"Screenshot: {left}{self.png}{right}")
+                        self.assertEqual(status, 200)
+                        self.assertEqual(self.response_digest(body, ("answers", "usage")),
+                                         self.B397_WRAPPED_DIGESTS[name])
+                        self.assertEqual(srv.engine.seen[-1].state, f"Screenshot: {left}[image 1]{right}")
+                        self.assertEqual(len(srv.engine.seen[-1].images), 1)
+                for state, images in (({"screenshot": self.gif}, blink._NO_IMAGES), ("text", [self.gif])):
+                    with self.subTest(flags=flags, layout=layout, images=images is not blink._NO_IMAGES):
+                        with mock.patch.object(blink, "_decode_image",
+                                               side_effect=AssertionError("decoded unsupported GIF")) as decoder:
+                            status, body = self.request(srv.port, state, images)
+                            self.assertEqual(status, 422)
+                            self.assertIn("data:image/png", body["error"])
+                            if images is blink._NO_IMAGES:
+                                self.assertEqual(self.response_digest(body, ("error", "detail")),
+                                                 self.B397_INLINE_GIF_ERROR)
+                            decoder.assert_not_called()
+                for malformed in ("data:image/png;base64,", "data:image/png;base64,%%%%"):
+                    with self.subTest(flags=flags, layout=layout, malformed=malformed):
+                        self.assertEqual(self.request(srv.port, {"screenshot": malformed})[0], 422)
+                status, body = self.request(srv.port, {"mime": "data:image/gif"})
+                self.assertEqual(status, 200)
+                self.assertNotIn("image_pixels", body["usage"])
+
+    def test_parameterized_images_refuse_before_decoding_in_both_layouts_and_batch_modes(self):
+        svg = "data:image/svg+xml;base64," + base64.b64encode(b"<svg/>").decode("ascii")
+        for flags in ((), ("--batch-window-ms", "1")):
+            for layout in ("first", "inline"):
+                srv = Server("--vision", "--image-layout", layout, *flags,
+                             engine=FakeVisionEngine, model_name="blink-mimo-9b")
+                for source in (self.png, self.gif, svg):
+                    for separator in (";charset=utf-8;base64,", "; charset=utf-8 ;BASE64,"):
+                        parameterized = source.replace(";base64,", separator, 1)
+                        cases = (
+                            (f"Screenshot: `{parameterized}`", blink._NO_IMAGES, ["body", "state"]),
+                            ({"nested": {"image": parameterized}}, blink._NO_IMAGES,
+                             ["body", "state", "nested", "image"]),
+                            (["text", parameterized], blink._NO_IMAGES, ["body", "state", 1]),
+                            ({"messages": [{"content": f"see {parameterized} now"}]}, blink._NO_IMAGES,
+                             ["body", "state", "messages", 0, "content"]),
+                            ("context", [parameterized], ["body", "images", 0]),
+                        )
+                        for state, images, loc in cases:
+                            with self.subTest(flags=flags, layout=layout, separator=separator,
+                                              mime=source.split(";", 1)[0], loc=loc):
+                                with mock.patch.object(blink, "_decode_image",
+                                                       side_effect=AssertionError("decoded")) as decoder:
+                                    status, body = self.request(srv.port, state, images)
+                                    self.assertEqual(status, 422)
+                                    self.assertIn("parameters", body["error"])
+                                    self.assertEqual(body["detail"], [
+                                        {"loc": loc, "msg": body["error"], "type": "value_error"}])
+                                    decoder.assert_not_called()
+                    self.assertEqual(srv.engine.seen, [])
+
+    def test_flag_and_graft_report_capability(self):
+        for flags, name in ((["--vision"], "blink-mimo-9b"), (["--vision"], "Qwen3.5-4B"),
+                            (["--vision-tower", "Qwen/Qwen3.5-4B@fixed"], "blink-4b"),
+                            (["--vision-tower", "Qwen/Qwen3.8-27B@fixed"], "blink-27b")):
+            with self.subTest(flags=flags):
+                srv = Server(*flags, engine=FakeVisionEngine, model_name=name)
+                self.assertIs(srv.health["accepts_images"], True)
+                models = json.loads(call(srv.port, "GET", "/v1/models")[2])
+                self.assertIs(models["models"][0]["accepts_images"], True)
+                status, body = self.request(srv.port, {"messages": [{"content": "see " + self.png}]})
+                self.assertEqual(status, 200)
+                self.assertEqual(set(body["answers"]), {"go", "done"})
+                self.assertEqual(srv.engine.seen[-1].state["messages"][0]["content"], "see [image 1]")
+                self.assertEqual(len(srv.engine.seen[-1].images), 1)
+                self.assertEqual(body["usage"]["image_pixels"], 65_536)
+                self.assertEqual(body["usage"]["visual_tokens"], 64)
+
+    def test_renamed_checkpoint_uses_explicit_logical_model_name(self):
+        cases = (
+            (["--vision"], "blink-mimo-9b"),
+            (["--vision-tower", "Qwen/Qwen3.5-4B@fixed"], "blink-4b"),
+            (["--vision-tower", "Qwen/Qwen3.8-27B@fixed"], "blink-27b"),
+        )
+        for flags, family in cases:
+            with self.subTest(family=family):
+                srv = Server(*flags, "--model-name", family, engine=FakeVisionEngine, model_name="blink")
+                self.assertTrue(srv.health["accepts_images"])
+                self.assertEqual(srv.health["image_layout"], "first")
+                self.assertEqual(self.request(srv.port, {"screen": self.png})[0], 200)
+                docker = Server(*flags, engine=FakeVisionEngine, model_name="blink",
+                                env={"BLINK_MODEL_NAME": family})
+                self.assertEqual(self.request(docker.port, {"screen": self.png})[0], 200)
+        here = Path(__file__).resolve().parent
+        # the research tree keeps the model Dockerfile beside this test; the public tree ships it as docker/Dockerfile.model
+        dockerfile = next(p for p in (here / "Dockerfile", here.parent / "docker" / "Dockerfile.model") if p.exists())
+        self.assertIn('"--model", "/blink"', dockerfile.read_text())
+
+    def test_private_review_material_is_not_in_model_package_allowlist(self):
+        try:
+            import stage
+        except ModuleNotFoundError:
+            self.skipTest("release/stage.py (the model-package stager) is only in the research tree")
+
+        self.assertNotIn("VISION-v1.3-FACTS.md", stage.ALLOWED)
+        self.assertNotIn("VISION-v1.3-CARD-SOURCES.md", stage.ALLOWED)
+        self.assertNotIn("LAYOUT-DECISION.md", stage.ALLOWED)
+        self.assertNotIn("blink-mimo-9b-v1.3-facts.md", stage.ALLOWED)
+
+    def test_layout_flag_and_environment_leave_text_answers_unchanged(self):
+        inline = Server("--vision", "--image-layout", "inline", engine=FakeVisionEngine,
+                        model_name="blink-mimo-9b")
+        first = Server("--vision", "--image-layout", "first", engine=FakeVisionEngine,
+                       model_name="blink-mimo-9b")
+        default = Server("--vision", engine=FakeVisionEngine, model_name="blink-mimo-9b")
+        from_env = Server("--vision", engine=FakeVisionEngine, model_name="blink-mimo-9b",
+                          env={"BLINK_IMAGE_LAYOUT": "first"})
+        self.assertEqual([srv.health["image_layout"] for srv in (inline, first, default, from_env)],
+                         ["inline", "first", "first", "first"])
+        for srv in (inline, first, default, from_env):
+            status, body = self.request(srv.port, "plain text")
+            self.assertEqual(status, 200)
+            self.assertNotIn("image_pixels", body["usage"])
+            if srv is inline:
+                reference = (body["answers"], body["usage"])
+            else:
+                self.assertEqual((body["answers"], body["usage"]), reference)
+
+    def test_cross_model_towers_are_rejected_before_loading(self):
+        for name, tower in (("blink-4b", "Qwen/Qwen3.8-27B"),
+                            ("blink-27b", "Qwen/Qwen3.5-4B"),
+                            ("blink-4b", "XiaomiMiMo/MiMo-V2.6-Distill-Qwen-9B"),
+                            ("blink-27b", "XiaomiMiMo/MiMo-V2.6-Distill-Qwen-9B")):
+            with self.subTest(model=name, tower=tower), tempfile.TemporaryDirectory() as root:
+                model = os.path.join(root, name)
+                os.mkdir(model)
+                args = ["serve.py", "--model", model, "--vision-tower", tower + "@fixed"]
+                with mock.patch.object(sys, "argv", args), mock.patch.object(
+                    blink, "TorchEngine", side_effect=AssertionError("must not load weights")
+                ), contextlib.redirect_stderr(io.StringIO()):
+                    with self.assertRaises(SystemExit):
+                        serve.main()
+
+    def test_model_tower_stays_off_without_opt_in_and_env_can_enable_it(self):
+        off = Server(engine=PathFreeEngine, model_name="blink-mimo-9b")
+        self.assertIs(off.health["accepts_images"], False)
+        on = Server(engine=FakeVisionEngine, model_name="blink-mimo-9b", env={"BLINK_VISION": "1"})
+        self.assertIs(on.health["accepts_images"], True)
+        self.assertEqual(self.request(on.port, "look", [self.png])[0], 200)
+
+    def test_empty_vision_tower_environment_is_unset(self):
+        plain = Server(engine=PathFreeEngine, env={"BLINK_VISION_TOWER": ""})
+        self.assertIs(plain.health["accepts_images"], False)
+        self.assertEqual(self.request(plain.port, "text")[0], 200)
+        native = Server(engine=FakeVisionEngine, model_name="blink-mimo-9b",
+                        env={"BLINK_VISION_TOWER": "", "BLINK_VISION": "1"})
+        self.assertIs(native.health["accepts_images"], True)
+
+    def test_full_resolution_image_usage_does_not_change_text_usage(self):
+        from PIL import Image
+
+        buffer = io.BytesIO()
+        Image.new("RGB", (1920, 1080), "navy").save(buffer, format="PNG")
+        screenshot = "data:image/png;base64," + base64.b64encode(buffer.getvalue()).decode("ascii")
+        srv = Server("--vision", engine=FakeVisionEngine, model_name="blink-mimo-9b")
+        status, body = self.request(srv.port, {"screenshot": screenshot})
+        self.assertEqual(status, 200)
+        self.assertEqual((body["usage"]["image_pixels"], body["usage"]["visual_tokens"]), (1920 * 1088, 2040))
+        status, body = self.request(srv.port, "text")
+        self.assertEqual(status, 200)
+        self.assertEqual(list(body["usage"]), ["input_tokens", "output_tokens"])
+
+    def test_image_stage_times_are_opt_in_and_do_not_change_answers(self):
+        base = Server("--vision", engine=FakeVisionEngine, model_name="blink-mimo-9b")
+        status, old = self.request(base.port, {"screenshot": self.png})
+        self.assertEqual(status, 200)
+        timed = Server("--vision", engine=FakeVisionEngine, model_name="blink-mimo-9b",
+                       env={"BLINK_IMAGE_TIMING": "1"})
+        status, measured = self.request(timed.port, {"screenshot": self.png})
+        self.assertEqual(status, 200)
+        self.assertEqual(old["answers"], measured["answers"])
+        for name in ("image_preprocess_ms", "vision_encoder_ms", "lm_prefill_ms"):
+            self.assertNotIn(name, old["usage"])
+            self.assertGreater(measured["usage"][name], 0)
+        self.assertEqual(self.request(timed.port, "text")[1]["usage"].keys(),
+                         {"input_tokens", "output_tokens"})
+
+    def test_limits_and_mime_are_422s(self):
+        srv = Server("--vision", "--max-images", "1", "--max-image-bytes", "1024",
+                     "--max-image-pixels", "65536", "--max-image-source-pixels", "65536",
+                     engine=FakeVisionEngine, model_name="blink-mimo-9b")
+        bad = (
+            ("x", [self.png, self.png], ["body", "images", 1], "at most 1"),
+            ("x", None, ["body", "images"], "must be a list"),
+            ("x", [self.gif], ["body", "images", 0], "data:image"),
+            ("x", ["data:image/png;base64,a"], ["body", "images", 0], "base64"),
+        )
+        for state, images, loc, reason in bad:
+            with self.subTest(reason=reason):
+                status, body = self.request(srv.port, state, images)
+                self.assertEqual(status, 422)
+                self.assertIn(reason, body["error"])
+                self.assertEqual(body["detail"][0]["loc"], loc)
+        from PIL import Image
+
+        data = io.BytesIO()
+        Image.new("RGB", (300, 300), "navy").save(data, format="PNG")
+        big = "data:image/png;base64," + base64.b64encode(data.getvalue()).decode("ascii")
+        status, body = self.request(srv.port, "x", [big])
+        self.assertEqual(status, 422)
+        self.assertIn("source pixels", body["error"])
+        status, _ = self.request(srv.port, "x", [self.png])
+        self.assertEqual(status, 200)
+        self.assertLessEqual(srv.engine.seen[-1].images[0].width * srv.engine.seen[-1].images[0].height, 65536)
+
+    def test_image_and_text_are_isolated_in_a_batch(self):
+        srv = Server("--vision", "--batch-window-ms", "20", engine=FakeVisionEngine, model_name="blink-mimo-9b")
+        entered, release = hold_worker(srv.engine)
+        with concurrent.futures.ThreadPoolExecutor(5) as pool:
+            first = pool.submit(post, srv.port, *REQS[0])
+            self.assertTrue(entered.wait(10))
+            image = pool.submit(self.request, srv.port, {"screen": self.png})
+            text = pool.submit(post, srv.port, *REQS[1])
+            wait_for(lambda: health(srv.port)["batching"]["queued"] == 2)
+            invalid, body = self.request(srv.port, "x", images=[self.png, self.png, self.png])
+            self.assertEqual(invalid, 422)
+            self.assertIn("at most 2", body["error"])
+            release.set()
+            image_status, image_body = image.result(30)
+            self.assertEqual(image_status, 200)
+            self.assertEqual(set(image_body["answers"]), {"go", "done"})
+            self.assertEqual(image_body["usage"]["visual_tokens"], 64)
+            self.assertEqual(text.result(30)[0], 200)
+            self.assertEqual(first.result(30)[0], 200)
+        self.assertEqual(len(srv.engine.seen), 1)
+        self.assertEqual(srv.engine.seen[0].state, {"screen": "[image 1]"})
+        self.assertEqual(srv.engine.packed, [1, 1])
+
+    def test_full_queue_returns_529_without_decoding_image(self):
+        srv = Server("--vision", "--batch-window-ms", "20", "--max-queued-requests", "1",
+                     engine=FakeVisionEngine, model_name="blink-mimo-9b")
+        entered, release = hold_worker(srv.engine)
+        with concurrent.futures.ThreadPoolExecutor(4) as pool:
+            try:
+                first = pool.submit(post, srv.port, *REQS[0])
+                self.assertTrue(entered.wait(10))
+                waiting = pool.submit(self.request, srv.port, {"screen": self.png})
+                wait_for(lambda: health(srv.port)["batching"]["queued"] == 1)
+                with mock.patch.object(blink, "_decode_image",
+                                       side_effect=AssertionError("decoded before 529")) as decoder:
+                    status, body = self.request(srv.port, {"screen": self.png})
+                    self.assertEqual(status, 529)
+                    self.assertIn("already waiting", body["error"])
+                    decoder.assert_not_called()
+            finally:
+                release.set()
+            self.assertEqual(first.result(30)[0], 200)
+            self.assertEqual(waiting.result(30)[0], 200)
 
 
 # The API reference's examples (docs.typesafe.ai/api), its quickstart request, and what JevBench's typesafe adapter and
@@ -569,8 +971,9 @@ class TestWire(unittest.TestCase):
                 body = json.loads(text)
                 self.assertEqual(list(body), ["models"])
                 (entry,) = body["models"]
-                self.assertEqual(list(entry), ["name", "description", "release_date"])
-                self.assertTrue(all(isinstance(v, str) for v in entry.values()))
+                self.assertEqual(list(entry), ["name", "description", "release_date", "accepts_images"])
+                self.assertTrue(all(isinstance(entry[k], str) for k in ("name", "description", "release_date")))
+                self.assertIs(entry["accepts_images"], False)
                 self.assertEqual(entry["name"], self.srv.model)  # the name every answer reports
 
     def test_open_by_default(self):

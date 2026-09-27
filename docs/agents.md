@@ -4,6 +4,8 @@
 
 Use the skill to send typed questions and read `noul`, `choice`, and `score` answers.
 
+For screenshots, enable vision on a self-hosted v1.3 server and [send a data URI](https://thegovind.github.io/blink/api.md#screenshots-opt-in).
+
 Install with `npx skills add thegovind/blink`, or copy [`skills/blink/`](https://github.com/thegovind/blink/blob/main/skills/blink/SKILL.md) into your agent's skills folder (for example `.agents/skills/blink/`).
 
 ## Docs for agents

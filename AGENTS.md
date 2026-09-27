@@ -26,4 +26,5 @@ make leak-scan
 
 - Run parity checks before changing answer math, rendering, or the default serving path.
 - Keep every existing API field. Only add fields.
+- Keep screenshot input opt-in and preserve the pre-image prompt bytes and numeric path for requests that do not submit images.
 - Run the tests and leak scan before a pull request.

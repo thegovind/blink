@@ -9,7 +9,7 @@
   {
     "dest": "space/blink.py",
     "reason": "",
-    "sha256": "f2b08739bb33e0978e5d80f16bf71fdcba7d6f31d838a8e596181ae4103979fd",
+    "sha256": "acacc4026c7f80e2956bcfffa49084fa97b33bcae0d599e88d06f553d7f6fd25",
     "src": "space/blink.py",
     "transform": "scrub_python"
   },
@@ -30,7 +30,7 @@
   {
     "dest": "space/api_doc.py",
     "reason": "",
-    "sha256": "7ec821eb245205bd7f49acf5a2efb5419da54bb59593afa7fbb53a7944506d64",
+    "sha256": "bd961bef931dc4d168897fa16313ce4ace97c2f13a95f1d31913189637725fed",
     "src": "space/api_doc.py",
     "transform": "scrub_python"
   },
@@ -79,7 +79,7 @@
   {
     "dest": "space/requirements.txt",
     "reason": "",
-    "sha256": "c77ffd74281f796f5af49bfb73f342ef36343b387c37bf6c709251f7e4264807",
+    "sha256": "90b9b9ab1e57ed397f1ea1a35509bdaf35621b10eb8ff3c8677c0b0ec9e7dab4",
     "src": "space/requirements.txt",
     "transform": "scrub"
   },
@@ -93,7 +93,7 @@
   {
     "dest": "space/test_blink.py",
     "reason": "",
-    "sha256": "a924442707f2a57e0870f728aa34a95ddf501c0428581154d1851e2daf2a502b",
+    "sha256": "bea8bfcd9556d40e61ae359e739ec19cb9aa16f3377801b61892d8baeafb5097",
     "src": "space/test_blink.py",
     "transform": "scrub_python"
   },
@@ -123,6 +123,20 @@
     "reason": "",
     "sha256": "5b8189df90a411ab65224792568598d8ce0cc9892188e8419a0090af0330e377",
     "src": "space/build_static.py",
+    "transform": "scrub_python"
+  },
+  {
+    "dest": "space/graft_keys.py",
+    "reason": "",
+    "sha256": "0524f4b465c41fb36cbbb41d7a12fc64226fe0bb6f9510d8b858568c3e56cba3",
+    "src": "space/graft_keys.py",
+    "transform": "scrub_python"
+  },
+  {
+    "dest": "space/test_images.py",
+    "reason": "",
+    "sha256": "9c043f9f03ead1a56e1f7282fa7fe3f5542de1f614a30fb225fd76ea96aadeaf",
+    "src": "space/test_images.py",
     "transform": "scrub_python"
   },
   {
@@ -261,21 +275,21 @@
   {
     "dest": "serve.py",
     "reason": "HTTP server",
-    "sha256": "17114cb78038846b26512446de6772a9caf7a77f8202039a28994fd6af013ea8",
+    "sha256": "1cf65f1bffeba3262c09387da4e97395af95dae3e1abb495f65a9b17667ee7e4",
     "src": "release/serve.py",
     "transform": "scrub_python"
   },
   {
     "dest": "space/test_serve.py",
     "reason": "HTTP server test",
-    "sha256": "456a9950a316f6de64cb24f98935202766bcd89cda9c1179f0e2625e3886e236",
+    "sha256": "f197fbdd4a968c8c3cb976ef6510190bf55b83b7e786ecd50698d3ce6d64c19c",
     "src": "release/test_serve.py",
     "transform": "scrub_python"
   },
   {
     "dest": "docker/Dockerfile.model",
     "reason": "model repo Dockerfile",
-    "sha256": "36b6d0c3b61d5ae50b307721b87023308e4e65410646e3a173faacd6cd85db2f",
+    "sha256": "1168bf9d849eaf7e699dab6d8b9d891bbbd08f9b4687149a3c552cc93c3591f7",
     "src": "release/Dockerfile",
     "transform": "scrub_docs"
   },
@@ -499,7 +513,7 @@
   {
     "dest": "lab/jevlab/graft_vlm.py",
     "reason": "training/data-generation",
-    "sha256": "e6b9eb663d8cf38f00e91ab5de1a3c1e1ff1ddcd8f90c590fb75ec5947614d42",
+    "sha256": "8fe534cc6857076b2e4981409a5047cebf4ad0e37dc7b0abd0a476840a4300a1",
     "src": "lab/jevlab/graft_vlm.py",
     "transform": "scrub_python"
   },
@@ -730,63 +744,63 @@
   {
     "dest": "README.md",
     "reason": "repository scaffold",
-    "sha256": "11f071a9d0a3c24e8c9ee65838fb5f782712a6cb2620004269856918cd999ec0",
+    "sha256": "18be9e576b967a40ccde8f0b6aaf0f54b27a71f537f8fb4147e59a52a945b330",
     "src": "<generated>",
     "transform": "generate"
   },
   {
     "dest": "AGENTS.md",
     "reason": "repository scaffold",
-    "sha256": "f0bb5e1db376dabc4c556c3add047f93b9372a9fc48ee462680d684c3aff38a7",
+    "sha256": "ec21d82696b48a9e85f4c05d140361e7c6aa8191ac6d5c3be7a0701477aba6d2",
     "src": "<generated>",
     "transform": "generate"
   },
   {
     "dest": "skills/blink/SKILL.md",
     "reason": "repository scaffold",
-    "sha256": "1567dd9e207c588cf38b826326f14d08c40ed5e26a3390045aa8602eac5690ac",
+    "sha256": "01859c8a0c9e3acba2b385ea90447b3bf2a3699ef6228393788615617c864a52",
     "src": "<generated>",
     "transform": "generate"
   },
   {
     "dest": "docs/index.md",
     "reason": "repository scaffold",
-    "sha256": "77e06667d456f9c8459a5cc69e54127c8633ba8f28d4eede73112f5fe7dc65fe",
+    "sha256": "e0f5c74519e9c0417067deaf0e90680f70e844928c84900447804e2a6bccbb9a",
     "src": "<generated>",
     "transform": "generate"
   },
   {
     "dest": "docs/api.md",
     "reason": "repository scaffold",
-    "sha256": "309da76ea7f911bae1cb199897ad22b7da0bf3333987e5728df3b9a55347a2c6",
+    "sha256": "90151f15737fc9c57bb05390d6e399fa09a6872e3227538a8fe460ab59fd0f4d",
     "src": "<generated>",
     "transform": "generate"
   },
   {
     "dest": "docs/agents.md",
     "reason": "repository scaffold",
-    "sha256": "92350acb20cc6a0b75329992d1a90689db755f76038d60a1665f864795c68ec5",
+    "sha256": "8356378415b5320d6da3234f32906dd5ae2cfa9f11f4d6c780246309e6466f46",
     "src": "<generated>",
     "transform": "generate"
   },
   {
     "dest": "docs/models.md",
     "reason": "repository scaffold",
-    "sha256": "f30d66f3e0dfd1825c2edb9e91a1af919ec377504d6e67f817feb0d23babd47c",
+    "sha256": "26cc6684f13ea0c0d164a7132c3bba2089c9f6772687c94c487dc9b11eef089f",
     "src": "<generated>",
     "transform": "generate"
   },
   {
     "dest": "docs/llms.txt",
     "reason": "repository scaffold",
-    "sha256": "bf3560f674042361f8f73a9e2dfec1c409f606373660964d34a3df7f87b54a23",
+    "sha256": "6c78749b83c438de1ec9076805707d70e1a6e63f3174c06b76b6a239a61d1a7a",
     "src": "<generated>",
     "transform": "generate"
   },
   {
     "dest": "pyproject.toml",
     "reason": "repository scaffold",
-    "sha256": "6b4c8c6e98bd653230dda1c97a9414f1c2baa486393d5ec0abd079ba917b20b2",
+    "sha256": "d1cb33ca55df9261a81471a2468175770a000c17a967161c91adcd28f2f1134c",
     "src": "<generated>",
     "transform": "generate"
   },
@@ -821,21 +835,21 @@
   {
     "dest": "CHANGELOG.md",
     "reason": "repository scaffold",
-    "sha256": "e123e90916033cb041620ef2b18860b7cad7a5aa3c6a59ab8e4753cb72fc31ab",
+    "sha256": "f7eed0fab309b755fa0c6cdac5aebb2f7c3dd9b1edcc181663f19c0e83bc24c8",
     "src": "<generated>",
     "transform": "generate"
   },
   {
     "dest": "CITATION.cff",
     "reason": "repository scaffold",
-    "sha256": "fa3fcf2a157d64ee75c9ef6e42ce9b242e7c25f6793850e979309cdf0e2629c7",
+    "sha256": "d5870bcbbd91c9c3b6e2bf645c90eeb4a695b559e18d12351f140087fb767115",
     "src": "<generated>",
     "transform": "generate"
   },
   {
     "dest": ".github/workflows/ci.yml",
     "reason": "repository scaffold",
-    "sha256": "d0f381484c961664d71cc738cc0abf1a16a185fdec09737134f011e5a4e588fc",
+    "sha256": "9debb32c28109d9e001c96b897ceb56527e68717efa8051b74b3490d2feff839",
     "src": "<generated>",
     "transform": "generate"
   },

@@ -29,7 +29,9 @@ The blink weights are for non-commercial research and evaluation only.
 
 Point a server-side TypeSafe Python or JavaScript SDK at a self-hosted server. Set `TYPESAFE_BASE_URL` to the server URL. Set `TYPESAFE_API_KEY` to any value or the server's key. Or send plain HTTP to `POST /v1/systemone`.
 
-For a quick test, call the [Space](https://huggingface.co/spaces/thegovind/blink) with `gradio_client`. Send the same fields through its Gradio API. The Space is not a TypeSafe endpoint.
+For screenshots on a self-hosted v1.3 server with vision enabled, send a PNG, JPEG, or WebP data URI in a `state` string or top-level `images` list; see the [API example](https://thegovind.github.io/blink/api.md#screenshots-opt-in).
+
+For a quick text-only test, call the [Space](https://huggingface.co/spaces/thegovind/blink) with `gradio_client`. Send `state` and `questions` through its Gradio API. The demo Space does not serve screenshots and is not a TypeSafe endpoint.
 
 ## Request and answer shapes
 

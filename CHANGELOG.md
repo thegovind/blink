@@ -1,5 +1,19 @@
 # Changelog
 
+## v1.3.0 - 2026-09-27
+
+- Opt-in screenshots for self-hosted `/v1/systemone`; text-only requests keep the byte-identical pre-image
+  prompt and numeric path.
+- Send PNG, JPEG, or WebP data URIs in a `state` string or top-level `images` list. Image URLs are not
+  fetched. Detected but unsupported headers and invalid image submissions return `422`; bare MIME text
+  and undetected headers in `state` stay text (see the [API rule](https://thegovind.github.io/blink/api.md#screenshots-opt-in)).
+- Use `--vision` for blink-mimo-9b or a matched `--vision-tower` for blink-4b and blink-27b;
+  `--image-layout first` is the default. Use `--model-name` for renamed folders.
+- Default limits: 2 images, 8 MiB decoded each, 20 MP source, 2,088,960 pixels after resize;
+  adjustable with `--max-images`, `--max-image-bytes`, `--max-image-source-pixels`, and `--max-image-pixels`.
+
+Code: Apache-2.0. Weights: non-commercial research and evaluation only; see each model card's license.
+
 ## v1.2.0 - 2026-09-26
 
 - `serve.py` supports TypeSafe's Python and JavaScript SDKs from server-side code by changing the base URL. It adds
