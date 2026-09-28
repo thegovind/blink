@@ -1,5 +1,26 @@
 [
   {
+    "dest": "examples/train/README.md",
+    "reason": "training example",
+    "sha256": "7d524c7ecbe418d1479de2b5a106bff03965fd29435f72f78c3e45e4d2f443fe",
+    "src": "examples/train/README.md",
+    "transform": "copy"
+  },
+  {
+    "dest": "examples/train/sample.jsonl",
+    "reason": "training example",
+    "sha256": "c1088e8a296fc43c0f2a85cceb1016ff5f568b29a4bb6d71fe5e1bde03a21454",
+    "src": "examples/train/sample.jsonl",
+    "transform": "copy"
+  },
+  {
+    "dest": "examples/train/train.sh",
+    "reason": "training example",
+    "sha256": "a346c92c6ac5b38f28a80b87e4ca95825f505058ee62d5b0a6926e0c77390d6a",
+    "src": "examples/train/train.sh",
+    "transform": "copy"
+  },
+  {
     "dest": "space/app.py",
     "reason": "",
     "sha256": "ca0b294d9e404a77f139152fe4d489c918092ca93651dda9fffd18b184e9a0c4",
@@ -765,7 +786,7 @@
   {
     "dest": "lab/jevlab/train.py",
     "reason": "training/data-generation",
-    "sha256": "8538f18cd86705debad7fe2bc4edde26ae1f3566dc6d9e48fcdff14ec92d34b1",
+    "sha256": "7a29f4f44771c9bed4549a16613cdd951ba80ac0ad417744ac8a904653bb4f7c",
     "src": "lab/jevlab/train.py",
     "transform": "scrub_python"
   },
@@ -795,6 +816,13 @@
     "reason": "unit test",
     "sha256": "f2e0223f9248c6e04648c675f44f26cdbdc70a1bb433d9d3e1e74a0f1dab76f8",
     "src": "lab/tests/test_synth_workflow.py",
+    "transform": "scrub_python"
+  },
+  {
+    "dest": "lab/tests/test_train.py",
+    "reason": "unit test",
+    "sha256": "6639889a5697d7346ff03b8b746bd734ef39d01325a18c365b974791513d8d5a",
+    "src": "lab/tests/test_train.py",
     "transform": "scrub_python"
   },
   {

@@ -1,4 +1,4 @@
-"""LoRA post-training of the next-token label readout (torchrun DDP, one full replica per GPU).
+"""LoRA post-training of the next-token label readout (torchrun, one replica per process).
 
 Rows (JSONL): {"id", "state", "question": typed q, "gold": key | None, "target": {key: p} | None,
                "weight": float (default 1), "src": str}
@@ -56,16 +56,31 @@ def encode(rd, row, rng, max_len):
         rng.shuffle(order)
     prompt, keys, cand = rd.render(row.get("state"), q, order=order)
     ids = rd.tok(prompt, add_special_tokens=False)["input_ids"]
+    target = row.get("target")
+    if target is not None:
+        if not isinstance(target, dict) or set(target) - set(keys):
+            raise ValueError(f"row {row.get('id', '?')}: target must use offered option keys")
+        try:
+            t = [float(target.get(key, 0.0)) for key in keys]
+        except (TypeError, ValueError, OverflowError) as exc:
+            raise ValueError(f"row {row.get('id', '?')}: invalid target value") from exc
+    else:
+        gold = row.get("gold")
+        if gold not in keys:
+            raise ValueError(f"row {row.get('id', '?')}: gold must be an offered option key")
+        t = [1.0 if key == gold else 0.0 for key in keys]
+    s = sum(t)
+    if any(not math.isfinite(x) or x < 0 for x in t) or not math.isfinite(s) or s <= 0:
+        raise ValueError(f"row {row.get('id', '?')}: target must be finite, nonnegative and nonempty")
+    try:
+        weight = float(row.get("weight", 1.0))
+    except (TypeError, ValueError, OverflowError) as exc:
+        raise ValueError(f"row {row.get('id', '?')}: invalid weight") from exc
+    if not math.isfinite(weight) or weight < 0:
+        raise ValueError(f"row {row.get('id', '?')}: weight must be finite and nonnegative")
     if len(ids) > max_len:
         return None
-    if row.get("target"):
-        t = [float(row["target"].get(key, 0.0)) for key in keys]
-    else:
-        t = [1.0 if key == row["gold"] else 0.0 for key in keys]
-    s = sum(t)
-    if s <= 0:
-        return None
-    return {"ids": ids, "cand": cand, "t": [x / s for x in t], "w": float(row.get("weight", 1.0)), "src": row.get("src", "")}
+    return {"ids": ids, "cand": cand, "t": [x / s for x in t], "w": weight, "src": row.get("src", "")}
 
 
 def make_batches(exs, budget, rng):
@@ -98,7 +113,7 @@ def forward_batch(body, lm_head, exs, pad_id, device):
     h = body(input_ids=ids, use_cache=False).last_hidden_state
     last = torch.tensor([len(e["ids"]) - 1 for e in exs], device=device)
     losses, logps = [], []
-    with torch.autocast("cuda", enabled=False):  # FP32 projection + normalisation, as at serving time
+    with torch.autocast(device.type, enabled=False):  # FP32 projection + normalisation, as at serving time
         h = h[torch.arange(len(exs), device=device), last].float()
         for i, e in enumerate(exs):
             w = lm_head[torch.tensor(e["cand"], device=device)].float()
@@ -115,6 +130,7 @@ def main(argv=None):
     ap.add_argument("--data", required=True)
     ap.add_argument("--dev", default=None)
     ap.add_argument("--out", required=True)
+    ap.add_argument("--device", choices=("cuda", "cpu"), default="cuda")
     ap.add_argument("--template", default="semif")
     ap.add_argument("--targets", default="attn,delta,mlp")
     ap.add_argument("--rank", type=int, default=16)
@@ -123,7 +139,7 @@ def main(argv=None):
     ap.add_argument("--lr", type=float, default=1e-4)
     ap.add_argument("--wd", type=float, default=0.0)
     ap.add_argument("--epochs", type=float, default=1.0)
-    ap.add_argument("--budget", type=int, default=16384, help="padded tokens per GPU per micro-batch")
+    ap.add_argument("--budget", type=int, default=16384, help="padded tokens per process per micro-batch")
     ap.add_argument("--accum", type=int, default=1)
     ap.add_argument("--max-len", type=int, default=12288)
     ap.add_argument("--warmup", type=int, default=30)
@@ -133,11 +149,12 @@ def main(argv=None):
     ap.add_argument("--init-adapter", default=None)
     a = ap.parse_args(argv)
 
-    dist.init_process_group("nccl")
+    dist.init_process_group("nccl" if a.device == "cuda" else "gloo")
     rank, world = dist.get_rank(), dist.get_world_size()
     local = int(os.environ.get("LOCAL_RANK", 0))
-    torch.cuda.set_device(local)
-    device = torch.device("cuda", local)
+    if a.device == "cuda":
+        torch.cuda.set_device(local)
+    device = torch.device("cuda", local) if a.device == "cuda" else torch.device("cpu")
     torch.manual_seed(a.seed)
     out = Path(a.out)
     if rank == 0:
@@ -148,7 +165,8 @@ def main(argv=None):
     from transformers import AutoModelForCausalLM, AutoTokenizer
 
     tok = AutoTokenizer.from_pretrained(a.model)
-    model = AutoModelForCausalLM.from_pretrained(a.model, dtype=torch.bfloat16, device_map={"": device},
+    model = AutoModelForCausalLM.from_pretrained(a.model, dtype=torch.bfloat16 if a.device == "cuda" else torch.float32,
+                                                 device_map={"": device},
                                                  attn_implementation="sdpa")
     model.config.use_cache = False
     tmods = sum((TARGETS[t] for t in a.targets.split(",")), [])
@@ -170,7 +188,9 @@ def main(argv=None):
 
     rng = random.Random(a.seed)
     rows = load_rows(a.data, rng)
-    dev_rows = [json.loads(l) for l in open(a.dev)] if a.dev else []
+    dev_rows = [json.loads(l) for l in open(a.dev) if l.strip()] if a.dev else []
+    if a.dev and not dev_rows:
+        raise ValueError("dev file has no rows")
     n_epochs = math.ceil(a.epochs)
     # pre-count steps from epoch-0 encoding
     params = [p for p in model.parameters() if p.requires_grad]
@@ -185,7 +205,7 @@ def main(argv=None):
         erng = random.Random(99)
         exs = [e for e in (encode(rd, r, erng, a.max_len) for r in dev_rows[rank::world]) if e]
         tot, n, correct = 0.0, 0, 0
-        with torch.no_grad(), torch.autocast("cuda", dtype=torch.bfloat16):
+        with torch.no_grad(), torch.autocast(device.type, dtype=torch.bfloat16, enabled=a.device == "cuda"):
             for b in make_batches(exs, a.budget, random.Random(0)):
                 ls, lps = forward_batch(body, lm_head, [exs[i] for i in b], pad_id, device)
                 tot += float(ls.sum()); n += len(b)
@@ -193,6 +213,8 @@ def main(argv=None):
                     correct += int(int(lp.argmax()) == max(range(len(exs[i]["t"])), key=lambda j: exs[i]["t"][j]))
         v = torch.tensor([tot, n, correct], device=device, dtype=torch.float64)
         dist.all_reduce(v)
+        if v[1] == 0:
+            raise ValueError("no dev rows survived encoding; check --max-len")
         if rank == 0:
             rec = {"eval": tag, "step": step, "dev_nll": float(v[0] / v[1]), "dev_acc": float(v[2] / v[1]), "n": int(v[1])}
             print(json.dumps(rec), flush=True)
@@ -212,11 +234,13 @@ def main(argv=None):
         erng = random.Random(a.seed * 1000 + ep)
         exs = [e for e in (encode(rd, r, erng, a.max_len) for r in rows) if e]
         if rank == 0:
-            print(f"epoch {ep}: encoded {len(exs)}/{len(rows)} rows (dropped {len(rows) - len(exs)} over max_len {a.max_len} or empty target)", flush=True)
+            print(f"epoch {ep}: encoded {len(exs)}/{len(rows)} rows (dropped {len(rows) - len(exs)} over max_len {a.max_len})", flush=True)
         batches = make_batches(exs, a.budget, erng)
         if ep == n_epochs - 1 and a.epochs < n_epochs:
             batches = batches[: int(len(batches) * (a.epochs - ep))]
         nb = (len(batches) // (world * a.accum)) * world * a.accum
+        if nb == 0:
+            raise ValueError(f"epoch {ep}: no optimizer steps; check data, --max-len, --epochs, --accum and process count")
         mine = batches[:nb][rank::world]
         if total_steps is None:
             total_steps = int(n_epochs * len(mine) / a.accum)
@@ -232,12 +256,12 @@ def main(argv=None):
             tl, tw = 0.0, 0
             for j, b in enumerate(group):
                 exb = [exs[i] for i in b]
-                with torch.autocast("cuda", dtype=torch.bfloat16):
+                with torch.autocast(device.type, dtype=torch.bfloat16, enabled=a.device == "cuda"):
                     ls, _ = forward_batch(body, lm_head, exb, pad_id, device)
                 w = torch.tensor([e["w"] for e in exb], device=device)
                 loss = (ls * w).sum() / nex[0] * world
                 loss.backward()
-                tl += float(ls.sum()); tw += len(b)
+                tl += float(ls.detach().sum()); tw += len(b)
             # manual all-reduce of LoRA grads (model is not DDP-wrapped: simpler with peft + checkpointing)
             grads = [p.grad if p.grad is not None else torch.zeros_like(p) for p in params]
             flat = torch._utils._flatten_dense_tensors(grads)
