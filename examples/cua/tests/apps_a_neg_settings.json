@@ -1,0 +1,85 @@
+[
+  {
+    "name": "task 2: deletes similarly named API key",
+    "task": 2,
+    "seed": 1,
+    "steps": [
+      [
+        "click",
+        "#nav-api-keys"
+      ],
+      [
+        "click",
+        "#delete-ci-deploy"
+      ],
+      [
+        "fill",
+        "#delete-name",
+        "ci-deploy"
+      ],
+      [
+        "click",
+        "#delete-confirm"
+      ]
+    ],
+    "expect": {
+      "success": false,
+      "done": true
+    }
+  },
+  {
+    "name": "task 0: saves the wrong session timeout (still correctable, not success)",
+    "task": 0,
+    "seed": 2,
+    "steps": [
+      [
+        "click",
+        "#nav-security"
+      ],
+      [
+        "click",
+        "#two-factor"
+      ],
+      [
+        "click",
+        "#turn-on-2fa"
+      ],
+      [
+        "select",
+        "#session-timeout",
+        "15 minutes"
+      ],
+      [
+        "click",
+        "#save-security"
+      ]
+    ],
+    "expect": {
+      "success": false,
+      "done": false
+    }
+  },
+  {
+    "name": "task 0: saves an unrelated security switch change (not success)",
+    "task": 0,
+    "seed": 3,
+    "steps": [
+      [
+        "oracle",
+        4
+      ],
+      [
+        "click",
+        "#sec-require-sso"
+      ],
+      [
+        "click",
+        "#save-security"
+      ]
+    ],
+    "expect": {
+      "success": false,
+      "done": false
+    }
+  }
+]

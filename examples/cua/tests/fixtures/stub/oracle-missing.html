@@ -1,0 +1,18 @@
+<!doctype html>
+<html lang="en">
+<meta charset="utf-8">
+<title>Off-path oracle fixture</title>
+<style>body{font:18px system-ui;margin:60px}button{font:inherit;padding:15px 28px}</style>
+<h1>The requested item is no longer here</h1>
+<button id="back">Back</button>
+<script>
+  const q = new URLSearchParams(location.search);
+  window.blinkScenario = {
+    id:"oracle-missing-stub", seed:Number(q.get("seed")), taskIndex:Number(q.get("task")),
+    task:"Open the item that is no longer on this page.", values:[],
+    check() { return {done:false,success:false,detail:"target absent"}; },
+    expected() { return {selector:"#missing",action:"click",value:null,done:false,risky:false}; },
+    state() { return "off_path"; }, targets:null,
+  };
+</script>
+</html>

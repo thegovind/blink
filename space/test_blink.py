@@ -811,9 +811,18 @@ class TestClaimsAndLabels(unittest.TestCase):
         self.assertNotIn("Personal research release", foot)
         self.assertNotIn("affiliated", foot)
 
-    def test_verdicts_are_marked_simulated(self):
-        html = self.ui.render_verdict("go", "Send to billing", "Because.")
-        self.assertIn(">simulated<", html)
+    def test_verdicts_say_whose_answers_they_read(self):
+        saved = self.ui.render_verdict("go", "Send to billing", "Because.",
+                                       {"engine": "replay", "model": "thegovind/blink-4b", "latency_ms": 41.5})
+        self.assertIn(">saved run \u00b7 blink-4b</em>", saved)
+        self.assertIn("recorded earlier", saved)  # a saved run is the model's own output, said on hover
+        live = self.ui.render_verdict("go", "Send to billing", "Because.",
+                                      {"engine": "torch", "model": "thegovind/blink-4b", "latency_ms": 812.4})
+        self.assertIn(">live \u00b7 blink-4b \u00b7 812 ms</em>", live)
+        mock = self.ui.render_verdict("go", "Send to billing", "Because.", {"engine": "mock", "model": "m/x"})
+        self.assertIn(">mock \u00b7 x</em>", mock)
+        for html in (saved, live, mock):
+            self.assertNotIn("simulated", html)
 
     def test_demo_label_only_appears_when_answers_are_recorded(self):
         self.assertEqual(self.ui.engine_name(), "mock")
@@ -1257,12 +1266,14 @@ class TestAsk(unittest.TestCase):
         self.assertEqual(problems, [])
         self.assertEqual(back, req["questions"])
 
-    def test_provenance_names_the_drafter_and_what_it_generated(self):
+    def test_provenance_names_the_drafter_and_its_time(self):
         line = self.ui.drafted_line(
             {"model": "Qwen/Qwen3.5-4B", "generated_tokens": 77, "model_ms": 5000.0})
         self.assertIn("Qwen/Qwen3.5-4B", line)
-        self.assertIn("77 generated tokens", line)
         self.assertIn("5.0 s", line)
+        # a token count read as jargon; the API's draft.author still carries it
+        self.assertNotIn("generated", line)
+        self.assertNotIn("77", line)
         self.assertEqual(self.ui.drafted_line(None), "")
         self.assertEqual(self.ui.drafted_line({}), "")
 
@@ -1274,8 +1285,11 @@ class TestAsk(unittest.TestCase):
         drafted = self.ui.render_answers("x", q, out, {"model": "mock", "generated_tokens": 12,
                                                        "model_ms": 1234.0})
         self.assertIn("blk-drafted", drafted)
-        # blink still reports none of its own
-        self.assertIn("<b>0</b> generated", drafted)
+        # no "0 generated" chip on the stats row, which read as jargon; the raw response stays whole
+        for html in (plain, drafted):
+            stats = html.split('<div class="blk-stats">', 1)[1].split("</div>", 1)[0]
+            self.assertNotIn("generated", stats)
+            self.assertIn("&quot;generated_tokens&quot;: 0", html)
 
     def test_the_ask_link_pre_fills_and_nothing_more(self):
         self.assertEqual(self.ui.parse_ask("?ask=How%20many%20r"), "How many r")
@@ -1554,9 +1568,11 @@ class TestDeepLinks(unittest.TestCase):
         self.ui = ui
 
     def test_the_slugs_cover_every_tab_and_case(self):
+        # Computer use follows Home wherever a model that reads screens is served or there are runs to show
+        cua = ("computer-use",) if self.ui.CUA_SERVED else ()
         self.assertEqual(
             self.ui.TAB_IDS,
-            ("home", "use-cases", "ask", "playground", "results", "how-it-works", "api"),
+            ("home", *cua, "use-cases", "ask", "playground", "results", "how-it-works", "api"),
         )
         self.assertEqual(self.ui.DEFAULT_TAB, "home")
         self.assertEqual(self.ui.HOME_TAB, "home")
@@ -1565,10 +1581,12 @@ class TestDeepLinks(unittest.TestCase):
         self.assertEqual(self.ui.API_TAB, "api")
         import screens
 
-        # the screenshot case comes last, wherever a model that reads screens is served
-        extra = (screens.KEY,) if screens.available() else ()
-        self.assertEqual(self.ui.CASE_IDS, tuple(c.key for c in examples.USE_CASES) + extra)
-        self.assertIn("nextclick", self.ui.CASE_IDS)
+        # the text next click leads the use cases, then the rest in their own order; Screen click
+        # lives on the Computer use tab
+        rest = tuple(c.key for c in examples.USE_CASES if c.key != "nextclick")
+        self.assertEqual(self.ui.CASE_IDS, ("nextclick",) + rest)
+        self.assertNotIn(screens.KEY, self.ui.CASE_IDS)
+        self.assertEqual(self.ui.DEFAULT_CASE, self.ui.CASE_IDS[0])
 
     def test_query_and_hash_both_name_a_tab(self):
         for raw, want in (
@@ -2634,12 +2652,14 @@ class TestAttributionAndRows(unittest.TestCase):
 
     def test_the_claim_about_generated_text_follows_the_tab(self):
         plain, drafting = self.ui.masthead(), self.ui.masthead(drafting=True)
-        self.assertIn(self.ui.MAST["chip"], plain)
         self.assertIn(self.ui.MAST["lede"], plain)
-        self.assertNotIn(self.ui.MAST["chip"], drafting)
-        self.assertIn(self.ui.MAST["ask_chip"], drafting)
         self.assertIn(self.ui.MAST["ask_lede"], drafting)
         self.assertNotIn("No generated text", drafting)
+        # no token-count chip on any tab: it read as jargon
+        for head in (plain, drafting):
+            self.assertNotIn("generated tokens", head)
+            self.assertNotIn("writes no text", head)
+        self.assertNotIn("chip", self.ui.MAST)
         # the model tag survives either way
         self.assertIn("owner/model", self.ui.masthead("owner/model", drafting=True))
 
@@ -2893,6 +2913,14 @@ class TestLatencyElement(unittest.TestCase):
         self.assertIn("141.2", html)
         self.assertNotIn("accelerator", html)
         self.assertIn("bundled examples", html)
+        self.assertNotIn("generated", html)
+
+    def test_results_never_count_generated_tokens(self):
+        import ui
+
+        for block in ui.results_blocks():
+            self.assertNotIn("tokens generated", block)
+            self.assertNotIn("</b> generated", block)
 
     def test_app_builds_with_latency_null(self):
         gr = need_gradio(self)
@@ -3212,10 +3240,11 @@ class TestStaticBuild(unittest.TestCase):
             "development proxies computed here",
             "No hard-accuracy advantage is claimed",
             "Longer inputs are refused, not truncated",
-            ">simulated<",
+            ">saved run \u00b7 blink-4b</em>",
         ):
             self.assertIn(phrase, html, phrase)
         self.assertNotIn("same kind of 0.7", html)
+        self.assertNotIn("simulated", html)
         self.assertIn("Weights are for non-commercial research and evaluation; app code is Apache-2.0.", html)
         self.assertEqual(html.count("Apache-2.0"), 1)
 

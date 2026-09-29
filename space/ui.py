@@ -9,10 +9,12 @@ from __future__ import annotations
 
 import hashlib
 import json
+import math
 import urllib.parse
 
 import api_doc
 import blink
+import computer_use
 import examples
 import results
 import screens
@@ -20,7 +22,7 @@ import screens
 DATA = results.load()
 PLAYGROUND_PRESETS = examples.PLAYGROUND_PRESETS
 
-# Read only by the mock engine so the bundled examples look realistic without a GPU.
+# Read only by the mock engine so the bundled examples look realistic without an accelerator.
 BIAS_BY_STATE = {
     ex.state: examples.bias_for(case.key, ex.label)
     for case in examples.USE_CASES
@@ -30,9 +32,18 @@ BIAS_BY_STATE[examples.PLAYGROUND_STATE] = examples.PLAYGROUND_BIAS
 
 
 # --- deep links -------------------------------------------------------------------
+CASE_TAB = "use-cases"
+ASK_TAB = "ask"
+HOME_TAB = "home"
+API_TAB = "api"
+# Computer use: real runs, how a screenshot is read, and Screen click. It follows Home wherever a model
+# that reads screens is served or there are runs to show.
+CUA_TAB = computer_use.TAB
+CUA_SERVED = screens.available() or computer_use.available()
 # (slug, tab label). The slug is what a link carries; the label is what the tab shows.
 TABS = (
     ("home", "Home"),
+    *(((CUA_TAB, "Computer use"),) if CUA_SERVED else ()),
     ("use-cases", "Use cases"),
     ("ask", "Ask"),
     ("playground", "Playground"),
@@ -42,19 +53,19 @@ TABS = (
 )
 TAB_IDS = tuple(slug for slug, _ in TABS)
 DEFAULT_TAB = TAB_IDS[0]  # home
-CASE_TAB = "use-cases"
-ASK_TAB = "ask"
-HOME_TAB = "home"
-API_TAB = "api"
-# the screenshot case sits last, after the text next click, where a model that reads screens is served
-CASE_IDS = tuple(case.key for case in examples.USE_CASES) + ((screens.KEY,) if screens.available() else ())
+# the text Next click leads the use cases, then the rest in their own order; Screen click lives on
+# the Computer use tab, and its old links (case=screen) land there
+CUA_TEXT_CASE = "nextclick"
+CASES = tuple(sorted(examples.USE_CASES, key=lambda case: case.key != CUA_TEXT_CASE))
+CASE_IDS = tuple(case.key for case in CASES)
 DEFAULT_CASE = CASE_IDS[0]
 
 
 def parse_deep_link(raw) -> tuple[str, str | None]:
     """A location's search and hash -> (tab slug, case key or None).
 
-    "?tab=results", "#results" and "?tab=use-cases&case=nextclick" all resolve; anything
+    "?tab=results", "#results", "?tab=use-cases&case=nextclick" and "?tab=computer-use&scenario=shop" all
+    resolve; "?tab=use-cases&case=screen", Screen click's old home, opens the Computer use tab. Anything
     else falls back to the first tab, so a stale link still opens the page.
     """
     if not isinstance(raw, str):
@@ -65,19 +76,24 @@ def parse_deep_link(raw) -> tuple[str, str | None]:
     fragment = fragment.strip().lower()
     tab = asked if asked in TAB_IDS else (fragment if fragment in TAB_IDS else "")
     case = (params.get("case") or [""])[0].strip().lower()
+    if case == screens.KEY and tab in ("", CASE_TAB) and screens.available() and CUA_TAB in TAB_IDS:
+        return CUA_TAB, None
     case = case if case in CASE_IDS else None
     if case and not tab:
         tab = CASE_TAB  # a case on its own is still a use-case link
+    if not tab and CUA_TAB in TAB_IDS and (params.get("scenario") or [""])[0].strip():
+        tab = CUA_TAB  # a run on its own is still a computer-use link
     if not tab and (params.get("ask") or [""])[0].strip():
         tab = ASK_TAB  # an ask link lands where the ask box is
     return (tab or DEFAULT_TAB), (case if tab == CASE_TAB else None)
 
 
 def parse_shot(raw) -> str | None:
-    """A Screen click link's preset: "?tab=use-cases&case=screen&shot=done" -> "done".
+    """A Screen click link's preset: "?tab=computer-use&shot=done" (or the older
+    "?tab=use-cases&case=screen&shot=done") -> "done".
 
-    Only a link that opens Screen click carries one; an unknown shot falls back to the first preset."""
-    if parse_deep_link(raw)[1] != screens.KEY:
+    Only a link that opens Screen click's tab carries one; an unknown shot falls back to the first preset."""
+    if not screens.available() or parse_deep_link(raw)[0] != CUA_TAB:
         return None
     search = raw.partition("#")[0]
     asked = (urllib.parse.parse_qs(search.lstrip("?")).get("shot") or [""])[0].strip().lower()
@@ -213,6 +229,28 @@ def timing_html(meta: dict) -> str:
     return f'<span><b>{meta["latency_ms"]:.1f}</b> ms</span>'
 
 
+# Where an answer came from, beside the verdict it backs: a saved run is the model's own output
+# for exactly this request, recorded earlier; a live one was just computed; mock is fabricated.
+PROVENANCE = {
+    "saved": "saved run \u00b7 {model}",
+    "saved_hover": "Real {model} output recorded earlier on this preset.",
+    "live": "live \u00b7 {model} \u00b7 {ms} ms",
+    "live_hover": "{model} just ran on this request.",
+    "mock": "mock \u00b7 {model}",
+    "mock_hover": "Mock mode: these numbers are fabricated.",
+}
+
+
+def provenance_tag(meta: dict | None) -> str:
+    meta = meta or {}
+    model = short_model(meta.get("model") or blink.MODEL_ID)
+    kind = {"replay": "saved", "mock": "mock"}.get(meta.get("engine"), "live")
+    ms = meta.get("latency_ms")
+    text = PROVENANCE[kind].format(model=model, ms=f"{ms:,.0f}" if ms is not None else "\u2013")
+    return (f'<em class="blk-tag blk-from {kind}" title="{esc(PROVENANCE[kind + "_hover"].format(model=model))}">'
+            f"{esc(text)}</em>")
+
+
 def answered_by_html(meta: dict) -> str:
     return (
         f'<span class="blk-by"><b>{esc(short_model(meta["model"]))}</b></span>'
@@ -246,7 +284,6 @@ def render_answers(state, questions: dict, out: dict, author: dict | None = None
         + answered_by
         + timing
         + f'<span><b>{meta["input_tokens"]:,}</b> input tokens</span>'
-        f'<span><b>{meta["generated_tokens"]}</b> generated</span>'
         f'<span><b>{len(questions)}</b> questions</span>'
         f'<span>temperature <b>{meta["temperature"]:g}</b></span>'
         f"</div>"
@@ -260,11 +297,11 @@ def render_answers(state, questions: dict, out: dict, author: dict | None = None
     return f'<div class="blk-answers">{"".join(blocks)}</div>{foot}'
 
 
-def render_verdict(tone: str, headline: str, detail: str) -> str:
-    """The policy runs for real; nothing downstream of it does, so the box says so."""
+def render_verdict(tone: str, headline: str, detail: str, meta: dict | None = None) -> str:
+    """The policy reads the answers for real; the tag says whose answers, saved or live."""
     return (
         f'<div class="blk-verdict {esc(tone)}"><span class="blk-dotmark"></span>'
-        f'<div><h3>{esc(headline)}<em class="blk-tag">simulated</em></h3>'
+        f"<div><h3>{esc(headline)}{provenance_tag(meta)}</h3>"
         f"<p>{esc(detail)}</p></div></div>"
     )
 
@@ -628,8 +665,36 @@ HOME = {
     "open": "Open",
 }
 
+# Computer use, near the top of the home page: a real run looping (a marked screenshot until there are
+# runs), then where to watch and try it.
+HOME_CUA = {
+    "title": "Computer use, step by step",
+    "pitch": "Watch blink try ten original apps, one screenshot at a time. See every click, pause, and miss.",
+    "watch": "Watch the runs",
+    "open": "Try Screen click",
+    "next": "Try text-only",
+    "alt": "Catalog page with {n} numbered things to click",
+}
+
+
+def home_cua_shot() -> str:
+    g = computer_use.load()
+    figure = computer_use.home_figure(g) if g else ""
+    if figure or not screens.available():
+        return figure
+    shot = screens.presets()[0]
+    return (f'<figure class="blk-cua-shot"><img src="{screens.thumb(shot)}" '
+            f'alt="{esc(HOME_CUA["alt"].format(n=len(shot.boxes)))}"></figure>')
+
+
+def home_cua_text() -> str:
+    return (f'<h2 class="blk-cua-pitch">{esc(HOME_CUA["title"])}</h2>'
+            f'<p class="blk-note blk-cua-line">{esc(HOME_CUA["pitch"])}</p>')
+
+
 # (slug or url, title, one line). A slug switches tab; a url opens in a new tab.
 HOME_LINKS = (
+    *(((CUA_TAB, "Computer use", "Watch blink try ten apps."),) if CUA_SERVED else ()),
     ("use-cases", "Use cases", "Sort requests or choose next steps."),
     ("ask", "Ask a question", "A model drafts options; blink scores."),
     ("playground", "Try it", "Enter a state and questions."),
@@ -734,7 +799,7 @@ ASK = {
     "button": "Ask",
     "drafting": "Drafting the question",
     "deciding": "Answering",
-    "drafted": "drafted by {model} \u00b7 {tokens} generated tokens \u00b7 {seconds}",
+    "drafted": "drafted by {model} \u00b7 {seconds}",
     "failed": "Drafting failed. Try again or enter the question and options yourself.",
     "open": "Open in Playground",
     "stale": "Ask again.",
@@ -764,7 +829,6 @@ def drafted_line(author: dict | None) -> str:
         return ""
     said = ASK["drafted"].format(
         model=author.get("model", ""),
-        tokens=author.get("generated_tokens", 0),
         seconds=f"{(author.get('model_ms') or 0) / 1000:.1f} s",
     )
     return f'<p class="blk-drafted" id="ask-provenance">{esc(said)}</p>'
@@ -875,7 +939,7 @@ def run_use_case(case: examples.UseCase, state: str, model: str | None = None,
     except Exception as exc:
         return _live_failure(exc)
     tone, headline, detail = case.verdict(out["answers"])
-    return mock_banner() + render_verdict(tone, headline, detail) + render_answers(
+    return mock_banner() + render_verdict(tone, headline, detail, out["meta"]) + render_answers(
         state, case.questions, out
     )
 
@@ -893,10 +957,8 @@ def base_of(model_id: str) -> str:
 MAST = {
     "lede": "Send a state and typed questions. Get a probability for each option. "
             "No generated text.",
-    "chip": "0 generated tokens",
     "ask_lede": "Ask in your own words. A separate model drafts the question, then blink gives each "
                 "option a probability in one pass.",
-    "ask_chip": "drafting model writes text \u00b7 blink writes no text",
 }
 
 
@@ -913,7 +975,6 @@ def masthead(model: str | None = None, drafting: bool = False) -> str:
         '<div class="blk-meta">'
         f'<span class="key">{esc(model or blink.MODEL_ID)}</span>'
         f'<span>{esc(base_of(model or blink.MODEL_ID))} · LoRA, merged</span>'
-        f'<span>{esc(MAST["ask_chip"] if drafting else MAST["chip"])}</span>'
         "</div></div>"
         '<div class="blk-rule"></div>'
     )
@@ -1083,8 +1144,7 @@ def results_blocks(data: dict | None = None) -> list[str]:
         "the same harness, and are kept on their own scale.</p>"
         + (
             f'<p>Latency is {lat["p50_ms"]} ms at the median and {lat["max_ms"]} ms at the '
-            f'slowest of {lat["requests"]} bundled requests, '
-            f'with {lat["generated_tokens"]} tokens generated.</p>'
+            f'slowest of {lat["requests"]} bundled requests.</p>'
             if lat
             else ""
         )
@@ -1126,6 +1186,13 @@ print(out["answers"]["queue"]["probabilities"])""".replace("@REVISION@", api_doc
 
 
 def how_blocks() -> list[str]:
+    blocks = _how_blocks()
+    if screens.available():
+        blocks.insert(next(i for i, b in enumerate(blocks) if "RLCD" in b) + 1, how_screen_section())
+    return blocks
+
+
+def _how_blocks() -> list[str]:
     items = blink.question_options(DEMO_Q)
     labels = blink.LABEL_POOL[: len(items)]
     rendered = blink.user_message("My card was charged twice.", DEMO_Q, labels, items)
@@ -1312,8 +1379,12 @@ SCREEN = {
     "grid_pill": "Grid {k}\u00d7{k}",
     "done": "Done?",
     "risky": "Risky?",
-    "saved": "saved run",
     "not_run": "Not run yet. Click Decide.",
+    "live_note": "Presets open saved runs. Choose Decide to run {model} live on the current screenshot.",
+    "reading": "{model} is reading the screenshot",
+    "how_title": "How it reads the screenshot",
+    "how_line": "{model} reads the numbered screenshot with its own vision encoder. It suggests an action and "
+                "never clicks.",
     "draw": "Drag or tap two corners to draw a box.",
     "miss": "No saved run for this screenshot. Try a preset as is.",
     "off": "Screenshot input is off here.",
@@ -1327,7 +1398,42 @@ SCREEN = {
     "how": "{title} uses that tower for screenshots. Every other tab uses the text side. Either way, "
            "blink reads option-letter scores and generates no text.",
     "docs": "Run it yourself",
+    # How it works: the screenshot section
+    "section": "Screenshots",
+    "section_line": "On {title}, {model} reads the numbered screenshot and answers without generating text.",
+    "good": "Good to know",
 }
+SCREEN_GOOD = ("The Space API stays text-only.",
+               "Self-host {model} with serve.py --vision.",
+               "blink-4b and blink-27b use --vision-tower to borrow the vision encoder from their base model.")
+# The screenshot steps, told once for the card's disclosure and for How it works. Each number comes
+# from where it is kept: the preset and its saved run, blink's image limits, the model card.
+VISION_CARD = {"blocks": 27, "hidden": 1152, "projected": 4096, "tensors": 333}  # blink-mimo-9b model card
+VISION_TOWERS = (("blink-4b", "Qwen/Qwen3.5-4B@851bf6e806efd8d0a36b00ddf55e13ccb7b8cd0a"),
+                 ("blink-27b", "Qwen/Qwen3.8-27B@1d4bf0f2ff6012fd82039f2fa52739d0dd7c60c0"))  # their model cards
+OUTCOMES = ("Click N", "Ask before clicking N", "Task looks done", "Let a person take over")  # screens.verdict
+# the card's disclosure: one visible line, these steps on a click
+HOW_STEPS = (
+    "The screenshot is resized to multiples of {factor}.",
+    "Its vision encoder comes from {base}. blink training did not change it.",
+    "The vision encoder turns the screenshot into image tokens.{tokens_sentence}",
+    "blink reads the image tokens and answers three questions: next box, task done, and click risk.",
+    "It returns probabilities for the offered answers. The page shows " + ", ".join(OUTCOMES[:-1])
+    + ", or " + OUTCOMES[-1] + ". No text is generated.",
+)
+TOKENS_SENTENCE = " Each preset uses {tokens}."
+# How it works: (node, caption, the numbers behind it)
+STEPS = (
+    ("Numbered screenshot", "Boxes mark the available click targets.",
+     "resized to multiples of {factor} px \u00b7 {width} \u00d7 {height}"),
+    ("Vision encoder", "{model} uses its own XiaomiMiMo vision encoder.",
+     "{blocks} blocks \u00b7 hidden {hidden} \u2192 {projected} \u00b7 {tensors} tensors unchanged"),
+    ("Image tokens", "The resized screenshot becomes image tokens.", "{tokens_fact}"),
+    ("Typed questions", "Next box, task done, and click risk.", "read with the image tokens, one at a time"),
+    ("Action result", "The page turns the probabilities into a clear next step.",
+     "answer-position logits \u00b7 FP32 softmax \u00b7 " + " / ".join(OUTCOMES)),
+)
+TOKENS_FACT = "{tokens} per preset \u00b7 one per {side} \u00d7 {side} px"
 # where the card points to run the same thing on one's own server; opens in a new tab
 SCREEN_DOCS_URL = "https://thegovind.github.io/blink/computer-use/"
 GRID_CHOICES = tuple((SCREEN["grid_pill"].format(k=k), str(k)) for k in screens.GRIDS)
@@ -1335,6 +1441,91 @@ GRID_CHOICES = tuple((SCREEN["grid_pill"].format(k=k), str(k)) for k in screens.
 _EYE = ('<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M2 12s3.6-7 10-7 10 7 10 7-3.6 7-10 7S2 12 2 12Z"/>'
         '<circle cx="12" cy="12" r="3"/></svg>')
 _CHECK = '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12.5 10 17.5 19 7"/></svg>'
+
+
+def vision_facts() -> dict:
+    """Every number the screenshot steps show. Image tokens only when the saved runs recorded them."""
+    model_id = screens.vision_model() or f"thegovind/{screens.VISION_NAME}"
+    shots = screens.presets()
+    facts = dict(VISION_CARD, model=short_model(model_id), base=base_of(model_id), factor=screens.FACTOR,
+                 width=shots[0].size[0], height=shots[0].size[1], tokens_sentence="", tokens_fact="",
+                 tokens=0, side=0)
+    saved = [screens.saved_image_facts(shot) for shot in shots]
+    if all(saved) and len({f["visual_tokens"] for f in saved}) == 1:  # one count holds for every preset
+        tokens, pixels = saved[0]["visual_tokens"], saved[0]["image_pixels"]
+        facts["tokens"], facts["side"] = tokens, math.isqrt(pixels // tokens)
+        facts["tokens_sentence"] = TOKENS_SENTENCE.format(tokens=f"{tokens:,}")
+        facts["tokens_fact"] = TOKENS_FACT.format(tokens=f"{tokens:,}", side=facts["side"])
+    return facts
+
+
+def vision_steps() -> list[tuple[str, str, str]]:
+    facts = vision_facts()
+    return [(node.format(**facts), caption.format(**facts), fact.format(**facts)) for node, caption, fact in STEPS]
+
+
+def screen_live_note() -> str:
+    model = short_model(screens.vision_model() or screens.VISION_NAME)
+    return (f'<p class="blk-livenote"><span class="blk-livedot" aria-hidden="true"></span>'
+            f'{esc(SCREEN["live_note"].format(model=model))}</p>')
+
+
+def screen_howread() -> str:
+    """How the screenshot is read: a visible line, the steps behind it on a click."""
+    facts = vision_facts()
+    steps = "".join(f"<li>{esc(step.format(**facts))}</li>" for step in HOW_STEPS)
+    return (f'<details class="blk-d blk-howread"><summary><span>{esc(SCREEN["how_title"])}'
+            f'<span class="blk-howline">{esc(SCREEN["how_line"].format(model=facts["model"]))}</span>'
+            f'</span></summary><ol class="blk-howsteps">{steps}</ol></details>')
+
+
+_STEP_ICONS = (
+    '<rect x="3" y="5" width="18" height="14" rx="2"/><rect x="6" y="8" width="5" height="3"/>'
+    '<rect x="13" y="13" width="5" height="3"/>',
+    '<circle cx="12" cy="12" r="3"/><path d="M12 3v3M12 18v3M3 12h3M18 12h3M5.6 5.6l2.1 2.1'
+    'M16.3 16.3l2.1 2.1M5.6 18.4l2.1-2.1M16.3 7.7l2.1-2.1"/>',
+    '<rect x="4" y="4" width="4" height="4"/><rect x="10" y="4" width="4" height="4"/>'
+    '<rect x="16" y="4" width="4" height="4"/><rect x="4" y="10" width="4" height="4"/>'
+    '<rect x="10" y="10" width="4" height="4"/><rect x="4" y="16" width="4" height="4"/>',
+    '<path d="M4 7h16M4 12h10M4 17h13"/>',
+    '<path d="M5 12.5 10 17.5 19 7"/>',
+)
+
+
+def how_screen_section() -> str:
+    """How it works: the screenshot path in five nodes, the numbered screenshot first."""
+    shot = screens.presets()[0]
+    facts = vision_facts()
+    items = []
+    for i, ((node, caption, fact), icon) in enumerate(zip(vision_steps(), _STEP_ICONS)):
+        art = (f'<img src="{screens.thumb(shot)}" alt="">' if i == 0 else
+               f'<svg viewBox="0 0 24 24" aria-hidden="true">{icon}</svg>')
+        items.append(f'<li style="--i:{i}"><span class="blk-vp-art">{art}</span>'
+                     f'<span class="blk-vp-n">{i + 1}</span><b>{esc(node)}</b><span>{esc(caption)}</span>'
+                     + (f'<code class="blk-vp-fact">{esc(fact)}</code>' if fact else "") + "</li>")
+    good = "".join(f"<li>{esc(item.format(model=facts['model']))}</li>" for item in SCREEN_GOOD)
+    towers = " \u00b7 ".join(f"{name}: --vision-tower {tower.split('@')[0]}@{tower.split('@')[1][:7]}\u2026"
+                             for name, tower in VISION_TOWERS)
+    return (f'<section class="blk-vsec"><p class="blk-eyebrow">{esc(SCREEN["section"])}</p>'
+            f'<p class="blk-note">{esc(SCREEN["section_line"].format(title=SCREEN["title"], model=facts["model"]))}</p>'
+            f'<ol class="blk-vpipe">{"".join(items)}</ol>'
+            f'<p class="blk-eyebrow blk-good">{esc(SCREEN["good"])}</p><ul class="blk-goodlist">{good}</ul>'
+            f'<code class="blk-vp-fact">{esc(towers)}; their checkpoint weights stay text-only</code>'
+            "</section>")
+
+
+def cua_explainer() -> str:
+    """The Computer use tab's six nodes, numbered from the first preset and its saved run."""
+    facts = vision_facts()
+    shot = screens.presets()[0]
+    answers, outcome = None, ""
+    if screens.available():
+        try:
+            answers = screens.decide(shot, prefer="saved")["answers"]
+            outcome = screens.verdict(answers)[2]
+        except blink.BlinkError:  # no saved run here: the nodes still say what happens, without numbers
+            answers = None
+    return computer_use.explainer(facts, thumb=screens.thumb(shot), answers=answers, outcome=outcome)
 
 
 def screen_note() -> str:
@@ -1405,9 +1596,7 @@ def _screen_verdict(shot: screens.Shot, answers: dict, meta: dict) -> tuple[str,
     box = next((b for b in shot.boxes if str(b.n) == choice), None)
     mark = {"click": esc(choice), "ask": esc(choice), "unsure": "?", "done": _CHECK}[act]
     line = f"{box.role} \u00b7 {box.name}" if act in ("click", "ask") and box is not None and box.name else ""
-    tags = '<em class="blk-tag">simulated</em>'
-    if meta.get("engine") == "replay":
-        tags += f'<em class="blk-tag blk-saved">{esc(SCREEN["saved"])}</em>'
+    tags = provenance_tag(meta)
     return act, (
         f'<div class="blk-sv {esc(tone)}" data-act="{esc(act)}" title="{esc(detail)}">'
         f'<span class="blk-sv-mark" aria-hidden="true">{mark}</span>'
@@ -1456,7 +1645,7 @@ def _idle_row(text: str) -> str:
 
 
 def screen_panel(shot: screens.Shot, out: dict | None = None, *, busy: bool = False, draw: bool = False,
-                 note: str = "", notice: str = "", rev=0) -> str:
+                 note: str = "", notice: str = "", rev=0, reading: bool = True) -> str:
     """The answer column: the verdict, the marked screenshot, then the two checks and the details.
 
     Every state keeps the rows above the screenshot, so drawing on it never makes it jump. `rev`
@@ -1471,8 +1660,7 @@ def screen_panel(shot: screens.Shot, out: dict | None = None, *, busy: bool = Fa
             + f'<span><b>{meta["input_tokens"]:,}</b> input tokens</span>'
             + (f'<span><b>{meta["visual_tokens"]:,}</b> {esc(SCREEN["image_tokens"])}</span>'
                if meta.get("visual_tokens") else "")
-            + f'<span><b>{meta["generated_tokens"]}</b> generated</span>'
-            f'<span><b>{len(qs)}</b> questions</span>'
+            + f'<span><b>{len(qs)}</b> questions</span>'
             f'<span>temperature <b>{meta["temperature"]:g}</b></span></div>'
         )
         raw = json.dumps({"state": _elided(shot, state), "questions": qs, **out}, indent=2, ensure_ascii=False)
@@ -1490,8 +1678,11 @@ def screen_panel(shot: screens.Shot, out: dict | None = None, *, busy: bool = Fa
                      f'<img class="blk-read" src="{screens.thumb(shot)}" alt="{esc(SCREEN["read"])}"></details>')
         foot = _screen_meters(answers) + f'<div class="blk-answer-foot">{stats}{more}</div>'
     elif busy:
+        # a live run says who is reading; opening a saved run is only a moment's wait
+        label = (SCREEN["reading"].format(model=short_model(screens.vision_model() or screens.VISION_NAME))
+                 if reading else "")
         head = ('<div class="blk-sv blk-sv-wait" aria-busy="true"><span class="blk-sv-mark"></span>'
-                f'<div class="blk-sv-text"><span class="blk-run">{esc(PENDING_LABEL)}</span></div></div>')
+                f'<div class="blk-sv-text"><span class="blk-run">{esc(label)}</span></div></div>')
     else:
         head = _idle_row(note or SCREEN["draw" if draw else "not_run"])
     if out is None:

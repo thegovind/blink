@@ -20,6 +20,7 @@ import gradio as gr
 
 import author
 import blink
+import computer_use
 import examples
 import screens
 import ui
@@ -178,12 +179,17 @@ CHIPS = r"""
 })();
 """
 
+# The address the page was opened with, before anything rewrites it: the Computer use tab reads it once to
+# open the run a link names, or to bring Screen click into view for one of its presets.
+FIRST_URL = "window.__blinkFirstUrl = window.location.search + window.location.hash;"
+
 # Geist from Google Fonts; until it arrives, and in the static build, Inter or the system face.
 HEAD = (
     '<link rel="preconnect" href="https://fonts.googleapis.com">'
     '<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>'
     '<link rel="stylesheet" href="https://fonts.googleapis.com/css2?'
     'family=Geist:wght@400;500;600&family=Geist+Mono:wght@400;500;600&display=swap">'
+    f"<script>{FIRST_URL}</script>"
     f"<script>{CHIPS}</script>"
 )
 
@@ -510,12 +516,32 @@ def _flatten(rows: list[dict]) -> list:
     return flat
 
 
-def home_tab() -> dict:
-    """Static: the headline figures and where to go next. Nothing here calls a model.
+def home_tab() -> tuple[dict, dict]:
+    """Static: computer use first, the headline figures, and where to go next. Nothing here
+    calls a model.
 
     The in-app cards are buttons wearing the card's markup: a rendered tab button is not
     something to hunt for on a phone, where the strip hides behind a menu."""
-    for block in ui.home_blocks(DATA):
+    lede, *blocks = ui.home_blocks(DATA)
+    gr.HTML(lede)
+    cua = {}
+    if ui.CUA_SERVED:
+        with gr.Row(equal_height=False, elem_classes="blk-cua"):
+            with gr.Column(scale=5, min_width=240, elem_classes="blk-cua-shotcol"):
+                gr.HTML(ui.home_cua_shot())
+            with gr.Column(scale=6, min_width=240, elem_classes="blk-cua-textcol"):
+                gr.HTML(ui.home_cua_text())
+                with gr.Row(elem_classes="blk-cua-go"):
+                    runs = computer_use.available()
+                    if runs:
+                        cua[WATCH] = gr.Button(ui.HOME_CUA["watch"], variant="primary", size="sm",
+                                               elem_id="home-watch")
+                    if screens.available():
+                        cua[screens.KEY] = gr.Button(ui.HOME_CUA["open"], variant="secondary" if runs else "primary",
+                                                     size="sm", elem_id="home-screen")
+                    cua[ui.CUA_TEXT_CASE] = gr.Button(ui.HOME_CUA["next"], size="sm", elem_id="home-nextclick",
+                                                      elem_classes="blk-cua-next")
+    for block in blocks:
         gr.HTML(block)
     cards = {}
     with gr.Row(elem_classes="blk-cards"):
@@ -524,7 +550,7 @@ def home_tab() -> dict:
                 gr.HTML(ui.card_face(title, line))
                 cards[slug] = gr.Button(title, elem_classes="blk-tile-hit")
     gr.HTML(ui.home_external())
-    return cards
+    return cards, cua
 
 
 def ask_tab():
@@ -818,8 +844,6 @@ def screen_tab(at_shot):
                 chips = [gr.Button(s.label, size="sm") for s in shots]
                 up_btn = gr.UploadButton(ui.SCREEN["upload"], file_types=["image"], file_count="single",
                                          size="sm", elem_id="screen-upload", elem_classes="blk-upchip")
-            if ui.demo_label():
-                gr.HTML(ui.demo_label())
             task = gr.Textbox(first.task, label=ui.SCREEN["task"], placeholder=ui.SCREEN["task_hint"],
                               lines=2, max_lines=4, elem_id="screen-task", elem_classes="blk-task")
             with gr.Group(visible=False, elem_classes="blk-upgroup") as up_group:
@@ -832,6 +856,8 @@ def screen_tab(at_shot):
                 clear = gr.Button(ui.SCREEN["clear"], size="sm", elem_classes="blk-clear")
             trouble = gr.HTML(elem_classes="blk-trouble")
             run_btn = gr.Button("Decide", variant="primary", elem_id="screen-run")
+            gr.HTML(ui.screen_live_note())
+            gr.HTML(ui.screen_howread())
         with gr.Column(scale=7, elem_classes="blk-main"):
             # first render only: a saved run, since no device can be attached at startup
             out = gr.HTML(ui.run_screen(first, prefer="saved"), js_on_load=SCREEN_DRAW,
@@ -846,6 +872,13 @@ def screen_tab(at_shot):
     hidden = {"api_visibility": "private"}
 
     def screen_run(rev, seen, picked, upload, task, boxes_text, grid):
+        return _screen(rev, seen, picked, upload, task, boxes_text, grid, "live")
+
+    def screen_open(rev, seen, picked, upload, task, boxes_text, grid):
+        """A preset opens its saved run; Decide runs the model live."""
+        return _screen(rev, seen, picked, upload, task, boxes_text, grid, "saved")
+
+    def _screen(rev, seen, picked, upload, task, boxes_text, grid, prefer):
         mine = ui.as_rev(rev)
         if not ui.newest(seen, "screen", mine):
             return gr.update(), gr.update()
@@ -855,7 +888,7 @@ def screen_tab(at_shot):
                 shot = screens.draft_shot(upload, boxes_text, _grid(grid))[0]
             panel = ui.screen_panel(shot, draw=not picked, rev=mine) if shot is not None else gr.update()
             return panel, ui.problems_html(problems)
-        answer = ui.run_screen(shot, draw=not picked, rev=mine)
+        answer = ui.run_screen(shot, prefer=prefer, draw=not picked, rev=mine)
         if ui.applied(seen, "screen") != mine:
             return gr.update(), gr.update()  # a newer change owns the card now
         return answer, ""
@@ -868,12 +901,13 @@ def screen_tab(at_shot):
         ui.newest(seen, "screen", mine)
         shot = screens.preset(key)
         return [key, None, shot.task, gr.update(visible=False), "", "",
-                ui.screen_panel(shot, busy=True, rev=mine)]
+                ui.screen_panel(shot, busy=True, reading=False, rev=mine)]
 
     for btn, shot in zip(chips, shots):
-        live(btn.click(None, None, rev, js=SCREEN_BUMP, queue=False, show_progress="hidden", **hidden).then(
+        btn.click(None, None, rev, js=SCREEN_BUMP, queue=False, show_progress="hidden", **hidden).then(
             lambda r, s, k=shot.key: load_preset(r, s, k), [rev, seen],
-            [picked, upload, task, up_group, boxes, trouble, out], queue=False, show_progress="hidden", **hidden))
+            [picked, upload, task, up_group, boxes, trouble, out], queue=False, show_progress="hidden", **hidden,
+        ).then(screen_open, run_in, [out, trouble], show_progress="minimal", **hidden)
         btn.click(None, None, at_shot, js=f"() => {json.dumps(shot.key)}", queue=False, show_progress="hidden",
                   **hidden)
 
@@ -935,6 +969,44 @@ def screen_tab(at_shot):
 
     return {"out": out, "opened": opened,
             "opened_out": [picked, upload, task, up_group, boxes, trouble, out, at_shot]}
+
+
+# --- computer use -------------------------------------------------------------------
+
+# Home's buttons into the Computer use tab: its runs (WATCH) or Screen click (screens.KEY)
+WATCH = "watch"
+
+# bring Screen click into view once its tab has mounted; a phone hides the strip, so nothing clicks a tab
+SHOW_TRY = r"""() => {
+  const go = (n) => {
+    const at = document.getElementById('cua-try');
+    if (at && at.offsetParent !== null) {
+      at.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    } else if (n < 40) {
+      setTimeout(() => go(n + 1), 100);
+    }
+  };
+  go(0);
+}"""
+
+
+def computer_use_tab(at_shot):
+    """Real runs first, how a screenshot is read, then Screen click and the tiles beyond clicks.
+
+    Returns Screen click's handles where a model that reads screens is served, else None."""
+    g = computer_use.load()
+    explain = ui.cua_explainer() if screens.available() else ""
+    # its own styles only: gradio's prose and button defaults would restyle the player's controls
+    gr.HTML(computer_use.top(g, explain), js_on_load=computer_use.PLAYER_JS, elem_id="cua-top",
+            elem_classes="blk-cuax-box", apply_default_css=False)
+    screen = None
+    if screens.available():
+        gr.HTML(computer_use.try_head())
+        screen = screen_tab(at_shot)
+    more = computer_use.more(g)
+    if more:
+        gr.HTML(more, js_on_load=computer_use.TILES_JS, elem_id="cua-more-box", apply_default_css=False)
+    return screen
 
 
 # --- results and how it works -------------------------------------------------------
@@ -1079,7 +1151,8 @@ BUMP_ASK_ARG = r"""(...a) => {
 
 # Rewrite the address so a visitor can copy it, and tell an embedding page too. Replace,
 # never push: a tab click should not fill the back button. Screen click's preset rides along
-# while it is in view; a visitor's own screenshot has no link of its own.
+# while its tab is in view; a visitor's own screenshot has no link of its own. The run open in
+# the Computer use player is its own script's to write, and goes when the tab does.
 SYNC_URL = r"""(tab, sub, shot) => {
   if (!tab) return;
   const url = new URL(window.location.href);
@@ -1089,10 +1162,13 @@ SYNC_URL = r"""(tab, sub, shot) => {
   } else {
     url.searchParams.delete('case');
   }
-  if (shot && sub === %(screen)s && tab === %(case_tab)s) {
+  if (shot && tab === %(cua_tab)s) {
     url.searchParams.set('shot', shot);
   } else {
     url.searchParams.delete('shot');
+  }
+  if (tab !== %(cua_tab)s) {
+    ['scenario', 'model', 'run', 'step'].forEach((k) => url.searchParams.delete(k));
   }
   const next = url.pathname + url.search;
   if (next !== window.location.pathname + window.location.search || window.location.hash) {
@@ -1104,17 +1180,16 @@ SYNC_URL = r"""(tab, sub, shot) => {
       'https://huggingface.co'
     );
   } catch (e) { /* not embedded, or a parent that does not listen */ }
-}""" % {"case_tab": json.dumps(ui.CASE_TAB), "screen": json.dumps(screens.KEY)}
+}""" % {"case_tab": json.dumps(ui.CASE_TAB), "cua_tab": json.dumps(ui.CUA_TAB)}
 
 TOP_BY_LABEL = {label: slug for slug, label in ui.TABS}
 CASE_BY_TITLE = {case.title: case.key for case in examples.USE_CASES}
-if screens.available():
-    CASE_BY_TITLE[ui.SCREEN["title"]] = screens.KEY
 
 
 def masthead_for(tab: str, case: str | None, model) -> str:
-    """The masthead names the model answering the panel in view: on Screen click, the one that reads screens."""
-    if tab == ui.CASE_TAB and case == screens.KEY and screens.available():
+    """The masthead names the model answering the panel in view: on the Computer use tab, the one that
+    reads screens."""
+    if tab == ui.CUA_TAB and screens.available():
         return ui.masthead(screens.vision_model())
     return ui.masthead(model, drafting=tab == ui.ASK_TAB)
 
@@ -1186,18 +1261,19 @@ def build() -> gr.Blocks:
         ask = None
         with gr.Tabs() as tabs:
             with gr.Tab(TAB_LABEL[ui.HOME_TAB], id=ui.HOME_TAB):
-                cards = home_tab()
+                cards, cua = home_tab()
+            if ui.CUA_TAB in TAB_LABEL:
+                # no switch of its own: every screenshot here is read by blink-mimo-9b
+                with gr.Tab(TAB_LABEL[ui.CUA_TAB], id=ui.CUA_TAB):
+                    screen = computer_use_tab(at_shot)
             with gr.Tab(TAB_LABEL[ui.CASE_TAB], id=ui.CASE_TAB):
                 with gr.Tabs() as case_tabs:
-                    for case in examples.USE_CASES:
+                    # the text Next click leads, then the rest (ui.CASE_IDS)
+                    for case in ui.CASES:
                         with gr.Tab(case.title, id=case.key):
                             case_switch, case_out = use_case_tab(case)
                             switches.append(case_switch)
                             panels.append(case_out)
-                    if screens.available():
-                        # no switch of its own: the screenshot is always read by blink-mimo-9b
-                        with gr.Tab(ui.SCREEN["title"], id=screens.KEY):
-                            screen = screen_tab(at_shot)
             if author.enabled():
                 with gr.Tab(TAB_LABEL[ui.ASK_TAB], id=ui.ASK_TAB):
                     ask_switch, ask = ask_tab()
@@ -1279,6 +1355,24 @@ def build() -> gr.Blocks:
                       queue=False, show_progress="hidden").then(
                 restore_rows, back_in, pg["slots"],
                 queue=False, show_progress="hidden")
+
+        def into_case(case, model):
+            """Home's computer-use buttons: the runs and Screen click on the Computer use tab, the text
+            Next click among the use cases."""
+            if case in (WATCH, screens.KEY):
+                return [gr.update(selected=ui.CUA_TAB), gr.update(), ui.CUA_TAB, "",
+                        masthead_for(ui.CUA_TAB, "", model)]
+            return [gr.update(selected=ui.CASE_TAB), gr.update(selected=case), ui.CASE_TAB, case,
+                    masthead_for(ui.CASE_TAB, case, model)]
+
+        for case, btn in cua.items():
+            moved = btn.click(lambda m, c=case: into_case(c, m), [first_switch],
+                              [tabs, case_tabs, at_tab, at_case, mast],
+                              queue=False, show_progress="hidden", api_visibility="private").then(
+                restore_rows, back_in, pg["slots"], queue=False, show_progress="hidden", api_visibility="private")
+            if case == screens.KEY:
+                moved.then(None, None, None, js=SHOW_TRY, queue=False, show_progress="hidden",
+                           api_visibility="private")
 
         if ask is not None:
             # two steps: the tab first, then the request. A Tabs update in the same call

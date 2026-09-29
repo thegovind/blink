@@ -21,9 +21,436 @@
     "transform": "copy"
   },
   {
+    "dest": "examples/cua/SPEC.md",
+    "reason": "offline computer-use contract",
+    "sha256": "8ebd7a8617d68bc4de179919f1281a5e28619b76c57f6321a682d6b9bd12522f",
+    "src": "cua/scenarios/SPEC.md",
+    "transform": "cua_spec"
+  },
+  {
+    "dest": "examples/cua/apps/build_registry.py",
+    "reason": "offline scenario registry and shared helpers",
+    "sha256": "b1c30e9b1423712560057ff723530830ebb6727c9fa5fac436ebd57f1b22528d",
+    "src": "cua/scenarios/apps/build_registry.py",
+    "transform": "cua_text"
+  },
+  {
+    "dest": "examples/cua/apps/registry.json",
+    "reason": "offline scenario registry and shared helpers",
+    "sha256": "cf44d4e5bd0d9489982a79bd15b6030e67dfca2bfedc1934381c4d6e05c9e02f",
+    "src": "cua/scenarios/apps/registry.json",
+    "transform": "cua_text"
+  },
+  {
+    "dest": "examples/cua/apps/common/a-kit.js",
+    "reason": "offline scenario registry and shared helpers",
+    "sha256": "6532fd06005a48e09f2f0e052c47c627c7298beaa431486e5033477f26547fec",
+    "src": "cua/scenarios/apps/common/a-kit.js",
+    "transform": "cua_text"
+  },
+  {
+    "dest": "examples/cua/apps/common/blink-scenario.js",
+    "reason": "offline scenario registry and shared helpers",
+    "sha256": "3cbb5fd64bba95d9ee78814a83a6c38c9866edb46e192c3969260bc840a4c461",
+    "src": "cua/scenarios/apps/common/blink-scenario.js",
+    "transform": "cua_text"
+  },
+  {
+    "dest": "examples/cua/apps/shop/index.html",
+    "reason": "offline scenario app",
+    "sha256": "3211e573bb0d3157c3decb27e73f86c25ba425cf254e5d68486bea0b81277706",
+    "src": "cua/scenarios/apps/shop/index.html",
+    "transform": "cua_text"
+  },
+  {
+    "dest": "examples/cua/apps/shop/scenario.json",
+    "reason": "offline scenario app",
+    "sha256": "6a151aa7875b462dac4fda12b87e27abb2043c95e5f01b882fd4edd21400fb43",
+    "src": "cua/scenarios/apps/shop/scenario.json",
+    "transform": "cua_text"
+  },
+  {
+    "dest": "examples/cua/apps/shop/app.js",
+    "reason": "offline scenario app",
+    "sha256": "e0e839e8d3e4fb36a2c19431f2a26b721f36bbb3024ac9aad520fed3aba70870",
+    "src": "cua/scenarios/apps/shop/app.js",
+    "transform": "cua_text"
+  },
+  {
+    "dest": "examples/cua/apps/shop/style.css",
+    "reason": "offline scenario app",
+    "sha256": "fecc95f2157047715d793ae23b5f7d850e4ef1821766bb58e58aef7d81526e16",
+    "src": "cua/scenarios/apps/shop/style.css",
+    "transform": "cua_text"
+  },
+  {
+    "dest": "examples/cua/apps/mail/index.html",
+    "reason": "offline scenario app",
+    "sha256": "8c138d105027c3cee82b5225ce2cccc4b150415c175dad0f68c06d54676266dc",
+    "src": "cua/scenarios/apps/mail/index.html",
+    "transform": "cua_text"
+  },
+  {
+    "dest": "examples/cua/apps/mail/scenario.json",
+    "reason": "offline scenario app",
+    "sha256": "9fbd93014076fe374eb481f48d86242df05e258f96688b6c0dadae2afe084e8b",
+    "src": "cua/scenarios/apps/mail/scenario.json",
+    "transform": "cua_text"
+  },
+  {
+    "dest": "examples/cua/apps/mail/app.js",
+    "reason": "offline scenario app",
+    "sha256": "5f5d9ca6e5a81dcc4978954cc63758d8d83a218908b5709e809fc2ef6d23859f",
+    "src": "cua/scenarios/apps/mail/app.js",
+    "transform": "cua_text"
+  },
+  {
+    "dest": "examples/cua/apps/mail/style.css",
+    "reason": "offline scenario app",
+    "sha256": "a36b2bf6acd75995a4c8f7aaab64e755c761d797d14631fa6a34c9d8ff3d37da",
+    "src": "cua/scenarios/apps/mail/style.css",
+    "transform": "cua_text"
+  },
+  {
+    "dest": "examples/cua/apps/settings/index.html",
+    "reason": "offline scenario app",
+    "sha256": "ffd264093411e949639348aa992afab4a80ee3c0cdad098f13f51640624301b3",
+    "src": "cua/scenarios/apps/settings/index.html",
+    "transform": "cua_text"
+  },
+  {
+    "dest": "examples/cua/apps/settings/scenario.json",
+    "reason": "offline scenario app",
+    "sha256": "c6b00d177bb99ff37d3093d3c13c032f7ca4f0a51165189cf48565a9a37076db",
+    "src": "cua/scenarios/apps/settings/scenario.json",
+    "transform": "cua_text"
+  },
+  {
+    "dest": "examples/cua/apps/settings/app.js",
+    "reason": "offline scenario app",
+    "sha256": "caf0e6886a2df02c9e1dac0fbf212a8a6e619db5b2c07947fc0a97af74f1d945",
+    "src": "cua/scenarios/apps/settings/app.js",
+    "transform": "cua_text"
+  },
+  {
+    "dest": "examples/cua/apps/settings/style.css",
+    "reason": "offline scenario app",
+    "sha256": "257fd48b59628ca629ac702a6d56cc4095ef7fa28834bf1fb5c6798e481a3015",
+    "src": "cua/scenarios/apps/settings/style.css",
+    "transform": "cua_text"
+  },
+  {
+    "dest": "examples/cua/apps/calendar/index.html",
+    "reason": "offline scenario app",
+    "sha256": "806bba727b77ed94319792cec6153266ce0ca67c3bb5d8e0da837b7fd5b7ea9d",
+    "src": "cua/scenarios/apps/calendar/index.html",
+    "transform": "cua_text"
+  },
+  {
+    "dest": "examples/cua/apps/calendar/scenario.json",
+    "reason": "offline scenario app",
+    "sha256": "655bf5f8b28af23933afe49d6d2efe2faede8ef969fbe3369ad139250a4de3d9",
+    "src": "cua/scenarios/apps/calendar/scenario.json",
+    "transform": "cua_text"
+  },
+  {
+    "dest": "examples/cua/apps/calendar/app.js",
+    "reason": "offline scenario app",
+    "sha256": "d10d2d02ad2796222185fa479645543f8244da6abb9520d34ac2e634aa88267e",
+    "src": "cua/scenarios/apps/calendar/app.js",
+    "transform": "cua_text"
+  },
+  {
+    "dest": "examples/cua/apps/calendar/style.css",
+    "reason": "offline scenario app",
+    "sha256": "0ae88389e0377f41fcf326caf0ec1d56a037da428c1f858bcac8db89ba33c22c",
+    "src": "cua/scenarios/apps/calendar/style.css",
+    "transform": "cua_text"
+  },
+  {
+    "dest": "examples/cua/apps/files/index.html",
+    "reason": "offline scenario app",
+    "sha256": "8c8909c339f4c62d039b40a595fce3717ac07fa258a04ed5ac41a3d785e61a1f",
+    "src": "cua/scenarios/apps/files/index.html",
+    "transform": "cua_text"
+  },
+  {
+    "dest": "examples/cua/apps/files/scenario.json",
+    "reason": "offline scenario app",
+    "sha256": "089a36a0374989d3a7be4ecbbeef81f90951d452dc51dfdbdb1a84e44ad1c624",
+    "src": "cua/scenarios/apps/files/scenario.json",
+    "transform": "cua_text"
+  },
+  {
+    "dest": "examples/cua/apps/files/app.js",
+    "reason": "offline scenario app",
+    "sha256": "102845526af5762396ad51be7c1e1ae5144ffbf49898e02cf98efe66544d3618",
+    "src": "cua/scenarios/apps/files/app.js",
+    "transform": "cua_text"
+  },
+  {
+    "dest": "examples/cua/apps/files/style.css",
+    "reason": "offline scenario app",
+    "sha256": "53d53b20eff4af8060bb6ef4c3d92816dd00a14726d7e730b0e90fe8ac437e43",
+    "src": "cua/scenarios/apps/files/style.css",
+    "transform": "cua_text"
+  },
+  {
+    "dest": "examples/cua/apps/travel/index.html",
+    "reason": "offline scenario app",
+    "sha256": "d2d0718ef30d5cc48cc54b1b8ec99b6461076d85bbf5050d2fdcf6f8c7133f8a",
+    "src": "cua/scenarios/apps/travel/index.html",
+    "transform": "cua_text"
+  },
+  {
+    "dest": "examples/cua/apps/travel/scenario.json",
+    "reason": "offline scenario app",
+    "sha256": "d3be96729579229c1651eb0fb74530343b569f62aae13d2deb1dd03b7f7ae0c7",
+    "src": "cua/scenarios/apps/travel/scenario.json",
+    "transform": "cua_text"
+  },
+  {
+    "dest": "examples/cua/apps/careers/index.html",
+    "reason": "offline scenario app",
+    "sha256": "42069833123f4cc02dc3c4293f40627dbb1d8830153421c4568874c984735e4a",
+    "src": "cua/scenarios/apps/careers/index.html",
+    "transform": "cua_text"
+  },
+  {
+    "dest": "examples/cua/apps/careers/scenario.json",
+    "reason": "offline scenario app",
+    "sha256": "b9dcfb50b96b38a7a31c30e8520d9e3fee507ec9adba4ebbe59d60945e53a1a1",
+    "src": "cua/scenarios/apps/careers/scenario.json",
+    "transform": "cua_text"
+  },
+  {
+    "dest": "examples/cua/apps/phone/index.html",
+    "reason": "offline scenario app",
+    "sha256": "68981ad6705bc90242b7f777ac953fc29f2f31cec25a89ec1af99540ae7a45a0",
+    "src": "cua/scenarios/apps/phone/index.html",
+    "transform": "cua_text"
+  },
+  {
+    "dest": "examples/cua/apps/phone/scenario.json",
+    "reason": "offline scenario app",
+    "sha256": "4788f5bfe117a00715cd63a34a703c3a0e69ca3b37fcbf63ddd52c2fd4e336fe",
+    "src": "cua/scenarios/apps/phone/scenario.json",
+    "transform": "cua_text"
+  },
+  {
+    "dest": "examples/cua/apps/desktop/index.html",
+    "reason": "offline scenario app",
+    "sha256": "1f040ab3f7a0333ad8430a3d356165cddffe42a548a0c009ead52c237b8a52e3",
+    "src": "cua/scenarios/apps/desktop/index.html",
+    "transform": "cua_text"
+  },
+  {
+    "dest": "examples/cua/apps/desktop/scenario.json",
+    "reason": "offline scenario app",
+    "sha256": "e501c78b50e67253d9d8bb06296bb4bab9dfccfb87cc531d92f19209d72ed57f",
+    "src": "cua/scenarios/apps/desktop/scenario.json",
+    "transform": "cua_text"
+  },
+  {
+    "dest": "examples/cua/apps/game/index.html",
+    "reason": "offline scenario app",
+    "sha256": "fc6d715807576e6a78a815c47301f25ec1efe5abf36c09530fc902165e520463",
+    "src": "cua/scenarios/apps/game/index.html",
+    "transform": "cua_text"
+  },
+  {
+    "dest": "examples/cua/apps/game/scenario.json",
+    "reason": "offline scenario app",
+    "sha256": "9877012cae94ebc9d577782f051ffb0e1d6b056109cc8deedd916b9ac5f74732",
+    "src": "cua/scenarios/apps/game/scenario.json",
+    "transform": "cua_text"
+  },
+  {
+    "dest": "examples/cua/harness/__init__.py",
+    "reason": "local screenshot agent harness",
+    "sha256": "1a4306cb696c3234b2153515ba73133629e2949e58f88db3c3f40bc740ceee19",
+    "src": "cua/scenarios/harness/__init__.py",
+    "transform": "cua_text"
+  },
+  {
+    "dest": "examples/cua/harness/agent.py",
+    "reason": "local screenshot agent harness",
+    "sha256": "f35b63bd96fe36571f84cc598e6ef3daacd76ff367021d55bb1529e45c51a2d0",
+    "src": "cua/scenarios/harness/agent.py",
+    "transform": "cua_text"
+  },
+  {
+    "dest": "examples/cua/harness/client.py",
+    "reason": "local screenshot agent harness",
+    "sha256": "a289245a428596cec371f85658cbf5ef480c59be078515d3702a1d7c0e09946e",
+    "src": "cua/scenarios/harness/client.py",
+    "transform": "cua_client"
+  },
+  {
+    "dest": "examples/cua/harness/dom.py",
+    "reason": "local screenshot agent harness",
+    "sha256": "990c8379d89d38d23924f5e2e23da046c1547dd43b804eb422c7764249797fea",
+    "src": "cua/scenarios/harness/dom.py",
+    "transform": "cua_text"
+  },
+  {
+    "dest": "examples/cua/harness/mark.py",
+    "reason": "local screenshot agent harness",
+    "sha256": "ea0c22977dc40b6d1e3d4a59e0da8eaf2a7b65adbbf3deed71782b727999245b",
+    "src": "cua/scenarios/harness/mark.py",
+    "transform": "cua_text"
+  },
+  {
+    "dest": "examples/cua/harness/overlay.js",
+    "reason": "local screenshot agent harness",
+    "sha256": "94d7268048af6f48f1be6e19e39cfc4a416af0e910f30bb54ffd6590795a155e",
+    "src": "cua/scenarios/harness/overlay.js",
+    "transform": "cua_text"
+  },
+  {
+    "dest": "examples/cua/harness/report.py",
+    "reason": "local screenshot agent harness",
+    "sha256": "b111e6aeb7dc59764995f3ebccc0299f53ff29bd132c01f5b36d064f07abd796",
+    "src": "cua/scenarios/harness/report.py",
+    "transform": "cua_text"
+  },
+  {
+    "dest": "examples/cua/harness/sweep.py",
+    "reason": "local screenshot agent harness",
+    "sha256": "6832ce6108c15c6ee1478d1cb35b6f5127b35125186878f6192cd4b01e06167e",
+    "src": "cua/scenarios/harness/sweep.py",
+    "transform": "cua_sweep"
+  },
+  {
+    "dest": "examples/cua/harness/video.py",
+    "reason": "local screenshot agent harness",
+    "sha256": "9ca37f85f1832aee2b588e3974ca1b7d273ffdc24b5338b0927378c9e79b770c",
+    "src": "cua/scenarios/harness/video.py",
+    "transform": "cua_text"
+  },
+  {
+    "dest": "examples/cua/tests/apps_a_check.py",
+    "reason": "CPU scenario and harness tests",
+    "sha256": "0ad901f9f85bcd7471da0c7e9cb791a3fb3add6c3a0ebad726b8cc6382da986f",
+    "src": "cua/scenarios/tests/apps_a_check.py",
+    "transform": "cua_text"
+  },
+  {
+    "dest": "examples/cua/tests/apps_a_fuzz.py",
+    "reason": "CPU scenario and harness tests",
+    "sha256": "06cc35333dc388d6a5bc253dbc28798e5cde44fc28e481d9168241ec1d34358d",
+    "src": "cua/scenarios/tests/apps_a_fuzz.py",
+    "transform": "cua_text"
+  },
+  {
+    "dest": "examples/cua/tests/apps_a_helpers.py",
+    "reason": "CPU scenario and harness tests",
+    "sha256": "153e078ddf16ab9b5df1f2b046a49b31009a6b649a3181424f890efc23ab9d95",
+    "src": "cua/scenarios/tests/apps_a_helpers.py",
+    "transform": "cua_text"
+  },
+  {
+    "dest": "examples/cua/tests/test_apps_a.py",
+    "reason": "CPU scenario and harness tests",
+    "sha256": "0dc39e4a5baa2405c106237b59aafd1886c045499c0aba1242b13be4dbf7d3f8",
+    "src": "cua/scenarios/tests/test_apps_a.py",
+    "transform": "cua_text"
+  },
+  {
+    "dest": "examples/cua/tests/test_apps_b.py",
+    "reason": "CPU scenario and harness tests",
+    "sha256": "d9e45d9a8b01d96d32efbf916ff54ae6e6a6709917bf8301cbc05c5450f23bf3",
+    "src": "cua/scenarios/tests/test_apps_b.py",
+    "transform": "cua_apps_b_test"
+  },
+  {
+    "dest": "examples/cua/tests/test_harness_core.py",
+    "reason": "CPU scenario and harness tests",
+    "sha256": "5d196321269aad669c2eb02ff32bef586de14017abdff7c2f3cf0b75df87061d",
+    "src": "cua/scenarios/tests/test_harness_core.py",
+    "transform": "cua_core_test"
+  },
+  {
+    "dest": "examples/cua/tests/test_harness_sweep.py",
+    "reason": "CPU scenario and harness tests",
+    "sha256": "b0c4704de9fc7e144d4b7f93ce20c22d5766a411080ff30116a2cb998e1f8064",
+    "src": "cua/scenarios/tests/test_harness_sweep.py",
+    "transform": "cua_text"
+  },
+  {
+    "dest": "examples/cua/tests/apps_a_neg_calendar.json",
+    "reason": "scenario negative test fixture",
+    "sha256": "4506a3044c68d4fc51667d65ed0124771ecb76691dafe1006b02681f9c1db390",
+    "src": "cua/scenarios/tests/apps_a_neg_calendar.json",
+    "transform": "cua_text"
+  },
+  {
+    "dest": "examples/cua/tests/apps_a_neg_files.json",
+    "reason": "scenario negative test fixture",
+    "sha256": "162fbeac502da336117c48871916b769f5ac7c4609b2976d0981c5b0b5f74e53",
+    "src": "cua/scenarios/tests/apps_a_neg_files.json",
+    "transform": "cua_text"
+  },
+  {
+    "dest": "examples/cua/tests/apps_a_neg_mail.json",
+    "reason": "scenario negative test fixture",
+    "sha256": "efdf86992fd6bcb3e32b0c71e1246eab7309d6064a2293e2559dc52f768570a4",
+    "src": "cua/scenarios/tests/apps_a_neg_mail.json",
+    "transform": "cua_text"
+  },
+  {
+    "dest": "examples/cua/tests/apps_a_neg_settings.json",
+    "reason": "scenario negative test fixture",
+    "sha256": "29b79ff4576e4e348f74ed11f88ba58a23f981236e7b646bb838bbe515809009",
+    "src": "cua/scenarios/tests/apps_a_neg_settings.json",
+    "transform": "cua_text"
+  },
+  {
+    "dest": "examples/cua/tests/apps_a_neg_shop.json",
+    "reason": "scenario negative test fixture",
+    "sha256": "5ebc747d9494aa20637760e1b70f5da5553abb3aa50dbd25b6c6548189473a10",
+    "src": "cua/scenarios/tests/apps_a_neg_shop.json",
+    "transform": "cua_text"
+  },
+  {
+    "dest": "examples/cua/tests/fixtures/stub/canvas.html",
+    "reason": "offline harness test fixture",
+    "sha256": "e313c62a11d72e1ec4a84bbdd2c5c03da6ed9a8d1745f1eafc15fb3ae6f6b3e5",
+    "src": "cua/scenarios/tests/fixtures/stub/canvas.html",
+    "transform": "cua_text"
+  },
+  {
+    "dest": "examples/cua/tests/fixtures/stub/game.html",
+    "reason": "offline harness test fixture",
+    "sha256": "a5ebc0a02462b6632a6e4c12c2ee15815d1596c92886d1a7562cb066185d7db8",
+    "src": "cua/scenarios/tests/fixtures/stub/game.html",
+    "transform": "cua_text"
+  },
+  {
+    "dest": "examples/cua/tests/fixtures/stub/index.html",
+    "reason": "offline harness test fixture",
+    "sha256": "842144f37c978fb32f61d6a0abfe2368b6c46164e31ae8182fd5ea854dd46fb0",
+    "src": "cua/scenarios/tests/fixtures/stub/index.html",
+    "transform": "cua_text"
+  },
+  {
+    "dest": "examples/cua/tests/fixtures/stub/oracle-missing.html",
+    "reason": "offline harness test fixture",
+    "sha256": "4de213520a405234febbd1c7d7e7137c334c06ba547aa659f16e133058b6d6ae",
+    "src": "cua/scenarios/tests/fixtures/stub/oracle-missing.html",
+    "transform": "cua_text"
+  },
+  {
+    "dest": "examples/cua/tests/fixtures/stub/scenario.json",
+    "reason": "offline harness test fixture",
+    "sha256": "e3ac4d347b69314fe5f0776a8a8430e2a5c1fe125ea5643a021420704bb8249d",
+    "src": "cua/scenarios/tests/fixtures/stub/scenario.json",
+    "transform": "cua_text"
+  },
+  {
     "dest": "space/app.py",
     "reason": "",
-    "sha256": "ca0b294d9e404a77f139152fe4d489c918092ca93651dda9fffd18b184e9a0c4",
+    "sha256": "c59a090d97e7c41d48607042af573f97e3ff502379fd245b58c4c89d75e46641",
     "src": "space/app.py",
     "transform": "scrub_python"
   },
@@ -44,7 +471,7 @@
   {
     "dest": "space/ui.py",
     "reason": "",
-    "sha256": "e2b9fbd310050b089f529c40419d646e54a2ff58d579a84f101f139b107cc161",
+    "sha256": "a57325c87edcf7104b332739530fcd5221931d469efcb044b6b4daefd363d946",
     "src": "space/ui.py",
     "transform": "scrub_python"
   },
@@ -58,7 +485,7 @@
   {
     "dest": "space/results.py",
     "reason": "",
-    "sha256": "70925457fef5d766ed05c86ad4b4717f24af38b76700ef1d03d7735ad5854695",
+    "sha256": "d829211c6016bb5a0fd4694a8309a69c7bdb13e4c81039fc46b6a252a7b859b9",
     "src": "space/results.py",
     "transform": "scrub_python"
   },
@@ -72,7 +499,7 @@
   {
     "dest": "space/style.css",
     "reason": "",
-    "sha256": "3d1ec4cf3cb4206b70c4ecde88515317ae39956b2a759b1753bc8a12db54f02a",
+    "sha256": "07bd19d466aebee39a04a2d93c0cc2abebd36682a8b17972f61d3b8e3e1672e6",
     "src": "space/style.css",
     "transform": "scrub"
   },
@@ -114,7 +541,7 @@
   {
     "dest": "space/test_blink.py",
     "reason": "",
-    "sha256": "4f8ce1132ef29aa30015db12545ae52d6dd54892cf54b9bf7996cd4974caded0",
+    "sha256": "cfaf7a444f1436e5c6b9b440da3245eee754f0d889521cccc4cece305937c051",
     "src": "space/test_blink.py",
     "transform": "scrub_python"
   },
@@ -156,21 +583,21 @@
   {
     "dest": "space/test_images.py",
     "reason": "",
-    "sha256": "9c043f9f03ead1a56e1f7282fa7fe3f5542de1f614a30fb225fd76ea96aadeaf",
+    "sha256": "c3ce6f7fb1bd4a6a3a8c471cf75cf1026bef236fb7e4472278dfbfc878db8d5e",
     "src": "space/test_images.py",
     "transform": "scrub_python"
   },
   {
     "dest": "space/screens.py",
     "reason": "",
-    "sha256": "8dcb970aa7d2345f3dc7f928fb6fc612685eac1159ca8c6167c56d09f30a9f10",
+    "sha256": "6f31649969a19a74548dad65005106b7541d99dcfc208125e7bb2e9e945ca5be",
     "src": "space/screens.py",
     "transform": "scrub_python"
   },
   {
     "dest": "space/test_screens.py",
     "reason": "",
-    "sha256": "3e81da2930671a8b351cc8a48f9a5f55af15afa4cb97b6676e532e7a56eaa2f6",
+    "sha256": "81bbb80903d61fc92c1383dad65f07e385ce38d5a10326df696092f8b7a54255",
     "src": "space/test_screens.py",
     "transform": "scrub_python"
   },
@@ -179,6 +606,27 @@
     "reason": "",
     "sha256": "03e2f0a33c87bf3720333a8e1b6277f8fab2b9f339c4fe218ee1a5b6a5637fad",
     "src": "space/build_screens.py",
+    "transform": "scrub_python"
+  },
+  {
+    "dest": "space/computer_use.py",
+    "reason": "",
+    "sha256": "15fafe350a84ad9a120011cddf3fa35de48c6f1977af999aa34742b41986fc67",
+    "src": "space/computer_use.py",
+    "transform": "scrub_python"
+  },
+  {
+    "dest": "space/build_gallery.py",
+    "reason": "",
+    "sha256": "71de4dfa4f921c6a8fb9ccc00232c5e606ba2f31d8039bd1bdb1576c5ac5a03e",
+    "src": "space/build_gallery.py",
+    "transform": "scrub_python"
+  },
+  {
+    "dest": "space/test_cua.py",
+    "reason": "",
+    "sha256": "640e55a95190746fcbe721343545dcb299a8be277a3eb5bd09d29f381c2a97c5",
+    "src": "space/test_cua.py",
     "transform": "scrub_python"
   },
   {
@@ -247,7 +695,7 @@
   {
     "dest": "space/shots/check_ask.py",
     "reason": "browser check",
-    "sha256": "b994765f396d3fd08a412997372eb73fc0654beaf9d16f620546640524dc6da0",
+    "sha256": "f6297d2add3bb03c62e8d856e685342a89b5ed4ce248d73e50b38b6fa188bfa9",
     "src": "space/shots/check_ask.py",
     "transform": "scrub_python"
   },
@@ -266,6 +714,13 @@
     "transform": "scrub_python"
   },
   {
+    "dest": "space/shots/check_cua.py",
+    "reason": "browser check",
+    "sha256": "cbf23a4122d99ff30837c311f7d24af586a7c938dbdf0ba3e51795a87a4857b1",
+    "src": "space/shots/check_cua.py",
+    "transform": "scrub_python"
+  },
+  {
     "dest": "space/shots/check_dark.py",
     "reason": "browser check",
     "sha256": "f926c76ecf692236adbe9f75d8f5e813d53363b86d88c7017d109d1aae2d9d2e",
@@ -275,7 +730,7 @@
   {
     "dest": "space/shots/check_deeplinks.py",
     "reason": "browser check",
-    "sha256": "ff2f17d45cbd362529a7d4a50169068c5e9102035425408d539a6650777ee89d",
+    "sha256": "f5734a6656a8135460c1a3a93fd9a975c4e807fd6a35cfc2d727e573d5732909",
     "src": "space/shots/check_deeplinks.py",
     "transform": "scrub_python"
   },
@@ -289,14 +744,14 @@
   {
     "dest": "space/shots/check_links.py",
     "reason": "browser check",
-    "sha256": "efa16a1da5b36aa0ac65bfb1c8a14a8ad322de0747fc0b9b754e30a584ff1c64",
+    "sha256": "972ddc70df9a407cd54cb4e932fc1ccbce55cbc560040bde09be88a114a19c3f",
     "src": "space/shots/check_links.py",
     "transform": "scrub_python"
   },
   {
     "dest": "space/shots/check_mobile.py",
     "reason": "browser check",
-    "sha256": "93654d2d0b03ce89148b93e8af8077a736096d8951309f5deb6e0b00361a46df",
+    "sha256": "e17a7a72a61d6a16a90cdb7b3081f9b4c27c00177f2ebc0900647eaa499b1a7e",
     "src": "space/shots/check_mobile.py",
     "transform": "scrub_python"
   },
@@ -324,7 +779,7 @@
   {
     "dest": "space/shots/check_screens.py",
     "reason": "browser check",
-    "sha256": "4524496c8551ada2386a6db5903cb24c7e2ca902b499eac63754a3c5118e7a36",
+    "sha256": "769758984793ef80c1eb510ab4aeb18eba7b9c5b9ccb2c52bb01e0b0d277ea59",
     "src": "space/shots/check_screens.py",
     "transform": "scrub_python"
   },
@@ -352,7 +807,7 @@
   {
     "dest": "space/README.md",
     "reason": "",
-    "sha256": "6bc8c0ee35f27b09508ac59b3ed8dc58cc8bb08a98d0d49214290d6685760f99",
+    "sha256": "967a16e7ce2e1b6e204381bf7682f8c89c37ddc17c1797b6d7b301a2dadb5034",
     "src": "space/README.md",
     "transform": "scrub_docs"
   },
@@ -849,7 +1304,7 @@
   {
     "dest": "README.md",
     "reason": "repository scaffold",
-    "sha256": "5614864fa0a7687e3f7a23749c2f99ef28c15263dd2bc7bdf7273941cba9f941",
+    "sha256": "a84162946441c1cc77ed78c44325894ddb7db5c1cf49689c3470cb67da2be508",
     "src": "<generated>",
     "transform": "generate"
   },
@@ -870,7 +1325,7 @@
   {
     "dest": "docs/index.md",
     "reason": "repository scaffold",
-    "sha256": "6da5cc0feb7e3d822eb1d7ced4007471fb2f572179481c5d36cc3b1799b48b63",
+    "sha256": "00f4e207eca60cff92bc963d2cb7e58fca6d5979aed50fdc6e11b6e5ebb7f62b",
     "src": "<generated>",
     "transform": "generate"
   },
@@ -898,14 +1353,21 @@
   {
     "dest": "docs/computer-use.md",
     "reason": "repository scaffold",
-    "sha256": "17f1ff6d10726a2cf37905bcce13176a848bf3a5ace29849ff2afafdb8cadfe1",
+    "sha256": "d504fcb524eddf1d78eefd4abdafa86674229c04e792a756089e6cbb8df19296",
     "src": "<generated>",
     "transform": "generate"
   },
   {
     "dest": "docs/llms.txt",
     "reason": "repository scaffold",
-    "sha256": "5ac1778026e50d666024dda10efcb67f1d993ce27c957368980abde5e9de0fad",
+    "sha256": "83a469e4a45b713f5524d31e35a405037d8386cb203c067fd430e5bfa29838cc",
+    "src": "<generated>",
+    "transform": "generate"
+  },
+  {
+    "dest": "examples/cua/README.md",
+    "reason": "repository scaffold",
+    "sha256": "a4d0030db282b3323cce52215e0e447b0f8b4c75a0b79b2b7163207cd461a8be",
     "src": "<generated>",
     "transform": "generate"
   },
@@ -961,7 +1423,7 @@
   {
     "dest": ".github/workflows/ci.yml",
     "reason": "repository scaffold",
-    "sha256": "9debb32c28109d9e001c96b897ceb56527e68717efa8051b74b3490d2feff839",
+    "sha256": "00d0bf5e956f8e5dbfb6c2c1ad844f4a0491b51ca592b8e9addb86aa6d015a7e",
     "src": "<generated>",
     "transform": "generate"
   },
@@ -1043,9 +1505,23 @@
     "transform": "generate"
   },
   {
+    "dest": "examples/cua/Dockerfile",
+    "reason": "repository scaffold",
+    "sha256": "f6442751839b6414c0e64420decca870933871ece030f01fb393214318ed3aa3",
+    "src": "<generated>",
+    "transform": "generate"
+  },
+  {
+    "dest": "examples/cua/tests/test_public_config.py",
+    "reason": "repository scaffold",
+    "sha256": "6c3c7bf0d0de5af61c028d184f807d397c1e83e6e92826492b080f28f7ba656d",
+    "src": "<generated>",
+    "transform": "generate"
+  },
+  {
     "dest": "scripts/leak_scan.py",
     "reason": "repository scaffold",
-    "sha256": "af9dbca0e2f94ba55ab54055c584792017ec593cdc843c28261fe7c45e22a72a",
+    "sha256": "4cff56d91ef5ae27acc041551243d1799743f78b1265866c53f5a65b90f28010",
     "src": "<generated>",
     "transform": "generate"
   },
@@ -1122,14 +1598,14 @@
   {
     "dest": "site/strings-reused.json",
     "reason": "docs site",
-    "sha256": "451a2386504e23a17a3f049ebe9d2c3fcc6ee86fc979898d9bd8ee978a629818",
+    "sha256": "1a23fd38a430ecdf8d41ac208b8ee03966babee9a44c7de10472b5e3e7104b68",
     "src": "<site>",
     "transform": "copy"
   },
   {
     "dest": "site/strings.json",
     "reason": "docs site",
-    "sha256": "84cf11a4d9933560ff2fbc278988179b9d15acf50483e0847a87983fe8307db4",
+    "sha256": "d57636af24793352c9c649c1a8af7be18264d38c0dc797b644ad44f090cf5db3",
     "src": "<site>",
     "transform": "copy"
   },
@@ -1171,7 +1647,7 @@
   {
     "dest": "site/test_build.py",
     "reason": "docs site",
-    "sha256": "94ba4b290453a3c944c80b7345765f34120cef2ac14ef4b6453bd81156d0f10c",
+    "sha256": "99170ce36626406e09ea59e8110f3e5109c189027a590452d81d275deefc32e6",
     "src": "<site>",
     "transform": "copy"
   }

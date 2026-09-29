@@ -1,0 +1,22 @@
+{
+  "id": "travel",
+  "title": "Flight search and booking",
+  "path": "travel/index.html",
+  "viewport": {"width": 960, "height": 576},
+  "scale": 1.5,
+  "kind": "dom",
+  "tasks": [
+    {"index": 0, "summary": "search, nonstop, sort by price, open cheapest; stop before paying", "optimal_steps": 7, "risky_steps": 0},
+    {"index": 1, "summary": "search, pick named flight and fare, pay (risky)", "optimal_steps": 8, "risky_steps": 1}
+  ],
+  "states": [
+    {"name": "home", "labels": {"page_kind": "home", "modal": false, "error": false, "signed_in": true, "loading": false}},
+    {"name": "loading", "labels": {"page_kind": "search_results", "modal": false, "error": false, "signed_in": true, "loading": true}},
+    {"name": "results", "labels": {"page_kind": "search_results", "modal": false, "error": false, "signed_in": true, "loading": false}},
+    {"name": "no_flights", "labels": {"page_kind": "search_results", "modal": false, "error": true, "signed_in": true, "loading": false}},
+    {"name": "review", "labels": {"page_kind": "detail", "modal": false, "error": false, "signed_in": true, "loading": false}},
+    {"name": "pay_confirm", "labels": {"page_kind": "dialog", "modal": true, "error": false, "signed_in": true, "loading": false}},
+    {"name": "declined", "labels": {"page_kind": "dialog", "modal": true, "error": true, "signed_in": true, "loading": false}},
+    {"name": "booked", "labels": {"page_kind": "confirm", "modal": false, "error": false, "signed_in": true, "loading": false}}
+  ]
+}

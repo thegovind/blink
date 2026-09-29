@@ -1,0 +1,23 @@
+{
+  "id": "shop",
+  "title": "Outdoor gear store",
+  "path": "shop/index.html",
+  "viewport": {"width": 960, "height": 576},
+  "scale": 1.5,
+  "kind": "dom",
+  "tasks": [
+    {"index": 0, "summary": "buy one product in a given size and colour, pay with the saved card (risky)", "optimal_steps": 8, "risky_steps": 1},
+    {"index": 1, "summary": "apply the given promo code at checkout and stop before paying", "optimal_steps": 4, "risky_steps": 0},
+    {"index": 2, "summary": "remove the one wrong item from a 3-item cart", "optimal_steps": 3, "risky_steps": 0}
+  ],
+  "states": [
+    {"name": "browse", "labels": {"page_kind": "list", "modal": false, "error": false, "signed_in": true, "loading": false}},
+    {"name": "product", "labels": {"page_kind": "detail", "modal": false, "error": false, "signed_in": true, "loading": false}},
+    {"name": "cart", "labels": {"page_kind": "cart", "modal": false, "error": false, "signed_in": true, "loading": false}},
+    {"name": "checkout", "labels": {"page_kind": "checkout", "modal": false, "error": false, "signed_in": true, "loading": false}},
+    {"name": "place_order", "labels": {"page_kind": "checkout", "modal": true, "error": false, "signed_in": true, "loading": false}},
+    {"name": "order_placed", "labels": {"page_kind": "confirm", "modal": false, "error": false, "signed_in": true, "loading": false}},
+    {"name": "card_declined", "labels": {"page_kind": "checkout", "modal": false, "error": true, "signed_in": true, "loading": false}},
+    {"name": "loading", "labels": {"page_kind": "list", "modal": false, "error": false, "signed_in": true, "loading": true}}
+  ]
+}

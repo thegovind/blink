@@ -137,11 +137,7 @@ class ReusedStrings(unittest.TestCase):
         if not (self.root / "space" / "ui.py").exists():
             self.skipTest("not inside the repository")
         self.reused = json.loads((HERE / "strings-reused.json").read_text(encoding="utf-8"))["strings"]
-        self.assertEqual(set(self.reused), {"hero.chip", "footer.note"})
-
-    def test_chip_is_the_spaces(self):
-        ui = (self.root / "space" / "ui.py").read_text(encoding="utf-8")
-        self.assertIn(f'"{self.reused["hero.chip"]["text"]}"', ui)
+        self.assertEqual(set(self.reused), {"footer.note"})
 
     def test_footer_is_the_spaces(self):
         out = subprocess.run([sys.executable, "-c", "import ui; print(ui.footer())"], cwd=self.root / "space",

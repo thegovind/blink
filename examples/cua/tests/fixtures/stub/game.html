@@ -1,0 +1,49 @@
+<!doctype html>
+<html lang="en">
+<meta charset="utf-8">
+<title>Three-lane fixture</title>
+<style>body{margin:0;background:#09142c}canvas{display:block}</style>
+<canvas id="board" width="960" height="576"></canvas>
+<script>
+  const seed = Number(new URLSearchParams(location.search).get("seed") || 1);
+  const board = document.querySelector("#board");
+  const ctx = board.getContext("2d");
+  const boxes = [0,1,2].map(i => ({id:`lane-${i}`,name:`lane ${i+1}`,role:"button",
+    rect:{x:100+i*260,y:175,w:205,h:300}}));
+  let wave=0,hits=0;
+  const safe = () => (seed+wave*2)%3;
+  function draw() {
+    ctx.fillStyle="#09142c";ctx.fillRect(0,0,960,576);
+    ctx.fillStyle="#fff";ctx.font="bold 28px system-ui";
+    ctx.fillText(`Waves ${wave}/5 · Hits ${hits}`,70,80);
+    if (wave===5) {ctx.fillText("Run complete",70,135);return;}
+    boxes.forEach((lane,i) => {
+      const {x,y,w,h}=lane.rect;
+      ctx.fillStyle=i===safe()?"#239f89":"#bc3746";
+      ctx.beginPath();ctx.roundRect(x,y,w,h,14);ctx.fill();
+      ctx.fillStyle="#fff";ctx.font="bold 32px system-ui";
+      ctx.fillText(i===safe()?"SAFE":"BLOCKED",x+27,y+156);
+    });
+  }
+  board.addEventListener("click",e => {
+    if (wave===5) return;
+    const x=e.clientX-board.getBoundingClientRect().x, y=e.clientY-board.getBoundingClientRect().y;
+    const lane=boxes.findIndex(b => x>=b.rect.x && x<b.rect.x+b.rect.w &&
+      y>=b.rect.y && y<b.rect.y+b.rect.h);
+    if (lane<0) return;
+    if (lane!==safe()) hits++;
+    wave++;draw();
+  });
+  draw();
+  window.blinkScenario={
+    id:"game-stub", seed, taskIndex:0, task:"Stay in the safe lane through five waves.",
+    values:[],
+    targets() {return wave<5?boxes:[];},
+    expected() {return {target:wave<5?boxes[safe()].id:null,action:wave<5?"click":"none",
+      value:null,done:wave===5,risky:false};},
+    check() {return {done:wave===5,success:wave===5&&hits===0,
+      waves_survived:wave-hits,hits,detail:`${wave-hits} waves survived, ${hits} hits`};},
+    state() {return "game";},
+  };
+</script>
+</html>

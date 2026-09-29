@@ -1,0 +1,105 @@
+<!doctype html>
+<html lang="en">
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Fixture · Request desk</title>
+<style>
+  :root { font-family:system-ui,sans-serif; color:#182039; background:#f4f6fa; }
+  body { margin:0; }
+  header { background:#fff; padding:22px 40px; font-weight:700; border-bottom:1px solid #dde2ed; }
+  main { width:550px; margin:72px auto; background:white; border:1px solid #e0e5ed;
+    border-radius:14px; padding:28px 32px; box-shadow:0 16px 38px #1b2b4820; }
+  h1 { font-size:25px; margin:0 0 20px; } p { color:#596275; }
+  label { display:block; margin:14px 0 8px; font-weight:600; }
+  input,select { font:inherit; width:100%; padding:10px; border:1px solid #b9c2d5; border-radius:7px; }
+  button,a { font:inherit; padding:11px 17px; border:0; border-radius:7px; background:#2447f5;
+    color:white; cursor:pointer; display:inline-block; text-decoration:none; margin-top:18px; }
+  button:disabled { opacity:.5; }
+  #cookie { position:fixed; bottom:14px; left:14px; background:#ecf0ff; border:1px solid #c8d3ff;
+    border-radius:10px; padding:12px 20px; }
+  #cookie button { margin:0 0 0 12px; }
+  #confirm-modal { position:fixed; inset:0; display:grid; place-items:center; background:#1c285066; }
+  #confirm-modal article { background:white; padding:32px 46px; border-radius:12px; }
+  [hidden] { display:none !important; }
+</style>
+<header>Request desk <span style="float:right;font-weight:400;color:#687383">Catalog · Orders</span></header>
+<main id="content"></main>
+<div id="cookie" hidden>Review your preferences <button id="dismiss">Dismiss</button></div>
+<div id="confirm-modal" hidden><article><h1>Publish this request?</h1>
+  <p>This action cannot be taken back.</p><button id="confirm">Confirm publish</button></article></div>
+<script>
+  const params = new URLSearchParams(location.search);
+  const taskIndex = Number(params.get("task") || 0);
+  const seed = Number(params.get("seed") || 1);
+  const interrupts = params.get("interrupts") === "1";
+  if (taskIndex !== 0) throw Error("Unknown stub task");
+  const flags = {search:"", searched:false, open:false, published:false, confirming:false,
+    forbidden:false, dismissed:false};
+  const content = document.querySelector("#content");
+  const cookie = document.querySelector("#cookie");
+  const modal = document.querySelector("#confirm-modal");
+  function render() {
+    if (flags.published) content.innerHTML = "<h1>Request published</h1><p>The Blue delivery request is in your queue.</p>";
+    else if (!flags.searched) content.innerHTML =
+      `<h1>Find a plan</h1><label for="search">Search catalog</label>
+       <input id="search" placeholder="Plan name" value="${flags.search.replaceAll('"', '&quot;')}">
+       <button id="search-button"><span role="button">Search</span></button>
+       <button hidden>Invisible</button><button disabled>Disabled</button>`;
+    else if (!flags.open) content.innerHTML =
+      `<h1>Matching plans</h1><p>One result for your search</p><a id="item" href="#">Amber Plan</a>`;
+    else content.innerHTML =
+      `<h1>Amber Plan</h1><p>Choose a delivery option before publishing.</p>
+       <label for="delivery">Delivery</label><select id="delivery">
+       <option value="Red">Red</option><option value="Blue">Blue</option></select>
+       <button id="publish">Publish request</button>`;
+    const search = document.querySelector("#search");
+    if (search) search.addEventListener("input", e => { flags.search = e.target.value; });
+    document.querySelector("#search-button")?.addEventListener("click", () => {
+      if (flags.search !== "Amber Plan") flags.forbidden = true;
+      flags.searched = true;
+      cookie.hidden = !interrupts || flags.dismissed;
+      render();
+    });
+    document.querySelector("#item")?.addEventListener("click", e => {
+      e.preventDefault(); flags.open = true; render();
+    });
+    document.querySelector("#publish")?.addEventListener("click", () => {
+      if (document.querySelector("#delivery").value !== "Blue") flags.forbidden = true;
+      flags.confirming = true; modal.hidden = false;
+    });
+  }
+  document.querySelector("#dismiss").addEventListener("click", () => {
+    cookie.hidden = true; flags.dismissed = true;
+  });
+  document.querySelector("#confirm").addEventListener("click", () => {
+    flags.published = true; flags.confirming = false; modal.hidden = true; render();
+  });
+  render();
+  window.blinkScenario = {
+    id:"stub", seed, taskIndex,
+    task:'Find "Amber Plan", choose "Blue" delivery, and publish the request.',
+    values:["Amber Plan"],
+    check() { return {done:flags.published, success:flags.published && !flags.forbidden,
+      detail:flags.forbidden ? "Wrong plan or delivery was published" : flags.published ? "Published" : "Not published"}; },
+    expected() {
+      if (flags.published) return {selector:null, action:"none", value:null, done:true, risky:false};
+      if (!flags.searched && flags.search !== "Amber Plan")
+        return {selector:"#search", action:"type", value:"Amber Plan", done:false, risky:false};
+      if (!flags.searched)
+        return {selector:"#search-button", action:"click", value:null, done:false, risky:false};
+      if (interrupts && !flags.dismissed)
+        return {selector:"#dismiss", action:"click", value:null, done:false, risky:false};
+      if (!flags.open)
+        return {selector:"#item", action:"click", value:null, done:false, risky:false};
+      if (document.querySelector("#delivery").value !== "Blue" && !flags.confirming)
+        return {selector:"#delivery", action:"select", value:"Blue", done:false, risky:false};
+      if (!flags.confirming)
+        return {selector:"#publish", action:"click", value:null, done:false, risky:false};
+      return {selector:"#confirm", action:"click", value:null, done:false, risky:true};
+    },
+    state() { return flags.published ? "done" : flags.confirming ? "confirm" :
+      flags.open ? "detail" : flags.searched ? "list" : "home"; },
+    targets:null
+  };
+</script>
+</html>

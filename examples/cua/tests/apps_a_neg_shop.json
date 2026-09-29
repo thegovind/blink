@@ -1,0 +1,15 @@
+[
+  {"name": "task 2: removes a wanted item instead of the wrong one", "task": 2, "seed": 1,
+   "steps": [["click", "#cart-btn"], ["click", "js:'#remove-' + window.__aApp.T.keep[0]"], ["click", "#remove-confirm"]],
+   "expect": {"success": false}},
+  {"name": "task 0: buys the right product in the wrong colour", "task": 0, "seed": 2,
+   "steps": [["oracle", 3], ["click", "js:'#' + [...document.querySelectorAll('.colour')].find(b => b.dataset.arg !== window.__aApp.T.colour).id"],
+             ["click", "#add"], ["click", "#checkout"], ["click", "#review"], ["click", "#place-confirm"]],
+   "expect": {"success": false, "done": true}},
+  {"name": "task 1: applies the code and then pays anyway", "task": 1, "seed": 3,
+   "steps": [["oracle", 4], ["click", "#review"], ["click", "#place-confirm"]],
+   "expect": {"success": false, "done": true}},
+  {"name": "task 1: applies the site banner code instead of the task code", "task": 1, "seed": 1,
+   "steps": [["oracle", 2], ["fill", "#promo", "WELCOME10"], ["click", "#apply"]],
+   "expect": {"success": false, "done": false}}
+]

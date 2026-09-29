@@ -133,7 +133,8 @@ def recorded() -> tuple[dict, dict]:
         _tone, act, head, _detail = screens.verdict(out["answers"])
         said[shot.key] = {"act": act, "head": head, "choice": out["answers"]["element"]["choice"],
                           "probs": out["answers"]["element"]["probabilities"]}
-    return said, ui.SCREEN
+    model = ui.short_model(screens.vision_model())
+    return said, dict(ui.SCREEN, saved=ui.PROVENANCE["saved"].format(model=model))
 
 
 async def missed(page, note: str, timeout=20000) -> str:
@@ -191,7 +192,7 @@ async def run(pw, size, scheme, ok, sample: str, said: dict, words: dict) -> lis
     errors = []
     page.on("console", lambda m: errors.append(m.text) if app_error(m) else None)
     page.on("pageerror", lambda e: errors.append(str(e)))
-    await page.goto(f"{URL}/?tab=use-cases&case=screen{query}", wait_until="load")
+    await page.goto(f"{URL}/?tab=computer-use{query}", wait_until="load")
     await page.wait_for_selector("#screen-out .blk-shot img", timeout=60000)
     await answered(page)
     if name != "light":
@@ -232,7 +233,7 @@ async def run(pw, size, scheme, ok, sample: str, said: dict, words: dict) -> lis
                lit == want["choice"] and wins[0]["tag"] == LIME and act == (want["act"] or act))
         if said:
             head = await page.evaluate("() => document.querySelector('#screen-out .blk-sv h3').firstChild.textContent")
-            tags = await page.locator("#screen-out .blk-saved").all_text_contents()
+            tags = await page.locator("#screen-out .blk-from.saved").all_text_contents()
             mock = await page.locator("#screen-out .blk-mock").count()
             same = len(painted) == len(want["probs"]) and all(
                 abs(m["p"] - want["probs"][m["n"]]) < 1e-4 for m in painted)
@@ -240,6 +241,8 @@ async def run(pw, size, scheme, ok, sample: str, said: dict, words: dict) -> lis
                head == want["head"] and tags == [words["saved"]] and not mock and same)
         rings = await page.locator("#screen-out .blk-ring").count()
         ok(f"{where} both checks are drawn", rings == 2)
+        stats = " | ".join(await page.locator("#screen-out .blk-stats span").all_text_contents())
+        ok(f"{where} the stats row has no generated-token chip: {stats[:70]!r}", stats and "generated" not in stats)
         room = await page.evaluate(OVERFLOW)
         ok(f"{where} nothing scrolls sideways {room}", room["page"] <= room["win"] and not room["wide"])
         if i == 0:
@@ -286,6 +289,9 @@ async def run(pw, size, scheme, ok, sample: str, said: dict, words: dict) -> lis
            len(heat) == 16 and lit == (0 if act == "done" else 1) and all(m["pct"] or m["p"] < 0.05 for m in heat))
     off = inside(await page.evaluate(GEOMETRY))
     ok(f"{tag} every cell's number stays on the screenshot {off[:2]}", not off)
+    # where a visitor draws: the screenshot in view (on a phone it sits below the controls)
+    await page.locator("#screen-out .blk-shot-frame").scroll_into_view_if_needed()
+    await page.wait_for_timeout(400)
     before = await page.locator("#screen-out .blk-shot-frame").bounding_box()
     top = await page.evaluate("() => window.scrollY")
 
@@ -360,7 +366,8 @@ async def run(pw, size, scheme, ok, sample: str, said: dict, words: dict) -> lis
        await page.locator('#screen-out .blk-shot[data-draw="0"]').count() == 1
        and not await page.locator("#screen-boxes").is_visible())
     search = await page.evaluate("() => window.location.search")
-    ok(f"{tag} the address names the case: {search}", "case=screen" in search)
+    ok(f"{tag} the address names the tab and the preset: {search}",
+       "tab=computer-use" in search and f"shot={META['presets'][1]['key']}" in search and "case=" not in search)
     ok(f"{tag} no console errors {errors[:3]}", not errors)
     await ctx.close()
     await browser.close()

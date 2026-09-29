@@ -1,0 +1,22 @@
+{
+  "id": "files",
+  "title": "Cloud file manager",
+  "path": "files/index.html",
+  "viewport": {"width": 960, "height": 576},
+  "scale": 1.5,
+  "kind": "dom",
+  "tasks": [
+    {"index": 0, "summary": "move a named file into the correct folder", "optimal_steps": 4, "risky_steps": 0},
+    {"index": 1, "summary": "delete the named file after confirmation", "optimal_steps": 3, "risky_steps": 1},
+    {"index": 2, "summary": "share a document with the named email as Viewer", "optimal_steps": 5, "risky_steps": 1}
+  ],
+  "states": [
+    {"name": "files", "labels": {"page_kind": "files", "modal": false, "error": false, "signed_in": true, "loading": false}},
+    {"name": "selected", "labels": {"page_kind": "files", "modal": false, "error": false, "signed_in": true, "loading": false}},
+    {"name": "move_dialog", "labels": {"page_kind": "files", "modal": true, "error": false, "signed_in": true, "loading": false}},
+    {"name": "delete_confirm", "labels": {"page_kind": "files", "modal": true, "error": false, "signed_in": true, "loading": false}},
+    {"name": "share_dialog", "labels": {"page_kind": "files", "modal": true, "error": false, "signed_in": true, "loading": false}},
+    {"name": "share_error", "labels": {"page_kind": "files", "modal": true, "error": true, "signed_in": true, "loading": false}},
+    {"name": "loading", "labels": {"page_kind": "files", "modal": false, "error": false, "signed_in": true, "loading": true}}
+  ]
+}

@@ -14,11 +14,16 @@ import sys
 from playwright.async_api import async_playwright
 
 URL = os.environ.get("BLINK_URL", "http://127.0.0.1:7911/").rstrip("/")
-OUT = os.path.dirname(os.path.abspath(__file__))
+OUT = os.environ.get("BLINK_SHOTS") or os.path.dirname(os.path.abspath(__file__))
 PHONE = {"width": 390, "height": 844}
 DESK = {"width": 1456, "height": 900}
-# the home cards, in their order on the page (ui.HOME_LINKS)
-CARDS = ["use-cases", "ask", "playground", "results", "how-it-works"]
+# the home cards by their titles (ui.HOME_LINKS); a Computer use card leads them where that tab is served
+CARDS = {"use-cases": "Use cases", "ask": "Ask a question", "playground": "Try it", "results": "All results",
+         "how-it-works": "How it works"}
+
+
+def card_button(page, slug: str):
+    return page.locator("button.blk-tile-hit").filter(has_text=CARDS[slug]).first
 
 SELECTED = """() => Array.from(
     document.querySelectorAll('button[role="tab"][aria-selected="true"]')
@@ -89,7 +94,7 @@ async def run(pw, size, ok) -> None:
                         ("playground", "Playground")):
         await open_tab(page, "Home")
         await page.wait_for_timeout(500)
-        card = page.locator("button.blk-tile-hit").nth(CARDS.index(slug))
+        card = card_button(page, slug)
         await card.scroll_into_view_if_needed()
         await card.click()
         await page.wait_for_timeout(1100)
@@ -149,7 +154,7 @@ async def run(pw, size, ok) -> None:
     # and neither must the way in through a home card
     await open_tab(page, "Home")
     await page.wait_for_timeout(700)
-    play_card = page.locator("button.blk-tile-hit").nth(CARDS.index("playground"))
+    play_card = card_button(page, "playground")
     await play_card.scroll_into_view_if_needed()
     await play_card.click()
     await page.wait_for_timeout(1400)
@@ -239,6 +244,9 @@ async def run(pw, size, ok) -> None:
                  .filter(e => e.offsetParent !== null).map(e => e.textContent.trim())""")
         await open_tab(page, "Use cases")
         await page.wait_for_timeout(900)
+        # it opens on Screen click, which has no switch of its own; the text Next click has one
+        await open_tab(page, "Next click")
+        await page.wait_for_timeout(900)
         await switch_model(page)
         await open_tab(page, "Ask")
         await page.wait_for_timeout(900)
@@ -260,18 +268,17 @@ async def run(pw, size, ok) -> None:
         return await page.evaluate(
             """() => (document.querySelector('.blk-meta') || {}).textContent || ''""")
 
+    # and the masthead counts no tokens anywhere: that chip read as jargon
     await open_tab(page, "Ask")
     await page.wait_for_timeout(900)
-    ok(f"{tag} ask does not claim zero generated: {(await claim())[-34:]!r}",
-       "0 generated tokens" not in await claim())
+    ok(f"{tag} ask counts no tokens up top: {(await claim())[-34:]!r}", "generated" not in await claim())
     await open_tab(page, "Playground")
     await page.wait_for_timeout(900)
-    ok(f"{tag} the playground still does", "0 generated tokens" in await claim())
+    ok(f"{tag} nor does the playground", "generated" not in await claim())
     await page.goto(URL + "/?tab=ask", wait_until="load")
     await page.wait_for_selector("#ask-input input", timeout=25000)
     await page.wait_for_timeout(2000)
-    ok(f"{tag} a deep link to ask sets the claim too",
-       "0 generated tokens" not in await claim())
+    ok(f"{tag} nor a deep link to ask", "generated" not in await claim())
 
     await page.close()
     await browser.close()

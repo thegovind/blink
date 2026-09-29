@@ -603,6 +603,19 @@ def decide(shot: Shot, model: str | None = None, prefer: str = "live") -> dict:
     return _live(eng, st, qs)
 
 
+def saved_image_facts(shot: Shot | None = None) -> dict | None:
+    """What a preset's saved run recorded about its image: processed pixels and image tokens."""
+    shot = shot or presets()[0]
+    model = vision_model()
+    if model is None:
+        return None
+    rec = _recording(blink.engine(model)) or blink._matching_replay(model)
+    hit = rec.cache.get(request_key(shot)) if rec is not None else None
+    if not hit or not hit.get("visual_tokens") or not hit.get("image_pixels"):
+        return None
+    return {"visual_tokens": int(hit["visual_tokens"]), "image_pixels": int(hit["image_pixels"])}
+
+
 def accepts_images(model: str | None = None) -> bool:
     """Whether a live run can read a screenshot here (mock mode always can)."""
     model = model or vision_model()

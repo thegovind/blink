@@ -1,0 +1,23 @@
+{
+  "id": "settings",
+  "title": "Workspace security settings",
+  "path": "settings/index.html",
+  "viewport": {"width": 960, "height": 576},
+  "scale": 1.5,
+  "kind": "dom",
+  "tasks": [
+    {"index": 0, "summary": "enable two-factor authentication and save the target session timeout", "optimal_steps": 5, "risky_steps": 0},
+    {"index": 1, "summary": "change notification email digest to weekly and save", "optimal_steps": 3, "risky_steps": 0},
+    {"index": 2, "summary": "delete the named API key after typed confirmation", "optimal_steps": 4, "risky_steps": 1}
+  ],
+  "states": [
+    {"name": "profile", "labels": {"page_kind": "settings", "modal": false, "error": false, "signed_in": true, "loading": false}},
+    {"name": "security", "labels": {"page_kind": "settings", "modal": false, "error": false, "signed_in": true, "loading": false}},
+    {"name": "notifications", "labels": {"page_kind": "settings", "modal": false, "error": false, "signed_in": true, "loading": false}},
+    {"name": "api_keys", "labels": {"page_kind": "settings", "modal": false, "error": false, "signed_in": true, "loading": false}},
+    {"name": "enable_2fa", "labels": {"page_kind": "settings", "modal": true, "error": false, "signed_in": true, "loading": false}},
+    {"name": "delete_key", "labels": {"page_kind": "settings", "modal": true, "error": false, "signed_in": true, "loading": false}},
+    {"name": "save_failed", "labels": {"page_kind": "settings", "modal": false, "error": true, "signed_in": true, "loading": false}},
+    {"name": "signed_out", "labels": {"page_kind": "login", "modal": false, "error": false, "signed_in": false, "loading": false}}
+  ]
+}

@@ -28,6 +28,7 @@ DESK = {"width": 1456, "height": 900}
 PHONE = {"width": 390, "height": 844}
 TABS = (("home", "Home"), ("use-cases", "Use cases"), ("ask", "Ask"), ("playground", "Playground"),
         ("results", "Results"), ("how-it-works", "How it works"), ("api", "API"))
+CUA = ("computer-use", "Computer use")  # after Home, where a model that reads screens or runs to show are served
 PROJECT = [["GitHub", "https://github.com/thegovind/blink"], ["Docs", "https://thegovind.github.io/blink/"]]
 WIRE = [["API docs", "https://thegovind.github.io/blink/api/"]]
 # How it works' "Full details": each model's card on the Hub, as ui.MODEL_CARDS lists them
@@ -120,8 +121,14 @@ async def clip_shot(page, selector: str, path: str, pad: int = 24, above: int = 
 async def main() -> int:
     problems: list[str] = []
     os.makedirs(OUT, exist_ok=True)
+    global TABS
     async with async_playwright() as p:
         browser = await p.chromium.launch()
+        ctx, page, _ = await fresh(browser, DESK)
+        await land(page, "/")
+        if await page.get_by_role("tab", name=CUA[1], exact=True).count():
+            TABS = TABS[:1] + (CUA,) + TABS[1:]
+        await ctx.close()
 
         # beside the name on every tab, opened by link; the header is never part of a tab
         for size, name in ((DESK, "desk"), (PHONE, "phone")):

@@ -1,0 +1,21 @@
+{
+  "id": "calendar",
+  "title": "Team room calendar",
+  "path": "calendar/index.html",
+  "viewport": {"width": 960, "height": 576},
+  "scale": 1.5,
+  "kind": "dom",
+  "tasks": [
+    {"index": 0, "summary": "book a named room for a titled one-hour meeting", "optimal_steps": 6, "risky_steps": 0},
+    {"index": 1, "summary": "cancel the named meeting on the specified weekday", "optimal_steps": 3, "risky_steps": 1}
+  ],
+  "states": [
+    {"name": "week", "labels": {"page_kind": "calendar", "modal": false, "error": false, "signed_in": true, "loading": false}},
+    {"name": "event_detail", "labels": {"page_kind": "calendar", "modal": true, "error": false, "signed_in": true, "loading": false}},
+    {"name": "new_booking", "labels": {"page_kind": "form", "modal": true, "error": false, "signed_in": true, "loading": false}},
+    {"name": "conflict", "labels": {"page_kind": "form", "modal": true, "error": true, "signed_in": true, "loading": false}},
+    {"name": "cancel_confirm", "labels": {"page_kind": "calendar", "modal": true, "error": false, "signed_in": true, "loading": false}},
+    {"name": "booked", "labels": {"page_kind": "calendar", "modal": false, "error": false, "signed_in": true, "loading": false}},
+    {"name": "loading", "labels": {"page_kind": "calendar", "modal": false, "error": false, "signed_in": true, "loading": true}}
+  ]
+}

@@ -47,9 +47,11 @@ def main() -> int:
             continue
         for pat in TOKEN_PATTERNS + GENERIC_PATTERNS:
             for m in pat.finditer(text):
-                if "@" in m.group(0) and ALLOW_EMAIL.fullmatch(m.group(0)):
-                    continue
                 val = m.group(0)
+                if "@" in val and ALLOW_EMAIL.fullmatch(val):
+                    continue
+                if rel.parts[:2] == ("examples", "cua") and "@" in val and val.lower().endswith(".example"):
+                    continue
                 if val in {"127.0.0.1", "0.0.0.0"}:
                     continue
                 hits.append(f"{rel}: {pat.pattern}: {val[:80]}")

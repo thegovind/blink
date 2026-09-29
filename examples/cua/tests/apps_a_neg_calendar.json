@@ -1,0 +1,16 @@
+[
+  {
+    "name": "task 1: cancels the other Design review occurrence",
+    "task": 1,
+    "seed": 1,
+    "steps": [["click", "#event-ev-design-tue"], ["click", "#cancel-open"], ["click", "#cancel-confirm"]],
+    "expect": {"done": true, "success": false}
+  },
+  {
+    "name": "task 0: books the right slot in the wrong room",
+    "task": 0,
+    "seed": 1,
+    "steps": [["oracle", 4], ["click", "#book-submit"]],
+    "expect": {"done": true, "success": false}
+  }
+]

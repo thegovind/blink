@@ -1,0 +1,12 @@
+{
+  "id": "stub",
+  "title": "Request desk fixture",
+  "path": "stub/index.html",
+  "viewport": {"width": 960, "height": 576},
+  "scale": 1.5,
+  "kind": "dom",
+  "tasks": [
+    {"index": 0, "summary": "search, select and publish (risky)", "optimal_steps": 6, "risky_steps": 1}
+  ],
+  "states": []
+}

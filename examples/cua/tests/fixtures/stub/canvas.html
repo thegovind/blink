@@ -1,0 +1,51 @@
+<!doctype html>
+<html lang="en">
+<meta charset="utf-8">
+<title>Canvas-only fixture</title>
+<style>body{margin:0;background:#e9edf6}canvas{display:block}</style>
+<canvas id="board" width="960" height="576"></canvas>
+<script>
+  const seed = Number(new URLSearchParams(location.search).get("seed") || 1);
+  const board = document.querySelector("#board");
+  const ctx = board.getContext("2d");
+  let phase = 0;
+  const areas = [
+    [{id:"inbox", name:"Open inbox", rect:{x:85,y:190,w:210,h:135}},
+     {id:"settings", name:"Settings", rect:{x:345,y:190,w:210,h:135}}],
+    [{id:"draft", name:"Draft", rect:{x:220,y:190,w:260,h:115}}],
+    [{id:"delete", name:"Delete draft", rect:{x:250,y:220,w:240,h:100}},
+     {id:"keep", name:"Keep draft", rect:{x:510,y:220,w:240,h:100}}],
+    [],
+  ];
+  function draw() {
+    ctx.fillStyle = "#edf1f9"; ctx.fillRect(0,0,960,576);
+    ctx.fillStyle = "#17213b"; ctx.font = "bold 32px system-ui";
+    ctx.fillText(["Desktop", "Inbox", "Delete the draft?", "Draft deleted"][phase], 75,100);
+    areas[phase].forEach((target,i) => {
+      const {x,y,w,h} = target.rect;
+      ctx.fillStyle = i === 0 ? "#2447f5" : "#40506a";
+      ctx.beginPath(); ctx.roundRect(x,y,w,h,16); ctx.fill();
+      ctx.fillStyle = "#fff"; ctx.font = "22px system-ui"; ctx.fillText(target.name,x+20,y+60);
+    });
+  }
+  board.addEventListener("click", e => {
+    const box = board.getBoundingClientRect();
+    const x = e.clientX-box.x, y=e.clientY-box.y;
+    const target = areas[phase].find(t => x>=t.rect.x && x<t.rect.x+t.rect.w &&
+      y>=t.rect.y && y<t.rect.y+t.rect.h);
+    if (target && ["inbox","draft","delete"][phase] === target.id) { phase++; draw(); }
+  });
+  draw();
+  window.blinkScenario = {
+    id:"canvas-stub", seed, taskIndex:0, task:"Open Inbox, open the draft, and delete it.",
+    values:[],
+    targets() { return areas[phase]; },
+    expected() { return phase === 3 ?
+      {target:null, action:"none", value:null, done:true, risky:false} :
+      {target:["inbox","draft","delete"][phase], action:"click", value:null,
+        done:false, risky:phase===2}; },
+    check() { return {done:phase===3,success:phase===3,detail:phase===3?"Draft deleted":"Not deleted"}; },
+    state() { return ["desktop","inbox","confirm","done"][phase]; },
+  };
+</script>
+</html>

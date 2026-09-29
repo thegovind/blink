@@ -1,0 +1,22 @@
+{
+  "id": "mail",
+  "title": "Tidings mail client",
+  "path": "mail/index.html",
+  "viewport": {"width": 960, "height": 576},
+  "scale": 1.5,
+  "kind": "dom",
+  "tasks": [
+    {"index": 0, "summary": "archive every newsletter in the inbox", "optimal_steps": 8, "optimal_steps_exact": false, "risky_steps": 0},
+    {"index": 1, "summary": "forward the right invoice to the given address", "optimal_steps": 4, "risky_steps": 1},
+    {"index": 2, "summary": "reply to the latest message from a teammate", "optimal_steps": 4, "risky_steps": 1}
+  ],
+  "states": [
+    {"name": "inbox", "labels": {"page_kind": "inbox", "modal": false, "error": false, "signed_in": true, "loading": false}},
+    {"name": "message", "labels": {"page_kind": "message", "modal": false, "error": false, "signed_in": true, "loading": false}},
+    {"name": "compose", "labels": {"page_kind": "form", "modal": true, "error": false, "signed_in": true, "loading": false}},
+    {"name": "sent", "labels": {"page_kind": "message", "modal": false, "error": false, "signed_in": true, "loading": false}},
+    {"name": "recipient_error", "labels": {"page_kind": "form", "modal": true, "error": true, "signed_in": true, "loading": false}},
+    {"name": "login", "labels": {"page_kind": "login", "modal": false, "error": false, "signed_in": false, "loading": false}},
+    {"name": "loading", "labels": {"page_kind": "inbox", "modal": false, "error": false, "signed_in": true, "loading": true}}
+  ]
+}

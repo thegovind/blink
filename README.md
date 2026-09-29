@@ -18,7 +18,9 @@ Probabilities are over the offered options only, not certified chances of being 
 
 Open the [Space](https://huggingface.co/spaces/thegovind/blink).
 
-See [Computer use](https://thegovind.github.io/blink/computer-use/) for browser agents and self-hosted screenshots, or try [Screen click](https://huggingface.co/spaces/thegovind/blink?tab=use-cases&case=screen).
+See [Computer use](https://thegovind.github.io/blink/computer-use/) for browser agents and self-hosted screenshots, or try [Screen click](https://huggingface.co/spaces/thegovind/blink?tab=computer-use).
+
+Run [ten offline computer-use scenarios](examples/cua/README.md) against a self-hosted screenshot-enabled blink server, or use the CPU mock to check the harness.
 
 ## Run it
 

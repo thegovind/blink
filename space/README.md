@@ -28,6 +28,8 @@ Send a state and typed questions. Get a probability for every offered option; no
 
 **Live models:** [blink-4b](https://huggingface.co/thegovind/blink-4b) (Qwen3.5-4B text) and [blink-mimo-9b](https://huggingface.co/thegovind/blink-mimo-9b) (MiMo-V2.6-Distill-Qwen-9B). [blink-27b](https://huggingface.co/thegovind/blink-27b) is in Results.
 
+**Computer use tab:** blink-mimo-9b works through apps from numbered screenshots, one step at a time; watch recorded runs step by step, or try Screen click on a screenshot of your own.
+
 **Ask tab:** [Qwen/Qwen3.5-4B](https://huggingface.co/Qwen/Qwen3.5-4B) drafts questions and options. blink scores options without generating text.
 
 **API:** See the API tab to use TypeSafe clients with a local blink server or call this Space via Gradio.

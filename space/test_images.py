@@ -28,7 +28,10 @@ from pathlib import Path
 from types import SimpleNamespace
 from unittest import mock
 
-from PIL import Image
+try:
+    from PIL import Image
+except ImportError:  # pragma: no cover - the public CI installs pillow
+    raise unittest.SkipTest("pillow is not installed") from None
 
 os.environ.setdefault("BLINK_MOCK", "1")
 import blink  # noqa: E402

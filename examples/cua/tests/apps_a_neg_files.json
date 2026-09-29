@@ -1,0 +1,11 @@
+[
+  {"name": "task 1: deletes the similarly named file", "task": 1, "seed": 1,
+   "steps": [["click", "js:'#row-' + window.__aApp.T.deleteDistractor"], ["click", "#delete"], ["click", "#delete-confirm"]],
+   "expect": {"success": false, "done": true}},
+  {"name": "task 2: shares as Editor instead of Viewer", "task": 2, "seed": 2,
+   "steps": [["oracle", 3], ["click", "#share-submit"]],
+   "expect": {"success": false, "done": true}},
+  {"name": "task 0: moves into the similar folder", "task": 0, "seed": 3,
+   "steps": [["click", "js:'#row-' + window.__aApp.T.moveFile"], ["click", "#move"], ["click", "js:'#pick-' + window.__aApp.T.folderDistractor"], ["click", "#move-here"]],
+   "expect": {"success": false, "done": false}}
+]

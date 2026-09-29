@@ -1,0 +1,1040 @@
+{
+  "version": 1,
+  "scenarios": [
+    {
+      "id": "calendar",
+      "title": "Team room calendar",
+      "path": "calendar/index.html",
+      "viewport": {
+        "width": 960,
+        "height": 576
+      },
+      "scale": 1.5,
+      "kind": "dom",
+      "tasks": [
+        {
+          "index": 0,
+          "summary": "book a named room for a titled one-hour meeting",
+          "optimal_steps": 6,
+          "risky_steps": 0
+        },
+        {
+          "index": 1,
+          "summary": "cancel the named meeting on the specified weekday",
+          "optimal_steps": 3,
+          "risky_steps": 1
+        }
+      ],
+      "states": [
+        {
+          "name": "week",
+          "labels": {
+            "page_kind": "calendar",
+            "modal": false,
+            "error": false,
+            "signed_in": true,
+            "loading": false
+          }
+        },
+        {
+          "name": "event_detail",
+          "labels": {
+            "page_kind": "calendar",
+            "modal": true,
+            "error": false,
+            "signed_in": true,
+            "loading": false
+          }
+        },
+        {
+          "name": "new_booking",
+          "labels": {
+            "page_kind": "form",
+            "modal": true,
+            "error": false,
+            "signed_in": true,
+            "loading": false
+          }
+        },
+        {
+          "name": "conflict",
+          "labels": {
+            "page_kind": "form",
+            "modal": true,
+            "error": true,
+            "signed_in": true,
+            "loading": false
+          }
+        },
+        {
+          "name": "cancel_confirm",
+          "labels": {
+            "page_kind": "calendar",
+            "modal": true,
+            "error": false,
+            "signed_in": true,
+            "loading": false
+          }
+        },
+        {
+          "name": "booked",
+          "labels": {
+            "page_kind": "calendar",
+            "modal": false,
+            "error": false,
+            "signed_in": true,
+            "loading": false
+          }
+        },
+        {
+          "name": "loading",
+          "labels": {
+            "page_kind": "calendar",
+            "modal": false,
+            "error": false,
+            "signed_in": true,
+            "loading": true
+          }
+        }
+      ]
+    },
+    {
+      "id": "careers",
+      "title": "Company careers site",
+      "path": "careers/index.html",
+      "viewport": {
+        "width": 960,
+        "height": 576
+      },
+      "scale": 1.5,
+      "kind": "dom",
+      "tasks": [
+        {
+          "index": 0,
+          "summary": "home to careers, filter team and location, open role, Apply; stop at form",
+          "optimal_steps": 5,
+          "risky_steps": 0
+        },
+        {
+          "index": 1,
+          "summary": "find the listing whose description names a skill, open it",
+          "optimal_steps": 3,
+          "risky_steps": 0
+        }
+      ],
+      "states": [
+        {
+          "name": "home",
+          "labels": {
+            "page_kind": "home",
+            "modal": false,
+            "error": false,
+            "signed_in": false,
+            "loading": false
+          }
+        },
+        {
+          "name": "careers",
+          "labels": {
+            "page_kind": "list",
+            "modal": false,
+            "error": false,
+            "signed_in": false,
+            "loading": false
+          }
+        },
+        {
+          "name": "filtered",
+          "labels": {
+            "page_kind": "search_results",
+            "modal": false,
+            "error": false,
+            "signed_in": false,
+            "loading": false
+          }
+        },
+        {
+          "name": "job",
+          "labels": {
+            "page_kind": "detail",
+            "modal": false,
+            "error": false,
+            "signed_in": false,
+            "loading": false
+          }
+        },
+        {
+          "name": "apply",
+          "labels": {
+            "page_kind": "form",
+            "modal": false,
+            "error": false,
+            "signed_in": false,
+            "loading": false
+          }
+        },
+        {
+          "name": "no_results",
+          "labels": {
+            "page_kind": "search_results",
+            "modal": false,
+            "error": true,
+            "signed_in": false,
+            "loading": false
+          }
+        },
+        {
+          "name": "submitted",
+          "labels": {
+            "page_kind": "confirm",
+            "modal": false,
+            "error": false,
+            "signed_in": false,
+            "loading": false
+          }
+        }
+      ]
+    },
+    {
+      "id": "desktop",
+      "title": "Desktop photos settings",
+      "path": "desktop/index.html",
+      "viewport": {
+        "width": 960,
+        "height": 576
+      },
+      "scale": 1.5,
+      "kind": "canvas",
+      "tasks": [
+        {
+          "index": 0,
+          "summary": "open Photos, delete the named photo (risky)",
+          "optimal_steps": 4,
+          "risky_steps": 1
+        },
+        {
+          "index": 1,
+          "summary": "open Settings, switch appearance to dark",
+          "optimal_steps": 3,
+          "risky_steps": 0
+        }
+      ],
+      "states": [
+        {
+          "name": "desktop",
+          "labels": {
+            "page_kind": "home",
+            "modal": false,
+            "error": false,
+            "signed_in": true,
+            "loading": false
+          }
+        },
+        {
+          "name": "photos",
+          "labels": {
+            "page_kind": "list",
+            "modal": false,
+            "error": false,
+            "signed_in": true,
+            "loading": false
+          }
+        },
+        {
+          "name": "photo",
+          "labels": {
+            "page_kind": "detail",
+            "modal": false,
+            "error": false,
+            "signed_in": true,
+            "loading": false
+          }
+        },
+        {
+          "name": "confirm_delete",
+          "labels": {
+            "page_kind": "dialog",
+            "modal": true,
+            "error": false,
+            "signed_in": true,
+            "loading": false
+          }
+        },
+        {
+          "name": "settings",
+          "labels": {
+            "page_kind": "settings",
+            "modal": false,
+            "error": false,
+            "signed_in": true,
+            "loading": false
+          }
+        },
+        {
+          "name": "appearance",
+          "labels": {
+            "page_kind": "settings",
+            "modal": false,
+            "error": false,
+            "signed_in": true,
+            "loading": false
+          }
+        },
+        {
+          "name": "files",
+          "labels": {
+            "page_kind": "files",
+            "modal": false,
+            "error": false,
+            "signed_in": true,
+            "loading": false
+          }
+        },
+        {
+          "name": "error",
+          "labels": {
+            "page_kind": "dialog",
+            "modal": true,
+            "error": true,
+            "signed_in": true,
+            "loading": false
+          }
+        }
+      ],
+      "notes": "Canvas-only calm Halcyon desktop with Photos deletion and Settings appearance tasks."
+    },
+    {
+      "id": "files",
+      "title": "Cloud file manager",
+      "path": "files/index.html",
+      "viewport": {
+        "width": 960,
+        "height": 576
+      },
+      "scale": 1.5,
+      "kind": "dom",
+      "tasks": [
+        {
+          "index": 0,
+          "summary": "move a named file into the correct folder",
+          "optimal_steps": 4,
+          "risky_steps": 0
+        },
+        {
+          "index": 1,
+          "summary": "delete the named file after confirmation",
+          "optimal_steps": 3,
+          "risky_steps": 1
+        },
+        {
+          "index": 2,
+          "summary": "share a document with the named email as Viewer",
+          "optimal_steps": 5,
+          "risky_steps": 1
+        }
+      ],
+      "states": [
+        {
+          "name": "files",
+          "labels": {
+            "page_kind": "files",
+            "modal": false,
+            "error": false,
+            "signed_in": true,
+            "loading": false
+          }
+        },
+        {
+          "name": "selected",
+          "labels": {
+            "page_kind": "files",
+            "modal": false,
+            "error": false,
+            "signed_in": true,
+            "loading": false
+          }
+        },
+        {
+          "name": "move_dialog",
+          "labels": {
+            "page_kind": "files",
+            "modal": true,
+            "error": false,
+            "signed_in": true,
+            "loading": false
+          }
+        },
+        {
+          "name": "delete_confirm",
+          "labels": {
+            "page_kind": "files",
+            "modal": true,
+            "error": false,
+            "signed_in": true,
+            "loading": false
+          }
+        },
+        {
+          "name": "share_dialog",
+          "labels": {
+            "page_kind": "files",
+            "modal": true,
+            "error": false,
+            "signed_in": true,
+            "loading": false
+          }
+        },
+        {
+          "name": "share_error",
+          "labels": {
+            "page_kind": "files",
+            "modal": true,
+            "error": true,
+            "signed_in": true,
+            "loading": false
+          }
+        },
+        {
+          "name": "loading",
+          "labels": {
+            "page_kind": "files",
+            "modal": false,
+            "error": false,
+            "signed_in": true,
+            "loading": true
+          }
+        }
+      ]
+    },
+    {
+      "id": "game",
+      "title": "Rocket lane dodge",
+      "path": "game/index.html",
+      "viewport": {
+        "width": 960,
+        "height": 576
+      },
+      "scale": 1.5,
+      "kind": "game",
+      "tasks": [
+        {
+          "index": 0,
+          "summary": "dodge 20 waves, pick the safe lane",
+          "optimal_steps": 20,
+          "risky_steps": 0
+        }
+      ],
+      "states": [
+        {
+          "name": "ready",
+          "labels": {
+            "page_kind": "game",
+            "modal": false,
+            "error": false,
+            "signed_in": true,
+            "loading": false
+          }
+        },
+        {
+          "name": "playing",
+          "labels": {
+            "page_kind": "game",
+            "modal": false,
+            "error": false,
+            "signed_in": true,
+            "loading": false
+          }
+        },
+        {
+          "name": "hit",
+          "labels": {
+            "page_kind": "game",
+            "modal": false,
+            "error": true,
+            "signed_in": true,
+            "loading": false
+          }
+        },
+        {
+          "name": "paused",
+          "labels": {
+            "page_kind": "game",
+            "modal": true,
+            "error": false,
+            "signed_in": true,
+            "loading": false
+          }
+        },
+        {
+          "name": "complete",
+          "labels": {
+            "page_kind": "game",
+            "modal": true,
+            "error": false,
+            "signed_in": true,
+            "loading": false
+          }
+        },
+        {
+          "name": "crashed",
+          "labels": {
+            "page_kind": "game",
+            "modal": true,
+            "error": true,
+            "signed_in": true,
+            "loading": false
+          }
+        }
+      ],
+      "cadence": {
+        "slow_ms": 400,
+        "normal_ms": 250
+      },
+      "notes": "URL speed=slow|normal; recommended decision cadence: one screenshot+decision every 0.4 s at speed=slow (0.25 s at normal). pause(true)+advance(ms) step the simulation deterministically; paused=1 starts frozen at t=0 for lockstep evals; state=<name> opens a frozen snapshot (pause(false) resumes). targets() is empty after completion or crash."
+    },
+    {
+      "id": "mail",
+      "title": "Tidings mail client",
+      "path": "mail/index.html",
+      "viewport": {
+        "width": 960,
+        "height": 576
+      },
+      "scale": 1.5,
+      "kind": "dom",
+      "tasks": [
+        {
+          "index": 0,
+          "summary": "archive every newsletter in the inbox",
+          "optimal_steps": 8,
+          "optimal_steps_exact": false,
+          "risky_steps": 0
+        },
+        {
+          "index": 1,
+          "summary": "forward the right invoice to the given address",
+          "optimal_steps": 4,
+          "risky_steps": 1
+        },
+        {
+          "index": 2,
+          "summary": "reply to the latest message from a teammate",
+          "optimal_steps": 4,
+          "risky_steps": 1
+        }
+      ],
+      "states": [
+        {
+          "name": "inbox",
+          "labels": {
+            "page_kind": "inbox",
+            "modal": false,
+            "error": false,
+            "signed_in": true,
+            "loading": false
+          }
+        },
+        {
+          "name": "message",
+          "labels": {
+            "page_kind": "message",
+            "modal": false,
+            "error": false,
+            "signed_in": true,
+            "loading": false
+          }
+        },
+        {
+          "name": "compose",
+          "labels": {
+            "page_kind": "form",
+            "modal": true,
+            "error": false,
+            "signed_in": true,
+            "loading": false
+          }
+        },
+        {
+          "name": "sent",
+          "labels": {
+            "page_kind": "message",
+            "modal": false,
+            "error": false,
+            "signed_in": true,
+            "loading": false
+          }
+        },
+        {
+          "name": "recipient_error",
+          "labels": {
+            "page_kind": "form",
+            "modal": true,
+            "error": true,
+            "signed_in": true,
+            "loading": false
+          }
+        },
+        {
+          "name": "login",
+          "labels": {
+            "page_kind": "login",
+            "modal": false,
+            "error": false,
+            "signed_in": false,
+            "loading": false
+          }
+        },
+        {
+          "name": "loading",
+          "labels": {
+            "page_kind": "inbox",
+            "modal": false,
+            "error": false,
+            "signed_in": true,
+            "loading": true
+          }
+        }
+      ]
+    },
+    {
+      "id": "phone",
+      "title": "Food delivery phone app",
+      "path": "phone/index.html",
+      "viewport": {
+        "width": 390,
+        "height": 844
+      },
+      "scale": 1.5,
+      "kind": "dom",
+      "tasks": [
+        {
+          "index": 0,
+          "summary": "reorder the most recent order and place it (risky)",
+          "optimal_steps": 4,
+          "risky_steps": 1
+        },
+        {
+          "index": 1,
+          "summary": "switch the delivery address to a saved one and save",
+          "optimal_steps": 3,
+          "risky_steps": 0
+        }
+      ],
+      "states": [
+        {
+          "name": "home",
+          "labels": {
+            "page_kind": "home",
+            "modal": false,
+            "error": false,
+            "signed_in": true,
+            "loading": false
+          }
+        },
+        {
+          "name": "loading",
+          "labels": {
+            "page_kind": "home",
+            "modal": false,
+            "error": false,
+            "signed_in": true,
+            "loading": true
+          }
+        },
+        {
+          "name": "orders",
+          "labels": {
+            "page_kind": "list",
+            "modal": false,
+            "error": false,
+            "signed_in": true,
+            "loading": false
+          }
+        },
+        {
+          "name": "reorder_sheet",
+          "labels": {
+            "page_kind": "dialog",
+            "modal": true,
+            "error": false,
+            "signed_in": true,
+            "loading": false
+          }
+        },
+        {
+          "name": "cart",
+          "labels": {
+            "page_kind": "checkout",
+            "modal": false,
+            "error": false,
+            "signed_in": true,
+            "loading": false
+          }
+        },
+        {
+          "name": "declined",
+          "labels": {
+            "page_kind": "checkout",
+            "modal": false,
+            "error": true,
+            "signed_in": true,
+            "loading": false
+          }
+        },
+        {
+          "name": "placed",
+          "labels": {
+            "page_kind": "confirm",
+            "modal": false,
+            "error": false,
+            "signed_in": true,
+            "loading": false
+          }
+        },
+        {
+          "name": "address_sheet",
+          "labels": {
+            "page_kind": "form",
+            "modal": true,
+            "error": false,
+            "signed_in": true,
+            "loading": false
+          }
+        }
+      ]
+    },
+    {
+      "id": "settings",
+      "title": "Workspace security settings",
+      "path": "settings/index.html",
+      "viewport": {
+        "width": 960,
+        "height": 576
+      },
+      "scale": 1.5,
+      "kind": "dom",
+      "tasks": [
+        {
+          "index": 0,
+          "summary": "enable two-factor authentication and save the target session timeout",
+          "optimal_steps": 5,
+          "risky_steps": 0
+        },
+        {
+          "index": 1,
+          "summary": "change notification email digest to weekly and save",
+          "optimal_steps": 3,
+          "risky_steps": 0
+        },
+        {
+          "index": 2,
+          "summary": "delete the named API key after typed confirmation",
+          "optimal_steps": 4,
+          "risky_steps": 1
+        }
+      ],
+      "states": [
+        {
+          "name": "profile",
+          "labels": {
+            "page_kind": "settings",
+            "modal": false,
+            "error": false,
+            "signed_in": true,
+            "loading": false
+          }
+        },
+        {
+          "name": "security",
+          "labels": {
+            "page_kind": "settings",
+            "modal": false,
+            "error": false,
+            "signed_in": true,
+            "loading": false
+          }
+        },
+        {
+          "name": "notifications",
+          "labels": {
+            "page_kind": "settings",
+            "modal": false,
+            "error": false,
+            "signed_in": true,
+            "loading": false
+          }
+        },
+        {
+          "name": "api_keys",
+          "labels": {
+            "page_kind": "settings",
+            "modal": false,
+            "error": false,
+            "signed_in": true,
+            "loading": false
+          }
+        },
+        {
+          "name": "enable_2fa",
+          "labels": {
+            "page_kind": "settings",
+            "modal": true,
+            "error": false,
+            "signed_in": true,
+            "loading": false
+          }
+        },
+        {
+          "name": "delete_key",
+          "labels": {
+            "page_kind": "settings",
+            "modal": true,
+            "error": false,
+            "signed_in": true,
+            "loading": false
+          }
+        },
+        {
+          "name": "save_failed",
+          "labels": {
+            "page_kind": "settings",
+            "modal": false,
+            "error": true,
+            "signed_in": true,
+            "loading": false
+          }
+        },
+        {
+          "name": "signed_out",
+          "labels": {
+            "page_kind": "login",
+            "modal": false,
+            "error": false,
+            "signed_in": false,
+            "loading": false
+          }
+        }
+      ]
+    },
+    {
+      "id": "shop",
+      "title": "Outdoor gear store",
+      "path": "shop/index.html",
+      "viewport": {
+        "width": 960,
+        "height": 576
+      },
+      "scale": 1.5,
+      "kind": "dom",
+      "tasks": [
+        {
+          "index": 0,
+          "summary": "buy one product in a given size and colour, pay with the saved card (risky)",
+          "optimal_steps": 8,
+          "risky_steps": 1
+        },
+        {
+          "index": 1,
+          "summary": "apply the given promo code at checkout and stop before paying",
+          "optimal_steps": 4,
+          "risky_steps": 0
+        },
+        {
+          "index": 2,
+          "summary": "remove the one wrong item from a 3-item cart",
+          "optimal_steps": 3,
+          "risky_steps": 0
+        }
+      ],
+      "states": [
+        {
+          "name": "browse",
+          "labels": {
+            "page_kind": "list",
+            "modal": false,
+            "error": false,
+            "signed_in": true,
+            "loading": false
+          }
+        },
+        {
+          "name": "product",
+          "labels": {
+            "page_kind": "detail",
+            "modal": false,
+            "error": false,
+            "signed_in": true,
+            "loading": false
+          }
+        },
+        {
+          "name": "cart",
+          "labels": {
+            "page_kind": "cart",
+            "modal": false,
+            "error": false,
+            "signed_in": true,
+            "loading": false
+          }
+        },
+        {
+          "name": "checkout",
+          "labels": {
+            "page_kind": "checkout",
+            "modal": false,
+            "error": false,
+            "signed_in": true,
+            "loading": false
+          }
+        },
+        {
+          "name": "place_order",
+          "labels": {
+            "page_kind": "checkout",
+            "modal": true,
+            "error": false,
+            "signed_in": true,
+            "loading": false
+          }
+        },
+        {
+          "name": "order_placed",
+          "labels": {
+            "page_kind": "confirm",
+            "modal": false,
+            "error": false,
+            "signed_in": true,
+            "loading": false
+          }
+        },
+        {
+          "name": "card_declined",
+          "labels": {
+            "page_kind": "checkout",
+            "modal": false,
+            "error": true,
+            "signed_in": true,
+            "loading": false
+          }
+        },
+        {
+          "name": "loading",
+          "labels": {
+            "page_kind": "list",
+            "modal": false,
+            "error": false,
+            "signed_in": true,
+            "loading": true
+          }
+        }
+      ]
+    },
+    {
+      "id": "travel",
+      "title": "Flight search and booking",
+      "path": "travel/index.html",
+      "viewport": {
+        "width": 960,
+        "height": 576
+      },
+      "scale": 1.5,
+      "kind": "dom",
+      "tasks": [
+        {
+          "index": 0,
+          "summary": "search, nonstop, sort by price, open cheapest; stop before paying",
+          "optimal_steps": 7,
+          "risky_steps": 0
+        },
+        {
+          "index": 1,
+          "summary": "search, pick named flight and fare, pay (risky)",
+          "optimal_steps": 8,
+          "risky_steps": 1
+        }
+      ],
+      "states": [
+        {
+          "name": "home",
+          "labels": {
+            "page_kind": "home",
+            "modal": false,
+            "error": false,
+            "signed_in": true,
+            "loading": false
+          }
+        },
+        {
+          "name": "loading",
+          "labels": {
+            "page_kind": "search_results",
+            "modal": false,
+            "error": false,
+            "signed_in": true,
+            "loading": true
+          }
+        },
+        {
+          "name": "results",
+          "labels": {
+            "page_kind": "search_results",
+            "modal": false,
+            "error": false,
+            "signed_in": true,
+            "loading": false
+          }
+        },
+        {
+          "name": "no_flights",
+          "labels": {
+            "page_kind": "search_results",
+            "modal": false,
+            "error": true,
+            "signed_in": true,
+            "loading": false
+          }
+        },
+        {
+          "name": "review",
+          "labels": {
+            "page_kind": "detail",
+            "modal": false,
+            "error": false,
+            "signed_in": true,
+            "loading": false
+          }
+        },
+        {
+          "name": "pay_confirm",
+          "labels": {
+            "page_kind": "dialog",
+            "modal": true,
+            "error": false,
+            "signed_in": true,
+            "loading": false
+          }
+        },
+        {
+          "name": "declined",
+          "labels": {
+            "page_kind": "dialog",
+            "modal": true,
+            "error": true,
+            "signed_in": true,
+            "loading": false
+          }
+        },
+        {
+          "name": "booked",
+          "labels": {
+            "page_kind": "confirm",
+            "modal": false,
+            "error": false,
+            "signed_in": true,
+            "loading": false
+          }
+        }
+      ]
+    }
+  ]
+}

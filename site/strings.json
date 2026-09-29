@@ -13,6 +13,7 @@
  "code.copy": "Copy",
  "code.copied": "Copied",
  "home.model_hub": "Hugging Face",
+ "hero.chip": "0 generated tokens",
  "md.header": "Docs index for agents:",
  "redirect.note": "This page has moved.",
  "notfound.title": "Page not found",

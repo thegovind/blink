@@ -1,0 +1,329 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Morsel</title>
+  <script src="../common/blink-scenario.js"></script>
+  <style>
+    :root{--bg:#fbf2e7;--panel:#fffaf2;--card:#fffefd;--text:#251814;--muted:#76645b;--line:#eadccb;--primary:#d94e32;--primary2:#ff8b58;--accent:#1d6f5f;--shadow:0 18px 42px rgba(82,45,27,.14);--tab:#fff7ed;--danger:#b7352d;--scrim:rgba(32,22,18,.38)}
+    html[data-theme="dark"]{--bg:#18110f;--panel:#211816;--card:#2b211e;--text:#fff4ea;--muted:#c8afa2;--line:#44332d;--primary:#ff7a56;--primary2:#e65c3f;--accent:#76cdbc;--shadow:0 20px 46px rgba(0,0,0,.42);--tab:#241a17;--danger:#ff897b;--scrim:rgba(0,0,0,.56)}
+    *{box-sizing:border-box}html,body{margin:0;width:100%;height:100%;overflow:hidden;background:var(--bg);font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,"Helvetica Neue",Arial,sans-serif;color:var(--text)}
+    body{display:grid;place-items:center}.phone{width:390px;height:844px;background:linear-gradient(180deg,var(--bg),var(--panel));position:relative;overflow:hidden}.status{height:34px;display:flex;align-items:end;justify-content:space-between;padding:0 23px 7px;font-weight:750;font-size:13px}.sys{display:flex;gap:5px;align-items:center}.sig{width:18px;height:10px;background:linear-gradient(90deg,var(--text) 3px,transparent 3px 5px,var(--text) 5px 9px,transparent 9px 11px,var(--text) 11px 18px);opacity:.9}.wifi{width:14px;height:10px;border:2px solid var(--text);border-bottom:0;border-left-color:transparent;border-right-color:transparent;border-radius:14px 14px 0 0}.bat{width:22px;height:11px;border:1.8px solid var(--text);border-radius:3px;position:relative}.bat:after{content:"";position:absolute;right:-4px;top:3px;width:2px;height:5px;background:var(--text);border-radius:2px}.bat:before{content:"";position:absolute;left:2px;top:2px;width:14px;height:5px;background:var(--text);border-radius:1px}.content{height:738px;padding:12px 18px 0;overflow:hidden}.bottom{position:absolute;left:16px;right:16px;bottom:18px;height:72px;background:color-mix(in srgb,var(--tab) 93%,transparent);border:1px solid var(--line);border-radius:24px;box-shadow:var(--shadow);display:grid;grid-template-columns:repeat(4,1fr);padding:8px;gap:3px}.tab{border:0;background:transparent;color:var(--muted);border-radius:17px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:3px;font-size:11px;font-weight:700}.tab svg{width:20px;height:20px;stroke:currentColor;fill:none;stroke-width:2}.tab[aria-selected="true"]{background:var(--primary);color:white}.homebar{position:absolute;bottom:6px;left:145px;width:100px;height:4px;border-radius:4px;background:color-mix(in srgb,var(--text) 25%,transparent)}
+    h1{font-size:31px;line-height:1.02;margin:10px 0 14px;letter-spacing:-.8px}.eyebrow{font-size:12px;color:var(--muted);font-weight:800;text-transform:uppercase;letter-spacing:.08em}.toprow{display:flex;align-items:center;justify-content:space-between;gap:12px}.addr{border:1px solid var(--line);background:var(--card);border-radius:999px;padding:9px 12px;color:var(--text);font-weight:800;box-shadow:0 6px 18px rgba(86,43,20,.06);max-width:215px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.avatar{width:42px;height:42px;border-radius:15px;background:linear-gradient(135deg,#4f2d25,#e96a44);color:#fff;display:grid;place-items:center;font-weight:900}.search{width:100%;height:48px;border:1px solid var(--line);border-radius:16px;background:var(--card);padding:0 15px;font-size:15px;color:var(--text);outline:none}.chips{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin:12px 0}.chip{height:36px;border:1px solid var(--line);background:var(--card);border-radius:999px;color:var(--text);font-weight:800;font-size:12px}.promo{height:116px;border-radius:24px;background:radial-gradient(circle at 90% 16%,#ffd5a6 0 18%,transparent 19%),linear-gradient(135deg,var(--primary),#8f3328);color:white;padding:20px;position:relative;overflow:hidden;box-shadow:var(--shadow)}.promo h2{margin:0;font-size:25px;letter-spacing:-.5px;max-width:225px}.promo p{margin:6px 0 0;opacity:.94;max-width:214px;position:relative;z-index:1}.rings{position:absolute;right:-42px;bottom:-42px;width:126px;height:126px;border:15px solid rgba(255,255,255,.18);border-radius:50%}.section{display:flex;justify-content:space-between;align-items:end;margin:16px 0 9px}.section h2{font-size:19px;margin:0;letter-spacing:-.3px}.restaurants{display:grid;gap:9px}.rest{height:88px;width:100%;border:1px solid var(--line);background:var(--card);border-radius:20px;padding:10px;display:grid;grid-template-columns:68px 1fr;gap:12px;text-align:left;color:var(--text);box-shadow:0 7px 20px rgba(60,32,20,.06)}.art{width:68px;height:68px;border-radius:18px;display:grid;place-items:center;overflow:hidden}.rest h3,.order h3{font-size:15px;margin:2px 0 5px}.meta{font-size:12px;color:var(--muted);font-weight:700}.price{font-size:13px;color:var(--accent);font-weight:850;margin-top:7px}.orders{display:grid;gap:9px}.order{min-height:91px;border:1px solid var(--line);background:var(--card);border-radius:20px;padding:10px;display:grid;grid-template-columns:46px 1fr auto;gap:10px;align-items:center}.order p{margin:0 0 5px;font-size:12px;color:var(--muted);line-height:1.25}.reorder{border:0;background:var(--primary);color:white;border-radius:14px;padding:10px 12px;font-weight:850}.pagehead{display:flex;align-items:center;gap:10px;margin-bottom:14px}.back,.iconbtn{width:42px;height:42px;border:1px solid var(--line);background:var(--card);border-radius:15px;color:var(--text);font-size:18px;font-weight:900}.cartcard{border:1px solid var(--line);background:var(--card);border-radius:24px;padding:16px;box-shadow:0 9px 28px rgba(65,32,18,.08)}.line{height:1px;background:var(--line);margin:13px 0}.itemrow,.totalrow{display:flex;justify-content:space-between;gap:10px;margin:9px 0;font-size:14px}.itemrow span:first-child{color:var(--muted)}.totalrow strong{font-size:18px}.addrrow{border:1px solid var(--line);background:color-mix(in srgb,var(--card) 65%,var(--bg));border-radius:16px;padding:12px;margin:12px 0}.radios{display:grid;grid-template-columns:1fr 1fr;gap:8px}.radio{border:1px solid var(--line);background:var(--card);border-radius:16px;padding:11px 11px 11px 36px;color:var(--text);font-weight:850;text-align:left;position:relative}.radio:before,.addrchoice:before{content:"";position:absolute;left:12px;top:50%;width:16px;height:16px;border:2px solid var(--muted);border-radius:50%;transform:translateY(-50%);background:var(--card)}.radio[aria-checked="true"]{border-color:var(--primary);box-shadow:inset 0 0 0 2px var(--primary)}.radio[aria-checked="true"]:before,.addrchoice[aria-checked="true"]:before{border-color:var(--primary)}.radio[aria-checked="true"]:after,.addrchoice[aria-checked="true"]:after{content:"";position:absolute;left:18px;top:50%;width:8px;height:8px;border-radius:50%;background:var(--primary);transform:translateY(-50%)}.primary{width:100%;height:54px;border:0;border-radius:18px;background:linear-gradient(135deg,var(--primary),var(--primary2));color:white;font-size:16px;font-weight:900;box-shadow:0 15px 28px rgba(217,78,50,.24)}.error{background:color-mix(in srgb,var(--danger) 13%,var(--card));border:1px solid color-mix(in srgb,var(--danger) 45%,var(--line));color:var(--danger);border-radius:16px;padding:11px;margin-bottom:12px;font-weight:800}.done{text-align:center;padding-top:70px}.check{width:112px;height:112px;border-radius:50%;margin:0 auto 25px;background:linear-gradient(135deg,#2e9c72,#8ad4a8);display:grid;place-items:center;box-shadow:var(--shadow)}.check svg{width:60px;height:60px;stroke:white;stroke-width:8;fill:none;stroke-linecap:round;stroke-linejoin:round;stroke-dasharray:100;animation:draw .45s ease-out both}@keyframes draw{from{stroke-dashoffset:100}to{stroke-dashoffset:0}}.done h1{font-size:34px}.ghost{height:48px;border:1px solid var(--line);border-radius:17px;background:var(--card);color:var(--text);font-weight:850}.two{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:22px}.rows{display:grid;gap:9px}.rowbtn{height:55px;border:1px solid var(--line);background:var(--card);border-radius:18px;color:var(--text);padding:0 14px;display:flex;align-items:center;justify-content:space-between;font-weight:850}.switch[aria-checked="true"]:after{content:"On";color:var(--accent)}.switch[aria-checked="false"]:after{content:"Off";color:var(--muted)}.recent{color:var(--muted);line-height:2.1;font-weight:700}.skeleton{height:96px;border-radius:22px;background:linear-gradient(90deg,var(--line),color-mix(in srgb,var(--line) 35%,var(--card)),var(--line));background-size:200% 100%;animation:shimmer 1.1s infinite;margin:12px 0}@keyframes shimmer{to{background-position:-200% 0}}.scrim{position:absolute;inset:0;background:var(--scrim);display:flex;align-items:end;z-index:5}.sheet{width:100%;background:var(--panel);border-radius:28px 28px 0 0;padding:10px 18px 24px;box-shadow:0 -22px 50px rgba(0,0,0,.24);animation:up .18s ease-out}.handle{width:42px;height:5px;border-radius:5px;background:var(--line);margin:0 auto 14px}.sheet h2{margin:0 0 12px;font-size:24px}.sheetitem{display:flex;justify-content:space-between;margin:10px 0;color:var(--muted)}.sheetactions{display:grid;gap:10px;margin-top:15px}.cancel{height:50px;border:1px solid var(--line);background:var(--card);border-radius:17px;color:var(--text);font-weight:850}.addrchoices{display:grid;gap:8px}.addrchoice{border:1px solid var(--line);background:var(--card);border-radius:18px;padding:11px 11px 11px 42px;text-align:left;color:var(--text);position:relative}.addrchoice[aria-checked="true"]{border-color:var(--primary);box-shadow:inset 0 0 0 2px var(--primary)}.addrchoice strong{display:block}.addrchoice span{color:var(--muted);font-size:12px}.sheettop{display:flex;justify-content:space-between;align-items:center}.toast{position:absolute;left:52px;right:52px;bottom:104px;background:#2d211c;color:white;border-radius:999px;padding:12px;text-align:center;font-weight:800;z-index:7;opacity:.98}.alert{align-self:center;margin:auto 26px;background:var(--panel);border-radius:26px;padding:22px;box-shadow:var(--shadow);text-align:center}.alert h2{margin:0 0 8px}.alert .two{margin-top:18px}.food svg{width:58px;height:58px}.thumb{width:46px;height:46px;border-radius:14px;display:grid;place-items:center;overflow:hidden;background:color-mix(in srgb,var(--primary) 10%,var(--card))}.thumb .food svg{width:42px;height:42px}.carttitle{display:grid;grid-template-columns:46px 1fr;gap:10px;align-items:center}.mini{font-size:12px;color:var(--muted)}@keyframes up{from{transform:translateY(28px);opacity:.85}to{transform:translateY(0);opacity:1}}
+  </style>
+</head>
+<body>
+<div class="phone"><div class="status"><span>9:41</span><div class="sys"><span class="sig"></span><span class="wifi"></span><span class="bat"></span></div></div><main id="app"></main><div class="homebar"></div></div>
+<script>
+(function () {
+  const K = window.BlinkScenarioKit;
+  const P = K.params;
+  const money = n => "$" + n.toFixed(2);
+
+  const rNames = [
+    "Lantern Noodle Bar",
+    "Juniper Pizza Co.",
+    "Tamarind Table",
+    "Clover Grain House",
+    "Mina's Hearth",
+    "Northstar Dumpling",
+    "Basil & Broth"
+  ];
+  const cuisineByRestaurant = {
+    "Lantern Noodle Bar": "noodle",
+    "Juniper Pizza Co.": "pizza",
+    "Tamarind Table": "curry",
+    "Clover Grain House": "grain",
+    "Mina's Hearth": "kofta",
+    "Northstar Dumpling": "dumpling",
+    "Basil & Broth": "soup"
+  };
+  const itemPools = [
+    [["Dan Dan Noodles", 15.6], ["Scallion Pancake", 6.2], ["Cucumber Salad", 7.1]],
+    [["Margherita Pie", 18.4], ["Roasted Pepper Slice", 7.8], ["Fennel Salad", 8.3]],
+    [["Coconut Curry", 16.9], ["Saffron Rice", 4.8], ["Mango Lassi", 5.4]],
+    [["Harvest Bowl", 14.7], ["Lentil Soup", 8.2], ["Seeded Flatbread", 4.9]],
+    [["Chicken Kofta", 17.8], ["Charred Carrots", 7.2], ["Mint Yogurt", 3.6]],
+    [["Pork Dumplings", 13.9], ["Sesame Greens", 6.5], ["Ginger Tea", 4.1]],
+    [["Tomato Bisque", 10.9], ["Herb Focaccia", 5.8], ["Pear Salad", 9.4]]
+  ];
+
+  const rr = K.stream("restaurants");
+  const ar = K.stream("addresses");
+  const ir = K.stream("interrupt");
+  const names = K.shuffle(rr, rNames).slice(0, 5);
+
+  function slug(label, used) {
+    const base = label.toLowerCase().replace(/['’]/g, "").replace(/[^a-z0-9]+/g, "-").replace(/^-|-$/g, "") || "address";
+    let out = base;
+    let i = 2;
+    while (used.has(out)) out = `${base}-${i++}`;
+    used.add(out);
+    return out;
+  }
+
+  const addressPairs = [
+    [{ label: "Studio", street: "8 Waverly Mews" }, { label: "Studio Annex", street: "8 Waverly Annex" }],
+    [{ label: "Work", street: "118 Linden Ave" }, { label: "Work (old)", street: "122 Linden Ave" }],
+    [{ label: "Parents'", street: "64 Juniper Road" }, { label: "Mom's place", street: "66 Juniper Road" }],
+    [{ label: "Riverside flat", street: "305 Fern Court" }, { label: "Book club", street: "309 Fern Court" }]
+  ];
+  const extras = [
+    { label: "Gym", street: "42 Grove Lane" },
+    { label: "North loft", street: "17 Camden Walk" },
+    { label: "Garden studio", street: "21 Poppy Row" },
+    { label: "Market stop", street: "90 Cedar Quay" }
+  ];
+  const chosenPair = K.pick(ar, addressPairs);
+  const targetRaw = K.pick(ar, chosenPair);
+  const rawAddresses = [
+    { label: "Home", street: "24 Alder St" },
+    ...chosenPair,
+    ...K.shuffle(ar, extras)
+  ].filter((a, i, arr) => arr.findIndex(b => b.label === a.label) === i).slice(0, 5);
+  const usedAddressIds = new Set();
+  const addresses = rawAddresses.map(a => ({ ...a, id: slug(a.label, usedAddressIds) }));
+  const targetAddress = addresses.find(a => a.label === targetRaw.label) || addresses[1];
+  const homeAddress = addresses.find(a => a.label === "Home");
+
+  function orderFor(i, newest) {
+    const pool = itemPools[rNames.indexOf(names[i])];
+    const items = [
+      { name: pool[0][0], qty: 2, price: pool[0][1] },
+      { name: pool[1][0], qty: 1, price: pool[1][1] }
+    ];
+    if (i % 2) items.push({ name: pool[2][0], qty: 1, price: pool[2][1] });
+    return {
+      id: "order" + i,
+      restaurant: names[i],
+      date: newest ? "Today, 12:40 PM" : (i === 1 ? "Yesterday, 7:18 PM" : "Sep " + (24 - i) + ", 6:0" + i + " PM"),
+      status: "Delivered",
+      items
+    };
+  }
+
+  const orders = [0, 1, 2, 3, 4].map((_, i) => orderFor(i, i === 0));
+  orders.forEach(o => { o.total = o.items.reduce((s, it) => s + it.qty * it.price, 0) + 3.99 + 2.31; });
+  const targetOrder = orders[0];
+  const etaStart = K.pick(rr, ["12:50", "12:55", "1:05", "1:10"]);
+  const etaEnd = { "12:50": "1:00", "12:55": "1:05", "1:05": "1:15", "1:10": "1:20" }[etaStart];
+  const courierName = K.pick(rr, ["Nira", "Ari", "Milo", "Tess", "Owen", "Rafi"]);
+
+  const byId = id => addresses.find(a => a.id === id);
+  const addrText = a => a.label + " · " + a.street;
+  const app = document.getElementById("app");
+
+  let screen = "home";
+  let modal = null;
+  let sheetOrder = null;
+  let cartOrder = null;
+  let currentAddress = homeAddress.id;
+  let selectedAddress = homeAddress.id;
+  let toast = "";
+  let placedOrder = null;
+  let placedCount = 0;
+  let failed = false;
+  let wrongAddressSaved = false;
+  let savedCount = 0;
+  let notified = false;
+  let interrupt = null;
+  let interruptSeen = false;
+
+  const direct = !!P.state;
+  if (P.state) {
+    if (P.state === "orders") screen = "orders";
+    if (P.state === "cart") { screen = "cart"; cartOrder = targetOrder; }
+    if (P.state === "declined") { screen = "declined"; cartOrder = targetOrder; }
+    if (P.state === "placed") { screen = "placed"; placedOrder = { order: targetOrder, address: currentAddress }; }
+    if (P.state === "loading") screen = "loading";
+    if (P.state === "reorder_sheet") { screen = "orders"; modal = "reorder"; sheetOrder = targetOrder; }
+    if (P.state === "address_sheet") { screen = "home"; modal = "address"; selectedAddress = currentAddress; }
+  }
+
+  function qty(o) { return o.items.reduce((s, it) => s + it.qty, 0); }
+  function sub(o) { return o.items.reduce((s, it) => s + it.qty * it.price, 0); }
+  function total(o) { return sub(o) + 3.99 + 2.31; }
+  function cuisine(restaurant) { return cuisineByRestaurant[restaurant] || "grain"; }
+
+  function food(kind) {
+    const art = {
+      pizza: `<circle cx="40" cy="40" r="27" fill="#ffd086"/><path d="M40 40L62 24A27 27 0 0 1 67 45z" fill="#f7b267"/><circle cx="34" cy="35" r="4" fill="#d94e32"/><circle cx="49" cy="47" r="4" fill="#d94e32"/><path d="M20 43h40" stroke="#6f9d55" stroke-width="4"/>`,
+      noodle: `<path d="M19 38h42l-5 20H24z" fill="#fff7ed" stroke="#6b3a2c" stroke-width="3"/><path d="M25 38c6 8 24 8 30 0M28 28c8 6 16 6 24 0" stroke="#d94e32" stroke-width="4" fill="none" stroke-linecap="round"/><path d="M54 18l8 18" stroke="#6b3a2c" stroke-width="3"/>`,
+      dumpling: `<path d="M18 49c7-19 37-22 45 0-10 10-35 10-45 0z" fill="#fff7ed" stroke="#6b3a2c" stroke-width="3"/><path d="M27 46c3-6 6-9 10-12M40 45c2-6 5-10 10-13" stroke="#d94e32" stroke-width="3" fill="none"/>`,
+      grain: `<circle cx="40" cy="42" r="25" fill="#fff7ed" stroke="#6b3a2c" stroke-width="3"/><circle cx="31" cy="37" r="7" fill="#76cdbc"/><circle cx="48" cy="36" r="6" fill="#ff8b58"/><path d="M25 51c11-7 22-7 32 0" stroke="#d9a441" stroke-width="5" fill="none"/>`,
+      kofta: `<path d="M21 58L59 22" stroke="#6b3a2c" stroke-width="4"/><rect x="23" y="43" width="18" height="10" rx="5" fill="#8f5a35" transform="rotate(-35 32 48)"/><rect x="39" y="28" width="18" height="10" rx="5" fill="#8f5a35" transform="rotate(-35 48 33)"/><circle cx="24" cy="27" r="6" fill="#76cdbc"/>`,
+      curry: `<path d="M18 36h44l-6 22H24z" fill="#fff7ed" stroke="#6b3a2c" stroke-width="3"/><circle cx="34" cy="43" r="7" fill="#d94e32"/><circle cx="48" cy="43" r="7" fill="#ffbe76"/><path d="M28 25c5-5 18-5 24 0" stroke="#76cdbc" stroke-width="4" fill="none"/>`,
+      soup: `<path d="M18 39h44l-7 18H25z" fill="#fff7ed" stroke="#6b3a2c" stroke-width="3"/><path d="M25 39c8 7 22 7 30 0" stroke="#d94e32" stroke-width="4" fill="none"/><path d="M31 27c-2-5 5-6 3-11M45 28c-2-5 5-6 3-11" stroke="#76cdbc" stroke-width="3" fill="none"/>`
+    }[kind];
+    return `<span class="food"><svg viewBox="0 0 80 80" aria-hidden="true"><rect x="6" y="8" width="68" height="64" rx="20" fill="currentColor" opacity=".08"/>${art}</svg></span>`;
+  }
+
+  function maybeInterrupt(m) {
+    if (direct || !P.interrupts || interruptSeen || interrupt) return;
+    const kind = K.pick(ir, ["alert", "promo"]);
+    const task = P.task;
+    const m0 = K.pick(ir, ["orders", "cart"]);
+    const m1 = K.pick(ir, ["home", "address"]);
+    if ((task === 0 && m === m0) || (task === 1 && m === m1)) {
+      interruptSeen = true;
+      interrupt = kind;
+    }
+  }
+
+  function go(s) { screen = s; modal = null; toast = ""; maybeInterrupt(s); render(); }
+  function openAddress() { modal = "address"; selectedAddress = currentAddress; toast = ""; maybeInterrupt("address"); render(); }
+  function openReorder(o) { sheetOrder = o; modal = "reorder"; toast = ""; render(); }
+  function dismissInterrupt() { interrupt = null; render(); }
+
+  function saveAddress() {
+    if (P.task === 1 && selectedAddress !== targetAddress.id) wrongAddressSaved = true;
+    currentAddress = selectedAddress;
+    savedCount++;
+    modal = null;
+    toast = "Delivering to " + byId(currentAddress).label;
+    render();
+  }
+
+  function place() {
+    if (!cartOrder) return;
+    if (cartOrder.id !== targetOrder.id) failed = true;
+    placedCount++;
+    placedOrder = { order: cartOrder, address: currentAddress };
+    screen = "placed";
+    render();
+  }
+
+  function addCart() { cartOrder = sheetOrder; modal = null; screen = "cart"; render(); }
+  function tab(name, label) {
+    return `<button class="tab" id="tab-${name}" role="tab" aria-selected="${screen === name}" ${modal || interrupt ? "disabled" : ""} aria-label="${label}" data-act="tab" data-tab="${name}">${icon(name)}<span>${label}</span></button>`;
+  }
+  function icon(n) {
+    const d = { home: "M4 11 12 4l8 7v8a1 1 0 0 1-1 1h-5v-6h-4v6H5a1 1 0 0 1-1-1z", search: "M10 18a8 8 0 1 1 5.7-2.4L21 21", orders: "M6 4h12v16l-3-2-3 2-3-2-3 2z", account: "M12 12a4 4 0 1 0 0-8 4 4 0 0 0 0 8zm-7 8a7 7 0 0 1 14 0" }[n];
+    return `<svg viewBox="0 0 24 24"><path d="${d}"/></svg>`;
+  }
+  function shell(inner) { return `<div class="content" id="bg">${inner}</div><nav class="bottom">${tab("home", "Home")}${tab("search", "Search")}${tab("orders", "Orders")}${tab("account", "Account")}</nav>`; }
+
+  function home() {
+    const a = byId(currentAddress);
+    return shell(`<div class="toprow"><div><div class="eyebrow">Deliver to</div><button id="address-pill" class="addr" ${modal || interrupt ? "disabled" : ""}>${addrText(a)} ›</button></div><div class="avatar">P</div></div><h1>Dinner without the wait.</h1><input id="home-search" class="search" aria-label="Search dishes or restaurants" placeholder="Search dishes or restaurants" ${modal || interrupt ? "disabled" : ""}><div class="chips">${["Bowls", "Pizza", "Noodles", "Salads"].map(x => `<button class="chip" ${modal || interrupt ? "disabled" : ""}>${x}</button>`).join("")}</div><div class="promo"><h2>Fresh picks nearby</h2><p>Warm meals, careful couriers, clear ETAs.</p><span class="rings"></span></div><div class="section"><h2>Popular near you</h2><span class="mini">20–35 min</span></div><div class="restaurants">${names.slice(0, 3).map((n, i) => `<button class="rest" id="restaurant-${i}" ${modal || interrupt ? "disabled" : ""} aria-label="Open ${n}"><span class="art" style="background:${i % 2 ? '#fff0d8' : '#ffe2d7'}">${food(cuisine(n))}</span><span><h3>${n}</h3><div class="meta">${(4.6 + i / 10).toFixed(1)} rating · ${22 + i * 4} min · ${i ? '$1.49' : 'Free'} delivery</div><div class="price">Popular tonight</div></span></button>`).join("")}</div>`);
+  }
+
+  function ordersPage() {
+    return shell(`<div class="pagehead"><h1 style="margin:0">Orders</h1></div><div class="orders">${orders.map((o, i) => `<div class="order"><span class="thumb">${food(cuisine(o.restaurant))}</span><div><h3>${o.restaurant}</h3><p>${o.items.map(it => it.qty + "× " + it.name).join(" · ")}</p><div class="meta">${o.date} · ${money(o.total)} · ${o.status}</div></div><button class="reorder" id="reorder-${i}" aria-label="Reorder ${o.restaurant}" ${modal || interrupt ? "disabled" : ""}>Reorder</button></div>`).join("")}</div>`);
+  }
+
+  function cartPage(err) {
+    const o = cartOrder || targetOrder;
+    return shell(`<div class="pagehead"><button id="cart-back" class="back" ${modal || interrupt ? "disabled" : ""} aria-label="Back to orders">‹</button><div class="carttitle"><span class="thumb">${food(cuisine(o.restaurant))}</span><div><div class="eyebrow">Checkout</div><h1 style="margin:0;font-size:27px">${o.restaurant}</h1></div></div></div>${err ? `<div class="error">Card •••• 4417 was declined</div>` : ""}<div class="cartcard">${o.items.map(it => `<div class="itemrow"><span>${it.qty}× ${it.name}</span><strong>${money(it.qty * it.price)}</strong></div>`).join("")}<div class="line"></div><div class="addrrow"><div class="eyebrow">Delivery address</div><strong>${addrText(byId(currentAddress))}</strong></div><div class="eyebrow">Delivery speed</div><div class="radios"><button class="radio" role="radio" aria-checked="true" ${modal || interrupt ? "disabled" : ""}>Standard</button><button class="radio" role="radio" aria-checked="false" ${modal || interrupt ? "disabled" : ""}>Priority</button></div><div class="line"></div><div class="itemrow"><span>Payment</span><strong>Card •••• 4417</strong></div><div class="itemrow"><span>Subtotal</span><span>${money(sub(o))}</span></div><div class="itemrow"><span>Delivery</span><span>$3.99</span></div><div class="itemrow"><span>Service fee</span><span>$2.31</span></div><div class="totalrow"><span>Total</span><strong>${money(total(o))}</strong></div><button id="place-order" class="primary" ${modal || interrupt ? "disabled" : ""}>${err ? "Try again" : "Place order"} · ${money(total(o))}</button></div>`);
+  }
+
+  function placedPage() {
+    const o = placedOrder ? placedOrder.order : targetOrder;
+    return shell(`<div class="done"><div class="check"><svg viewBox="0 0 80 80"><path d="M20 42l13 13 28-32"/></svg></div><div class="eyebrow">${o.restaurant}</div><h1>Order placed</h1><p class="meta" style="font-size:16px">Arriving ${etaStart}–${etaEnd}</p><p class="meta">${courierName} is heading to the restaurant now.</p><div class="two"><button id="track-order" class="ghost" ${modal || interrupt ? "disabled" : ""}>Track order</button><button id="back-home" class="primary" ${modal || interrupt ? "disabled" : ""}>Back to home</button></div></div>`);
+  }
+
+  function account() { return shell(`<div class="toprow"><div><div class="eyebrow">Signed in</div><h1 style="margin-top:2px">Priya Shah</h1></div><div class="avatar">P</div></div><div class="rows"><button id="account-addresses" class="rowbtn" ${modal || interrupt ? "disabled" : ""}>Addresses <span>›</span></button><button class="rowbtn" ${modal || interrupt ? "disabled" : ""}>Payment methods <span>›</span></button><button id="notifications" class="rowbtn switch" role="switch" aria-checked="${notified}" ${modal || interrupt ? "disabled" : ""}>Notifications</button><button class="rowbtn" ${modal || interrupt ? "disabled" : ""}>Help <span>›</span></button></div>`); }
+  function search() { return shell(`<h1>Search</h1><input id="search-input" class="search" aria-label="Search restaurants and dishes" placeholder="Search restaurants and dishes" ${modal || interrupt ? "disabled" : ""}><div class="section"><h2>Recent searches</h2></div><div class="recent">spicy noodles<br>grain bowls<br>weeknight pizza<br>mint yogurt</div>`); }
+  function loading() { return shell(`<div class="eyebrow">Deliver to</div><div class="skeleton" style="height:42px;border-radius:999px"></div><div class="skeleton"></div><div class="skeleton"></div><div class="skeleton"></div>`); }
+
+  function reorderSheet() {
+    const o = sheetOrder || targetOrder;
+    return `<div class="scrim"><div class="sheet" role="dialog" aria-label="Reorder from ${o.restaurant}"><div class="handle"></div><div class="carttitle"><span class="thumb">${food(cuisine(o.restaurant))}</span><h2>Reorder from ${o.restaurant}</h2></div>${o.items.map(it => `<div class="sheetitem"><span>${it.qty}× ${it.name}</span><strong>${money(it.qty * it.price)}</strong></div>`).join("")}<div class="line"></div><p class="meta">This replaces your cart.</p><div class="sheetactions"><button id="add-reorder" class="primary">Add ${qty(o)} items to cart</button><button id="cancel-reorder" class="cancel">Cancel</button></div></div></div>`;
+  }
+  function addressSheet() {
+    return `<div class="scrim"><div class="sheet" role="dialog" aria-label="Delivery address"><div class="handle"></div><div class="sheettop"><h2>Delivery address</h2><button id="close-address" class="iconbtn" aria-label="Close address sheet">×</button></div><div class="addrchoices">${addresses.map(a => `<button id="address-${a.id}" class="addrchoice" role="radio" aria-checked="${selectedAddress === a.id}" aria-label="${a.label} ${a.street}"><strong>${a.label}</strong><span>${a.street}</span></button>`).join("")}</div><div class="sheetactions"><button id="add-address" class="cancel">Add new address</button><button id="save-address" class="primary">Save address</button></div></div></div>`;
+  }
+  function interruptView() {
+    if (!interrupt) return "";
+    if (interrupt === "alert") return `<div class="scrim"><div class="alert" role="dialog" aria-label="Allow notifications"><h2>Allow notifications?</h2><p class="meta">Get courier updates and delivery changes.</p><div class="two"><button id="deny-notifications" class="cancel">Don't allow</button><button id="allow-notifications" class="primary">Allow</button></div></div></div>`;
+    return `<div class="scrim"><div class="sheet" role="dialog" aria-label="Free delivery all week"><div class="handle"></div><h2>Free delivery all week</h2><p class="meta">A small welcome offer for nearby dinners.</p><div class="sheetactions"><button id="claim-offer" class="primary">Claim offer</button><button id="maybe-later" class="cancel">Maybe later</button></div></div></div>`;
+  }
+  function render() {
+    let html = screen === "home" ? home() : screen === "orders" ? ordersPage() : screen === "cart" ? cartPage(false) : screen === "declined" ? cartPage(true) : screen === "placed" ? placedPage() : screen === "account" ? account() : screen === "search" ? search() : loading();
+    if (!interrupt && modal === "reorder") html += reorderSheet();
+    if (!interrupt && modal === "address") html += addressSheet();
+    html += interruptView();
+    if (toast) html += `<div class="toast">${toast}</div>`;
+    app.innerHTML = html;
+  }
+
+  app.addEventListener("click", e => {
+    const b = e.target.closest("button");
+    if (!b || b.disabled) return;
+    const id = b.id;
+    if (["deny-notifications", "allow-notifications", "maybe-later", "claim-offer"].includes(id)) { dismissInterrupt(); return; }
+    if (b.dataset.act === "tab") { go(b.dataset.tab); return; }
+    if (id === "address-pill" || id === "account-addresses") { openAddress(); return; }
+    if (id.startsWith("address-") && id !== "address-pill") { selectedAddress = id.replace("address-", ""); render(); return; }
+    if (id === "close-address") { modal = null; render(); return; }
+    if (id === "save-address") { saveAddress(); return; }
+    if (id === "add-address") return;
+    if (id.startsWith("reorder-")) { openReorder(orders[+id.split("-")[1]]); return; }
+    if (id === "cancel-reorder") { modal = null; render(); return; }
+    if (id === "add-reorder") { addCart(); return; }
+    if (id === "cart-back") { go("orders"); return; }
+    if (id === "place-order") { place(); return; }
+    if (id === "back-home") { go("home"); return; }
+    if (id === "notifications") { notified = !notified; render(); }
+  });
+
+  function check() {
+    if (failed) return { done: true, success: false, detail: "wrong order placed" };
+    if (P.task === 0) {
+      const ok = placedCount === 1 && placedOrder && placedOrder.order.id === targetOrder.id && placedOrder.address === currentAddress;
+      return { done: !!placedOrder, success: !!ok, detail: ok ? "newest order placed" : "waiting for newest reorder" };
+    }
+    const ok = currentAddress === targetAddress.id && savedCount === 1 && !wrongAddressSaved && placedCount === 0;
+    return { done: ok || wrongAddressSaved || placedCount > 0, success: ok, detail: ok ? "address saved" : "target address not saved cleanly" };
+  }
+
+  function expected() {
+    if (interrupt) return { selector: interrupt === "alert" ? "#deny-notifications" : "#maybe-later", action: "click", value: null, done: false, risky: false };
+    const c = check();
+    if (c.success) return { selector: null, action: "none", value: null, done: true, risky: false };
+    if (failed) return { selector: null, action: "none", value: null, done: false, risky: false, failed: true };
+    if (P.task === 0) {
+      if (modal === "reorder") return sheetOrder && sheetOrder.id === targetOrder.id ? { selector: "#add-reorder", action: "click", value: null, done: false, risky: false } : { selector: "#cancel-reorder", action: "click", value: null, done: false, risky: false };
+      if (modal === "address") return { selector: "#close-address", action: "click", value: null, done: false, risky: false };
+      if (screen === "cart" || screen === "declined") {
+        if (!cartOrder || cartOrder.id !== targetOrder.id) return { selector: "#cart-back", action: "click", value: null, done: false, risky: false };
+        return { selector: "#place-order", action: "click", value: null, done: false, risky: true };
+      }
+      if (screen === "orders") return { selector: "#reorder-0", action: "click", value: null, done: false, risky: false };
+      return { selector: "#tab-orders", action: "click", value: null, done: false, risky: false };
+    }
+
+    if (wrongAddressSaved && currentAddress === targetAddress.id && !modal) {
+      return { selector: null, action: "none", value: null, done: false, risky: false, failed: true };
+    }
+    if (modal === "reorder") return { selector: "#cancel-reorder", action: "click", value: null, done: false, risky: false };
+    if (modal === "address") {
+      if (selectedAddress !== targetAddress.id) return { selector: `#address-${targetAddress.id}`, action: "click", value: null, done: false, risky: false };
+      return { selector: "#save-address", action: "click", value: null, done: false, risky: false };
+    }
+    if (screen === "account") return { selector: "#account-addresses", action: "click", value: null, done: false, risky: false };
+    if (screen !== "home") return { selector: "#tab-home", action: "click", value: null, done: false, risky: false };
+    return { selector: "#address-pill", action: "click", value: null, done: false, risky: false };
+  }
+
+  function state() {
+    if (modal === "reorder") return "reorder_sheet";
+    if (modal === "address") return "address_sheet";
+    return screen;
+  }
+
+  K.register({
+    id: "phone",
+    task: P.task === 1 ? `Change the delivery address to your saved address ${targetAddress.label} and save it.` : "Reorder your most recent order and place it.",
+    values: [],
+    check,
+    expected,
+    state
+  });
+  maybeInterrupt(screen);
+  render();
+})();
+</script>
+</body>
+</html>

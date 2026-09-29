@@ -1,0 +1,86 @@
+{
+  "id": "game",
+  "title": "Rocket lane dodge",
+  "path": "game/index.html",
+  "viewport": {
+    "width": 960,
+    "height": 576
+  },
+  "scale": 1.5,
+  "kind": "game",
+  "tasks": [
+    {
+      "index": 0,
+      "summary": "dodge 20 waves, pick the safe lane",
+      "optimal_steps": 20,
+      "risky_steps": 0
+    }
+  ],
+  "states": [
+    {
+      "name": "ready",
+      "labels": {
+        "page_kind": "game",
+        "modal": false,
+        "error": false,
+        "signed_in": true,
+        "loading": false
+      }
+    },
+    {
+      "name": "playing",
+      "labels": {
+        "page_kind": "game",
+        "modal": false,
+        "error": false,
+        "signed_in": true,
+        "loading": false
+      }
+    },
+    {
+      "name": "hit",
+      "labels": {
+        "page_kind": "game",
+        "modal": false,
+        "error": true,
+        "signed_in": true,
+        "loading": false
+      }
+    },
+    {
+      "name": "paused",
+      "labels": {
+        "page_kind": "game",
+        "modal": true,
+        "error": false,
+        "signed_in": true,
+        "loading": false
+      }
+    },
+    {
+      "name": "complete",
+      "labels": {
+        "page_kind": "game",
+        "modal": true,
+        "error": false,
+        "signed_in": true,
+        "loading": false
+      }
+    },
+    {
+      "name": "crashed",
+      "labels": {
+        "page_kind": "game",
+        "modal": true,
+        "error": true,
+        "signed_in": true,
+        "loading": false
+      }
+    }
+  ],
+  "cadence": {
+    "slow_ms": 400,
+    "normal_ms": 250
+  },
+  "notes": "URL speed=slow|normal; recommended decision cadence: one screenshot+decision every 0.4 s at speed=slow (0.25 s at normal). pause(true)+advance(ms) step the simulation deterministically; paused=1 starts frozen at t=0 for lockstep evals; state=<name> opens a frozen snapshot (pause(false) resumes). targets() is empty after completion or crash."
+}

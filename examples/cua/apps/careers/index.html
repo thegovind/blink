@@ -1,0 +1,282 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Alderpoint Careers</title>
+  <style>
+    :root{
+      --bg:#f6f0e6;--panel:#fffaf1;--ink:#16201a;--muted:#657066;--rule:#ded4c4;
+      --forest:#174737;--forest-2:#22624b;--lime:#c8d987;--sand:#ead7aa;--danger:#8d2d25;
+      --shadow:0 18px 45px rgba(39,32,20,.12);--radius:22px;
+    }
+    html[data-theme="dark"]{--bg:#111813;--panel:#17221c;--ink:#eef2e8;--muted:#a9b4aa;--rule:#304237;--forest:#9dc9a4;--forest-2:#c8d987;--lime:#445a32;--sand:#2a3326;--shadow:0 18px 45px rgba(0,0,0,.38);}
+    *{box-sizing:border-box}html,body{margin:0;width:100%;height:100%;overflow:hidden}body{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,"Helvetica Neue",Arial,sans-serif;background:radial-gradient(circle at 85% 10%,rgba(200,217,135,.38),transparent 25%),var(--bg);color:var(--ink)}
+    a,button,input,select,textarea{font:inherit}a{color:inherit;text-decoration:none}button,a,select,input,textarea{outline-color:var(--forest)}
+    #app{height:576px;width:960px;position:relative;padding:18px 28px 18px;display:flex;flex-direction:column;gap:12px}
+    header{height:44px;display:flex;align-items:center;gap:24px;flex:0 0 auto}.brand{display:flex;align-items:center;gap:9px;font-weight:750;letter-spacing:-.02em}.brand-mark{width:29px;height:29px;border:1px solid var(--forest);border-radius:10px;background:linear-gradient(135deg,var(--forest),var(--lime));display:grid;place-items:center}.brand-mark svg{width:18px;height:18px;stroke:#fff;fill:none;stroke-width:2}.nav{display:flex;align-items:center;gap:4px;margin-left:auto}.nav a,.contact{border:0;background:transparent;padding:9px 12px;border-radius:999px;color:var(--muted);font-weight:650;font-size:14px}.nav a:hover,.nav a.active{background:rgba(23,71,55,.08);color:var(--ink)}html[data-theme="dark"] .nav a:hover,html[data-theme="dark"] .nav a.active{background:rgba(200,217,135,.1)}.contact{background:var(--ink);color:var(--bg);margin-left:6px}.top-rule{height:1px;background:var(--rule);flex:0 0 auto}.hero{display:grid;grid-template-columns:1.02fr .98fr;gap:20px;align-items:stretch;min-height:0;flex:1}.eyebrow{font-size:13px;text-transform:uppercase;letter-spacing:.14em;color:var(--forest);font-weight:800;margin:10px 0}.hero h1{font-size:52px;line-height:.93;letter-spacing:-.06em;margin:3px 0 12px;max-width:560px}.lead{font-size:16px;line-height:1.45;color:var(--muted);max-width:480px;margin:0 0 16px}.cta-row{display:flex;gap:10px}.btn,.link-btn{border:1px solid var(--rule);border-radius:999px;background:var(--panel);padding:10px 14px;font-weight:760;color:var(--ink);box-shadow:none}.btn.primary{background:var(--forest);border-color:var(--forest);color:var(--bg)}html[data-theme="dark"] .btn.primary{color:#111813}.visual{position:relative;border:1px solid var(--rule);border-radius:30px;background:linear-gradient(145deg,var(--panel),rgba(234,215,170,.45));box-shadow:var(--shadow);overflow:hidden;min-height:292px}.visual svg{position:absolute;inset:0;width:100%;height:100%}.stats{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-top:12px}.stat,.tile{border-top:1px solid var(--rule);padding-top:11px}.stat b{font-size:22px;letter-spacing:-.04em}.stat span,.tile p{display:block;color:var(--muted);font-size:12px;line-height:1.25;margin:0}.tiles{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-top:10px}.tile{background:rgba(255,250,241,.45);border-radius:18px;padding:9px 11px}.tile h3{margin:0 0 4px;font-size:14px}.page{flex:1;min-height:0;display:flex;flex-direction:column;gap:10px}.mini{display:grid;grid-template-columns:1fr 300px;gap:16px;align-items:stretch}.overview{border:1px solid var(--rule);border-radius:28px;background:var(--panel);padding:30px;box-shadow:var(--shadow)}.overview h1{font-size:46px;line-height:1;letter-spacing:-.05em;margin:0 0 12px}.overview p{color:var(--muted);line-height:1.5}.banner{border:1px solid var(--rule);border-radius:24px;background:linear-gradient(120deg,var(--panel),rgba(200,217,135,.24));padding:13px 18px;display:flex;align-items:center;justify-content:space-between}.banner h1{font-size:27px;letter-spacing:-.04em;margin:0}.banner p{margin:3px 0 0;color:var(--muted);font-size:14px}.filters{display:grid;grid-template-columns:1.2fr .8fr .95fr auto;gap:9px;align-items:end}.field label{display:block;font-size:12px;font-weight:800;color:var(--muted);margin:0 0 5px}.field input,.field select,.form-field input,.form-field textarea{width:100%;border:1px solid var(--rule);border-radius:13px;background:var(--panel);color:var(--ink);padding:10px 11px;height:40px}.field select{appearance:none;background-image:linear-gradient(45deg,transparent 50%,var(--muted) 50%),linear-gradient(135deg,var(--muted) 50%,transparent 50%);background-position:calc(100% - 17px) 17px,calc(100% - 12px) 17px;background-size:5px 5px;background-repeat:no-repeat}.clear{height:40px;border:1px solid var(--rule);border-radius:13px;background:transparent;color:var(--muted);padding:0 12px;font-weight:750}.jobs{display:grid;gap:7px;min-height:0;flex:0 0 auto}.job-row{border:1px solid var(--rule);border-radius:18px;background:rgba(255,250,241,.72);padding:9px 14px;min-height:58px;display:grid;grid-template-columns:1fr auto;align-items:center;transition:transform .16s ease,background .16s ease}.job-row:hover{transform:translateY(-1px);background:var(--panel)}html[data-theme="dark"] .job-row{background:rgba(23,34,28,.72)}.job-row b{font-size:16px}.job-row .role-meta{display:block;font-size:13px;color:var(--muted);margin-top:4px}.posted{font-size:12px;color:var(--forest);font-weight:800}.pager{height:30px;display:flex;align-items:center;justify-content:flex-end;gap:10px;color:var(--muted);font-size:13px}.pager button{border:1px solid var(--rule);background:var(--panel);border-radius:999px;padding:6px 12px;font-weight:750}.pager button:disabled{opacity:.42}.empty{border:1px dashed var(--rule);border-radius:24px;background:rgba(255,250,241,.55);padding:34px;text-align:center}.empty h2{margin:0 0 8px}.detail{display:grid;grid-template-columns:1fr 285px;gap:16px;min-height:0;flex:1}.back{font-weight:780;color:var(--forest);font-size:14px}.copy{border:1px solid var(--rule);border-radius:26px;background:var(--panel);padding:16px 20px;overflow:hidden}.copy h1{font-size:32px;letter-spacing:-.045em;margin:6px 0 8px}.chips{display:flex;gap:7px;flex-wrap:wrap}.chip{font-size:12px;font-weight:750;color:var(--forest);border:1px solid var(--rule);background:rgba(200,217,135,.18);border-radius:999px;padding:6px 9px}.copy h2{font-size:15px;margin:12px 0 5px}.copy p,.copy li{font-size:13px;line-height:1.32;color:var(--muted)}.copy ul{margin:0;padding-left:18px}.salary{margin-top:10px;padding-top:10px;border-top:1px solid var(--rule);font-weight:750;color:var(--ink)}.summary-card{border:1px solid var(--rule);border-radius:26px;background:linear-gradient(180deg,var(--panel),rgba(234,215,170,.4));padding:17px;align-self:start;box-shadow:var(--shadow)}.summary-card h3{margin:0 0 12px;font-size:20px;letter-spacing:-.025em}.summary-list{display:grid;gap:9px;margin-bottom:14px}.summary-row{border-top:1px solid var(--rule);padding-top:8px}.summary-row:first-child{border-top:0;padding-top:0}.summary-row span{display:block;color:var(--muted);font-size:11px;font-weight:800;text-transform:uppercase;letter-spacing:.08em}.summary-row b{display:block;font-size:14px;margin-top:2px;color:var(--ink)}.summary-card .btn{width:100%;text-align:center}.apply-grid{display:grid;grid-template-columns:310px 1fr;gap:16px;min-height:0;flex:1}.apply-aside{border:1px solid var(--rule);border-radius:26px;background:linear-gradient(150deg,var(--panel),rgba(200,217,135,.18));padding:20px}.apply-aside h1{font-size:30px;line-height:1.05;letter-spacing:-.045em;margin:16px 0 10px}.apply-aside p{color:var(--muted);font-size:14px;line-height:1.45}.form{border:1px solid var(--rule);border-radius:26px;background:var(--panel);padding:16px;display:grid;grid-template-columns:1fr 1fr;gap:10px;align-content:start}.form-field.full{grid-column:1/-1}.form-field label{display:block;font-size:12px;color:var(--muted);font-weight:800;margin-bottom:5px}.form-field textarea{height:72px;resize:none}.check-btn{grid-column:1/-1;text-align:left;border:1px solid var(--rule);border-radius:13px;background:transparent;color:var(--ink);padding:10px 12px;font-weight:650;display:flex;align-items:center;gap:9px}.check-btn::before{content:"";width:17px;height:17px;border:2px solid var(--forest);border-radius:5px;background:var(--panel);display:inline-grid;place-items:center;flex:0 0 auto}.check-btn[aria-checked="true"]{background:rgba(200,217,135,.22);border-color:var(--forest)}.check-btn[aria-checked="true"]::before{content:"✓";background:var(--forest);color:var(--bg);font-size:13px;font-weight:900;line-height:1}html[data-theme="dark"] .check-btn[aria-checked="true"]::before{color:#111813}.submit{grid-column:1/-1;border:0;border-radius:999px;background:var(--forest);color:var(--bg);padding:12px 16px;font-weight:800}html[data-theme="dark"] .submit{color:#111813}.confirm{margin:auto;border:1px solid var(--rule);border-radius:30px;background:var(--panel);padding:44px;text-align:center;box-shadow:var(--shadow);max-width:560px}.confirm h1{font-size:42px;margin:0 0 10px;letter-spacing:-.05em}.scrim{position:absolute;inset:0;background:rgba(16,20,18,.34);z-index:9;display:grid;place-items:center}.modal{width:420px;border:1px solid var(--rule);border-radius:26px;background:var(--panel);color:var(--ink);padding:22px;box-shadow:var(--shadow)}.modal h2{margin:0 0 8px;font-size:24px;letter-spacing:-.035em}.modal p{color:var(--muted);line-height:1.45}.modal-actions{display:flex;justify-content:flex-end;gap:9px;margin-top:12px}.modal-actions button{border:1px solid var(--rule);border-radius:999px;background:transparent;color:var(--ink);padding:10px 13px;font-weight:760}.modal-actions .solid{background:var(--forest);border-color:var(--forest);color:var(--bg)}html[data-theme="dark"] .modal-actions .solid{color:#111813}.cookie{align-self:end;margin:0 auto 18px;width:620px}.cookie .modal-actions{justify-content:flex-start}.disabled-note{color:var(--muted);font-size:13px}
+  </style>
+</head>
+<body>
+  <div id="app"></div>
+  <script src="../common/blink-scenario.js"></script>
+  <script>
+  (()=>{
+    const K = window.BlinkScenarioKit;
+    const app = document.getElementById('app');
+    const taskIndex = K.params.task === 1 ? 1 : 0;
+    const company = 'Alderpoint';
+    const teams = ['All teams','Platform','Data','Design','Security','Mobile','Sales'];
+    const locations = ['All locations','Lisbon','Toronto','Singapore','Austin','Remote (Europe)'];
+    const navMid = K.shuffle(K.stream('nav'), ['Platform','Customers','Company']);
+    const skillPool = ['Kotlin','Rust','Elixir','Terraform','Go','Kafka'];
+    const targetSkill = K.pick(K.stream('skill'), skillPool.slice(0,4));
+    const otherSkills = skillPool.filter(s=>s!==targetSkill);
+    const salaries = {Platform:'€86k–€118k',Data:'€78k–€108k',Design:'€72k–€99k',Security:'€92k–€126k',Mobile:'€80k–€112k',Sales:'€70k–€104k'};
+    const baseBullets = {
+      Platform:['Operate resilient services across region-aware clusters.','Improve deploy safety, observability, and on-call rituals.','Partner with product teams on capacity planning.'],
+      Data:['Build data products for battery telemetry and forecasts.','Model grid events with scientists and field teams.','Harden pipelines from device ingestion to reporting.'],
+      Design:['Shape product flows for dispatchers and operators.','Prototype dashboards with crisp interaction patterns.','Translate complex energy concepts into calm screens.'],
+      Security:['Review cloud controls and incident response paths.','Automate detection for identity and supply-chain risks.','Coach teams on practical threat modeling.'],
+      Mobile:['Ship field workflows for technicians and site leads.','Tune offline sync for low-connectivity visits.','Collaborate closely with platform API owners.'],
+      Sales:['Guide energy customers through technical evaluations.','Build account plans with solutions engineers.','Turn market feedback into product signals.']
+    };
+    const roles = buildRoles();
+    const task0Target = roles.find(r=>r.id==='sre-lisbon');
+    const task0WrongSameTitle = roles.find(r=>r.id==='sre-toronto');
+    const task1Target = roles.find(r=>r.id==='backend-target');
+    const taskTexts = [
+      `Go to Careers, show Platform roles in Lisbon, open ${task0Target.title} and click Apply. Stop at the application form.`,
+      `Find the "Backend Engineer" opening whose description asks for ${targetSkill} and open it.`
+    ];
+    const values = taskIndex===1 ? ['Backend Engineer'] : [];
+    const state = {
+      page: K.params.state || 'home', route: K.params.state || 'home', jobId:null, search:'', team:'All teams', location:'All locations', pageNo:1,
+      submitted:false, failed:false, interruptSeen:false, interruptOpen:false, interruptKind:null, checked:false
+    };
+    const milestone = K.pick(K.stream('interrupt'), ['careers','job']);
+    const kind = K.pick(K.stream('interrupt-kind'), ['cookie','promo']);
+    applyInitialState(K.params.state || 'home');
+    function buildRoles(){
+      const fixed = [
+        role('sre-lisbon','Senior Site Reliability Engineer','Platform','Lisbon',['SLO ownership','incident review','Linux networking','capacity models']),
+        role('sre-toronto','Senior Site Reliability Engineer','Platform','Austin',['SLO ownership','release safety','Linux networking','capacity models']),
+        role('site-rel-lisbon','Site Reliability Engineer','Platform','Lisbon',['Kubernetes','runbooks','service telemetry','Python']),
+        role('senior-platform-lisbon','Senior Platform Engineer','Platform','Lisbon',['Kubernetes','Go services','developer tooling','observability']),
+        role('backend-target','Backend Engineer','Platform','Austin',[targetSkill,'distributed APIs','service ownership','PostgreSQL']),
+        role('backend-data','Backend Engineer','Data','Toronto',[otherSkills[0],'stream processing','data contracts','PostgreSQL']),
+        role('backend-security','Backend Engineer','Security','Singapore',[otherSkills[1],'identity systems','audit trails','Python']),
+        role('backend-mobile','Backend Engineer','Mobile','Remote (Europe)',[otherSkills[2],'sync APIs','GraphQL','device telemetry'])
+      ];
+      const pool = [
+        ['Telemetry Designer','Design','Remote (Europe)'],['Senior Data Engineer','Data','Lisbon'],['Threat Detection Analyst','Security','Austin'],['iOS Field Engineer','Mobile','Toronto'],['Solutions Engineer','Sales','Singapore'],['Grid Forecasting Scientist','Data','Austin'],['Design Systems Lead','Design','Toronto'],['Cloud Security Engineer','Security','Remote (Europe)'],['Android Platform Engineer','Mobile','Lisbon'],['Enterprise Account Director','Sales','Austin'],['Developer Experience Engineer','Platform','Singapore'],['Customer Reliability','Sales','Remote (Europe)'],['Data Visualization Engineer','Data','Singapore'],['Product Security Lead','Security','Toronto'],['Energy Markets Designer','Design','Austin'],['Site Operations Analyst','Platform','Remote (Europe)']
+      ];
+      const extras = pool.map((p,i)=>role('extra-'+i,p[0],p[1],p[2],[K.pick(K.stream('skill-extra-'+i),skillPool),'customer empathy','systems thinking','clear writing']));
+      return K.shuffle(K.stream('roles'), fixed.concat(extras)).slice(0,24);
+    }
+    function role(id,title,team,location,skills){return {id,title,team,location,skills,mode:location==='Remote (Europe)'?'Remote':'Hybrid',posted:K.between(K.stream('posted-'+id),2,8)+' days ago'};}
+    function applyInitialState(name){
+      if(name==='filtered'){state.page='careers';state.team='Platform';state.location='Lisbon';}
+      else if(name==='job'){state.page='job';state.jobId=taskIndex===1?task1Target.id:task0Target.id;}
+      else if(name==='apply'){state.page='apply';state.jobId=task0Target.id;}
+      else if(name==='no_results'){state.page='careers';state.search='zzzzzz';}
+      else if(name==='submitted'){state.page='submitted';state.submitted=true;state.jobId=task0Target.id;}
+      else if(['home','careers'].includes(name)){state.page=name;}
+      else state.page='home';
+      state.route=state.page;
+    }
+    function filteredRoles(){
+      let rs = roles.slice();
+      const q = state.search.trim().toLowerCase();
+      if(q) rs = rs.filter(r=>r.title.toLowerCase().includes(q));
+      if(state.team!=='All teams') rs = rs.filter(r=>r.team===state.team);
+      if(state.location!=='All locations') rs = rs.filter(r=>r.location===state.location);
+      return rs;
+    }
+    function currentStateName(){
+      if(state.failed) return state.page==='submitted'?'submitted':state.page;
+      if(state.page==='submitted') return 'submitted';
+      if(state.page==='apply') return 'apply';
+      if(state.page==='job') return 'job';
+      if(state.page==='home') return 'home';
+      if(state.page==='careers'){
+        if(filteredRoles().length===0) return 'no_results';
+        if(state.search || state.team!=='All teams' || state.location!=='All locations') return 'filtered';
+        return 'careers';
+      }
+      return state.page;
+    }
+    function navLink(label){return `<a id="nav-${label.toLowerCase()}" href="#${label.toLowerCase()}" data-route="${label.toLowerCase()}">${label}</a>`;}
+    function header(){
+      const links = navMid.map(navLink).join('') + navLink('Careers');
+      const contact = state.page==='home' ? '<a id="contact-sales" class="contact" href="#contact" data-route="contact">Contact sales</a>' : '';
+      return `<header><a id="logo-home" class="brand" href="#home" data-route="home"><span class="brand-mark"><svg viewBox="0 0 24 24"><path d="M4 15c4-7 8 2 16-7"/><path d="M5 18h14"/></svg></span>${company}</a><nav class="nav">${links}${contact}</nav></header><div class="top-rule"></div>`;
+    }
+    function render(){
+      app.innerHTML = header() + renderPage();
+      wire();
+      maybeInterrupt();
+      renderInterrupt();
+    }
+    function renderPage(){
+      if(state.page==='home') return home();
+      if(state.page==='careers') return careers();
+      if(state.page==='job') return jobDetail();
+      if(state.page==='apply') return applyForm();
+      if(state.page==='submitted') return submitted();
+      return overview(state.page);
+    }
+    function home(){return `<main class="hero"><section><p class="eyebrow">Storage orchestration for a steadier grid</p><h1>Energy software that knows when to hold back.</h1><p class="lead">Alderpoint helps operators dispatch battery fleets, forecast constraints, and explain every decision before power moves.</p><div class="cta-row"><a id="see-platform" class="btn primary" href="#platform" data-route="platform">See the platform</a><a id="read-stories" class="btn" href="#customers" data-route="customers">Read customer stories</a></div><div class="stats"><div class="stat"><b>18 GW</b><span>storage scheduled nightly</span></div><div class="stat"><b>41 ms</b><span>median dispatch decision</span></div><div class="stat"><b>99.98%</b><span>control-plane availability</span></div></div><div class="tiles"><div class="tile"><h3>Forecast first</h3><p>Constraint-aware models tuned for volatile sites.</p></div><div class="tile"><h3>Operator calm</h3><p>Clear workflows when prices and weather swing.</p></div><div class="tile"><h3>Audit ready</h3><p>Every dispatch carries a readable trail.</p></div></div></section><aside class="visual" aria-hidden="true"><svg viewBox="0 0 430 360"><defs><linearGradient id="g" x1="0" x2="1"><stop stop-color="var(--lime)"/><stop offset="1" stop-color="var(--sand)"/></linearGradient></defs><path d="M0 260 C80 220 120 255 190 210 S335 170 430 210 V360 H0 Z" fill="url(#g)" opacity=".45"/><path d="M42 260h346" stroke="var(--rule)"/><path d="M70 260V118M120 260V88M170 260V128M286 260V103M345 260V142" stroke="var(--forest)" stroke-width="2"/><path d="M70 118l50-30 50 40 116-25 59 39" fill="none" stroke="var(--forest)" stroke-width="2"/><g fill="var(--panel)" stroke="var(--forest)"><rect x="54" y="210" width="44" height="50" rx="8"/><rect x="266" y="204" width="44" height="56" rx="8"/><rect x="327" y="218" width="44" height="42" rx="8"/></g><circle cx="120" cy="88" r="8" fill="var(--lime)"/><circle cx="286" cy="103" r="8" fill="var(--lime)"/></svg></aside></main>`;}
+    function overview(page){const titles={platform:'A platform for dispatch confidence',customers:'Teams using Alderpoint',company:'Independent, careful, field-minded',contact:'Talk with Alderpoint'};return `<main class="page mini"><section class="overview"><p class="eyebrow">${page}</p><h1>${titles[page]||'Alderpoint'}</h1><p>Explore the product story, customer patterns, and operating principles behind our grid-scale battery software. For open roles, use the Careers link in the header.</p><div class="tiles"><div class="tile"><h3>Planning</h3><p>Forecast availability before the market opens.</p></div><div class="tile"><h3>Control</h3><p>Dispatch safely with human-readable reasoning.</p></div><div class="tile"><h3>Review</h3><p>Learn from every operating window.</p></div></div></section><aside class="visual" aria-hidden="true"></aside></main>`;}
+    function careers(){
+      const rs = filteredRoles(); const perPage = 4; const pages = Math.max(1, Math.ceil(rs.length/perPage)); state.pageNo = Math.min(state.pageNo,pages); const shown = rs.slice((state.pageNo-1)*perPage,state.pageNo*perPage);
+      const hasFilters = state.search || state.team!=='All teams' || state.location!=='All locations';
+      const clear = (hasFilters && rs.length>0) ? '<button id="clear-filters" class="clear">Clear filters</button>' : '<span></span>';
+      return `<main class="page"><section class="banner"><div><h1>Careers at ${company} · 24 open roles</h1><p>Help build careful software for energy teams moving real power.</p></div><span class="chip">Open, focused, practical</span></section><section class="filters"><div class="field"><label for="search-roles">Search roles</label><input id="search-roles" value="${esc(state.search)}" placeholder="Search roles" autocomplete="off"></div><div class="field"><label for="team-select">Team</label><select id="team-select">${teams.map(t=>`<option value="${t}" ${t===state.team?'selected':''}>${t}</option>`).join('')}</select></div><div class="field"><label for="location-select">Location</label><select id="location-select">${locations.map(l=>`<option value="${l}" ${l===state.location?'selected':''}>${l}</option>`).join('')}</select></div>${clear}</section>${rs.length===0?empty():`<section class="jobs">${shown.map(row).join('')}</section>${rs.length>perPage?pager(pages):'<div class="pager"></div>'}`}</main>`;
+    }
+    function row(r){return `<a id="role-${r.id}" class="job-row" href="#job-${r.id}" data-job="${r.id}" aria-label="${r.title}, ${r.location}"><span class="role-text"><b>${r.title}</b><span class="role-meta">${r.team} · ${r.location} · Full-time</span></span><em class="posted">${r.posted}</em></a>`;}
+    function pager(pages){return `<div class="pager"><button id="prev-page" ${state.pageNo<=1?'disabled':''}>Previous</button><span>Page ${state.pageNo} of ${pages}</span><button id="next-page" ${state.pageNo>=pages?'disabled':''}>Next</button></div>`;}
+    function empty(){return `<section class="empty"><h2>No roles match</h2><p class="disabled-note">Try a broader team, location, or search phrase.</p><button id="clear-filters" class="btn">Clear filters</button></section>`;}
+    function currentJob(){return roles.find(r=>r.id===state.jobId)||task0Target;}
+    function roleDoBullets(r){
+      const byId = {
+        'sre-lisbon':['Own SLOs for dispatch control services used during live market windows.','Lead incident reviews that turn paging data into safer rollout patterns.','Improve Linux networking, capacity models, and regional failover drills.'],
+        'sre-toronto':['Shape release safety for services that coordinate customer battery fleets.','Partner with on-call engineers to shorten detection and recovery paths.','Build capacity models that make growth risks visible before launch.'],
+        'site-rel-lisbon':['Maintain Kubernetes runbooks for customer-facing control planes.','Turn service telemetry into practical alerts and weekly reliability fixes.','Automate Python tools that make routine operations less manual.'],
+        'senior-platform-lisbon':['Build Kubernetes developer paths for teams shipping dispatch features.','Improve Go service templates, tracing defaults, and deployment guardrails.','Coach product engineers on observable, region-aware service design.'],
+        'backend-target':['Design service APIs that keep dispatch decisions auditable and fast.','Own database changes from design review through production rollout.','Work with platform peers to harden customer-facing workflows.'],
+        'backend-data':['Build ingestion endpoints for telemetry and market data products.','Protect data contracts as pipelines evolve across science and product teams.','Tune storage paths so analysts can trust freshness and lineage.'],
+        'backend-security':['Develop identity and audit services for sensitive operator actions.','Translate security reviews into clear backend implementation plans.','Maintain trails that help customers explain access and approvals.'],
+        'backend-mobile':['Create sync APIs that keep technician workflows useful offline.','Partner with mobile engineers on GraphQL boundaries and device telemetry.','Measure latency and retry behavior from field devices through the API.']
+      };
+      return byId[r.id] || baseBullets[r.team];
+    }
+    function skillLine(skill,r){
+      const map = {
+        'Kubernetes':'5+ years running Kubernetes-backed services in production.',
+        'Terraform':'Comfort with Terraform and GitOps workflows for cloud infrastructure.',
+        'Kotlin':'You have written Kotlin services that handle real customer traffic.',
+        'Rust':'You have shipped Rust components where correctness and latency mattered.',
+        'Elixir':'You have operated Elixir systems with supervision trees and real users.',
+        'Go':'Experience building Go services with clear APIs and production telemetry.',
+        'Kafka':'Practical Kafka experience, including partitioning, retries, and consumer health.',
+        'PostgreSQL':'Strong PostgreSQL instincts for schema design, migrations, and query review.',
+        'Python':'Python automation experience for reliability, data, or security workflows.',
+        'GraphQL':'Experience designing GraphQL contracts that mobile clients can depend on.',
+        'SLO ownership':'You have owned SLOs, error budgets, and the tradeoffs behind them.',
+        'incident review':'You write blameless incident reviews that lead to concrete prevention work.',
+        'release safety':'You know how to reduce deployment risk with staged rollout practices.',
+        'Linux networking':'Deep Linux networking knowledge for debugging production service paths.',
+        'capacity models':'Experience forecasting capacity needs before customers feel constraints.',
+        'runbooks':'You write runbooks that another engineer can follow under pressure.',
+        'service telemetry':'Comfort turning service telemetry into alerts people can trust.',
+        'Go services':'You have built Go services with owned APIs, tests, and operational dashboards.',
+        'developer tooling':'A record of improving developer tooling without hiding production reality.',
+        'observability':'Strong observability instincts across traces, logs, metrics, and ownership.',
+        'distributed APIs':'Experience designing distributed APIs with clear failure modes.',
+        'service ownership':'You have carried service ownership through design, launch, and on-call.',
+        'stream processing':'Hands-on stream processing experience with late data and backfills.',
+        'data contracts':'You have maintained data contracts across producer and consumer teams.',
+        'identity systems':'Experience with identity systems, authorization boundaries, and auditability.',
+        'audit trails':'You know how to build audit trails that are useful during reviews.',
+        'sync APIs':'Experience with sync APIs that survive intermittent connectivity.',
+        'device telemetry':'You have worked with noisy device telemetry and practical debugging paths.',
+        'customer empathy':'You bring customer empathy to tradeoffs, documentation, and support handoffs.',
+        'systems thinking':'You use systems thinking to connect local fixes to broader reliability.',
+        'clear writing':'Clear writing habits for design docs, launch notes, and incident follow-ups.'
+      };
+      return map[skill] || `Practical experience with ${skill} in shipped, collaborative work.`;
+    }
+    function roleBringBullets(r){return r.skills.map(x=>skillLine(x,r));}
+    function jobDetail(){const r=currentJob();return `<main class="page"><a id="all-roles" class="back" href="#careers" data-route="careers">All roles</a><section class="detail"><article class="copy"><h1>${r.title}</h1><div class="chips"><span class="chip">${r.team}</span><span class="chip">${r.location}</span><span class="chip">Full-time</span><span class="chip">${r.mode}</span></div><h2>About the role</h2><p>You will help ${company} make high-stakes energy operations feel legible, stable, and measurable for customers running battery fleets.</p><h2>What you'll do</h2><ul>${roleDoBullets(r).map(x=>`<li>${x}</li>`).join('')}</ul><h2>What you bring</h2><ul>${roleBringBullets(r).map(x=>`<li>${x}</li>`).join('')}</ul><p class="salary">Salary band: ${salaries[r.team]} depending on location and experience.</p></article><aside class="summary-card"><h3>Role summary</h3><div class="summary-list"><div class="summary-row"><span>Team</span><b>${r.team}</b></div><div class="summary-row"><span>Location</span><b>${r.location}</b></div><div class="summary-row"><span>Employment type</span><b>Full-time</b></div><div class="summary-row"><span>Work style</span><b>${r.mode}</b></div><div class="summary-row"><span>Salary band</span><b>${salaries[r.team]}</b></div></div><button id="apply-button" class="btn primary">Apply</button></aside></section></main>`;}
+    function applyForm(){const r=currentJob();return `<main class="page"><a id="back-to-role" class="back" href="#job-${r.id}" data-job="${r.id}">Back to role</a><section class="apply-grid"><aside class="apply-aside"><p class="eyebrow">Application</p><h1>Applying for ${r.title} · ${r.location}</h1><p>Share a few details. This form is intentionally short so our recruiting team can focus on your work.</p></aside><form class="form" id="application-form"><div class="form-field"><label for="full-name">Full name</label><input id="full-name" autocomplete="off"></div><div class="form-field"><label for="email">Email</label><input id="email" autocomplete="off"></div><div class="form-field"><label for="phone">Phone</label><input id="phone" autocomplete="off"></div><div class="form-field"><label for="portfolio">Portfolio URL</label><input id="portfolio" autocomplete="off"></div><div class="form-field full"><label for="why">Why Alderpoint?</label><textarea id="why"></textarea></div><button type="button" id="privacy-check" class="check-btn" role="checkbox" aria-checked="${state.checked?'true':'false'}">I agree to the privacy notice</button><button id="submit-application" class="submit" type="submit">Submit application</button></form></section></main>`;}
+    function submitted(){const r=currentJob();return `<main class="confirm"><h1>Application received</h1><p>Thanks for applying to the ${r.title} role in ${r.location}. The recruiting team will review your materials.</p></main>`;}
+    function maybeInterrupt(){
+      if(!K.params.interrupts || K.params.state || state.interruptSeen || state.interruptOpen) return;
+      const here = currentStateName();
+      if(here===milestone){ state.interruptOpen=true; state.interruptSeen=true; state.interruptKind=kind; }
+    }
+    function renderInterrupt(){
+      const bg = app.querySelector('header') ? Array.from(app.children).filter(el=>!el.classList.contains('scrim')) : [];
+      bg.forEach(el=> state.interruptOpen ? el.setAttribute('inert','') : el.removeAttribute('inert'));
+      if(!state.interruptOpen) return;
+      const isCookie = state.interruptKind==='cookie';
+      const html = isCookie ? `<div class="scrim"><section class="modal cookie" role="dialog" aria-modal="true"><h2>Cookies for site basics</h2><p>We use necessary cookies for navigation and anonymous measurement. Preferences can wait.</p><div class="modal-actions"><button id="necessary-only">Necessary only</button><button id="accept-cookies" class="solid">Accept all</button></div></section></div>` : `<div class="scrim"><section class="modal" role="dialog" aria-modal="true"><h2>Join our talent community</h2><p>Get occasional notes about new roles and how our teams work. You can keep browsing without joining.</p><div class="modal-actions"><button id="not-now">Not now</button><button id="join-community" class="solid">Join updates</button></div></section></div>`;
+      app.insertAdjacentHTML('beforeend', html);
+      ['necessary-only','accept-cookies','not-now','join-community'].forEach(id=>{const el=document.getElementById(id); if(el) el.addEventListener('click',()=>{state.interruptOpen=false;render();});});
+    }
+    function wire(){
+      app.querySelectorAll('[data-route]').forEach(a=>a.addEventListener('click',e=>{e.preventDefault(); route(a.dataset.route);}));
+      app.querySelectorAll('[data-job]').forEach(a=>a.addEventListener('click',e=>{e.preventDefault(); state.jobId=a.dataset.job; state.page='job'; render();}));
+      const s=document.getElementById('search-roles'); if(s) s.addEventListener('input',()=>{state.search=s.value;state.pageNo=1;render();});
+      const ts=document.getElementById('team-select'); if(ts) ts.addEventListener('change',()=>{state.team=ts.value;state.pageNo=1;render();});
+      const ls=document.getElementById('location-select'); if(ls) ls.addEventListener('change',()=>{state.location=ls.value;state.pageNo=1;render();});
+      const clear=document.getElementById('clear-filters'); if(clear) clear.addEventListener('click',()=>{state.search='';state.team='All teams';state.location='All locations';state.pageNo=1;render();});
+      const prev=document.getElementById('prev-page'); if(prev) prev.addEventListener('click',()=>{state.pageNo=Math.max(1,state.pageNo-1);render();});
+      const next=document.getElementById('next-page'); if(next) next.addEventListener('click',()=>{state.pageNo=state.pageNo+1;render();});
+      const apply=document.getElementById('apply-button'); if(apply) apply.addEventListener('click',()=>{state.page='apply';render();});
+      const chk=document.getElementById('privacy-check'); if(chk) chk.addEventListener('click',()=>{state.checked=!state.checked;render();});
+      const form=document.getElementById('application-form'); if(form) form.addEventListener('submit',e=>{e.preventDefault();state.submitted=true;state.failed=true;state.page='submitted';render();});
+    }
+    function route(r){
+      if(r==='careers'){state.page='careers';}
+      else if(r==='home'){state.page='home';}
+      else {state.page=r;}
+      render();
+    }
+    function dismissExpected(){
+      if(!state.interruptOpen) return null;
+      return {selector: state.interruptKind==='cookie'?'#necessary-only':'#not-now', action:'click', value:null, done:false, risky:false};
+    }
+    function expected(){
+      const dis=dismissExpected(); if(dis) return dis;
+      const chk=check(); if(chk.done && chk.success) return {selector:null,action:'none',value:null,done:true,risky:false};
+      if(state.failed) return {selector:null,action:'none',value:null,done:false,risky:false,failed:true};
+      if(taskIndex===0) return expectedTask0();
+      return expectedTask1();
+    }
+    function expectedTask0(){
+      if(state.page!=='careers' && state.page!=='job' && state.page!=='apply') return {selector:'#nav-careers',action:'click',value:null,done:false,risky:false};
+      if(state.page==='apply'){
+        if(state.jobId===task0Target.id) return {selector:null,action:'none',value:null,done:true,risky:false};
+        return {selector:'#back-to-role',action:'click',value:null,done:false,risky:false};
+      }
+      if(state.page==='job'){
+        if(state.jobId===task0Target.id) return {selector:'#apply-button',action:'click',value:null,done:false,risky:false};
+        return {selector:'#all-roles',action:'click',value:null,done:false,risky:false};
+      }
+      if(state.search) return {selector:'#search-roles',action:'type',value:'',done:false,risky:false};
+      if(state.team!=='Platform') return {selector:'#team-select',action:'select',value:'Platform',done:false,risky:false};
+      if(state.location!=='Lisbon') return {selector:'#location-select',action:'select',value:'Lisbon',done:false,risky:false};
+      return {selector:'#role-sre-lisbon',action:'click',value:null,done:false,risky:false};
+    }
+    function expectedTask1(){
+      if(state.page==='apply') return {selector:'#back-to-role',action:'click',value:null,done:false,risky:false};
+      if(state.page==='job'){
+        if(state.jobId===task1Target.id) return {selector:null,action:'none',value:null,done:true,risky:false};
+        return {selector:'#all-roles',action:'click',value:null,done:false,risky:false};
+      }
+      if(state.page!=='careers') return {selector:'#nav-careers',action:'click',value:null,done:false,risky:false};
+      if(state.team!=='All teams') return {selector:'#team-select',action:'select',value:'All teams',done:false,risky:false};
+      if(state.location!=='All locations') return {selector:'#location-select',action:'select',value:'All locations',done:false,risky:false};
+      if(state.search!=='Backend Engineer') return {selector:'#search-roles',action:'type',value:'Backend Engineer',done:false,risky:false};
+      return {selector:'#role-backend-target',action:'click',value:null,done:false,risky:false};
+    }
+    function check(){
+      try{
+        if(state.failed) return {done:true,success:false,detail:'application was submitted'};
+        if(taskIndex===0){
+          const ok = state.page==='apply' && state.jobId===task0Target.id && !state.submitted;
+          return {done:ok,success:ok,detail:ok?'application form open for target role':'target application form not open'};
+        }
+        const ok = state.page==='job' && state.jobId===task1Target.id && !state.submitted;
+        return {done:ok,success:ok,detail:ok?`${targetSkill} Backend Engineer open`:'target backend role detail not open'};
+      }catch(e){return {done:false,success:false,detail:'check failed'};}
+    }
+    function esc(s){return String(s).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));}
+    render();
+    K.register({id:'careers', task:taskTexts[taskIndex], values, check, expected, state:currentStateName, targets:{task0:{target:task0Target.id, wrongSameTitle:task0WrongSameTitle.id}, task1:{target:task1Target.id, skill:targetSkill}}});
+  })();
+  </script>
+</body>
+</html>

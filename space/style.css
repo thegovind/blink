@@ -256,13 +256,6 @@ footer {
   animation: blk-pop 0.4s var(--ease) both;
 }
 
-/* the claim that makes it a blink: one pass, nothing generated */
-.blk-meta span:last-child {
-  background: var(--flash);
-  border-color: transparent;
-  color: var(--color-flash-ink);
-}
-
 .blk-rule {
   height: 1px;
   background: var(--line);
@@ -3120,11 +3113,32 @@ body {
   white-space: nowrap;
 }
 
-.blk-sv h3 .blk-saved {
-  margin-left: 6px;
+/* where an answer came from: a saved run of the model, a live run with its time, or the mock */
+.blk-tag.blk-from.saved {
   border-style: dashed;
   border-color: var(--blink-light);
   color: var(--blink-ink);
+}
+
+.blk-tag.blk-from.live {
+  border-color: var(--blink-light);
+  color: var(--blink-ink);
+}
+
+.blk-tag.blk-from.live::before {
+  content: "";
+  display: inline-block;
+  width: 7px;
+  height: 7px;
+  margin: 0 6px 1px 0;
+  border-radius: 50%;
+  background: var(--flash);
+  box-shadow: 0 0 0 1px rgba(10, 10, 10, 0.35);
+  vertical-align: middle;
+}
+
+.blk-tag.blk-from {
+  cursor: help;
 }
 
 .gradio-container .blk-sv p {
@@ -3949,4 +3963,1739 @@ table.blk-apitext td:first-child {
     transition-duration: 0.001ms !important;
     scroll-behavior: auto !important;
   }
+}
+
+
+/* --- computer use, where it leads -------------------------------------------------- */
+
+/* Screen click: Decide runs the model live, and how it reads the screenshot is one tap away */
+.gradio-container .blk-livenote {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin: 10px 0 0;
+  font-size: 13px;
+  line-height: 1.4;
+  color: var(--mid);
+}
+
+.blk-livedot {
+  flex: none;
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: var(--flash);
+  box-shadow: 0 0 0 1px rgba(10, 10, 10, 0.35);
+  animation: blk-beat 2.4s ease-in-out infinite;
+}
+
+@keyframes blk-beat {
+  0%, 100% { box-shadow: 0 0 0 1px rgba(10, 10, 10, 0.35), 0 0 0 0 rgba(212, 245, 92, 0.7); }
+  50% { box-shadow: 0 0 0 1px rgba(10, 10, 10, 0.35), 0 0 0 6px rgba(212, 245, 92, 0); }
+}
+
+.gradio-container .blk-howread {
+  margin-top: 12px;
+}
+
+.gradio-container .blk-howread summary {
+  font-size: 13px;
+}
+
+.gradio-container .blk-howline {
+  display: block;
+  margin-top: 2px;
+  color: var(--mid);
+  font-weight: 400;
+  line-height: 1.45;
+}
+
+.gradio-container .blk-howsteps {
+  margin: 10px 0 6px;
+  padding-left: 20px;
+  font-size: 13px;
+  line-height: 1.5;
+  color: var(--mid);
+}
+
+.gradio-container .blk-howsteps li {
+  margin: 4px 0;
+}
+
+.gradio-container .blk-howsteps b {
+  color: var(--ink);
+  font-weight: 600;
+}
+
+/* the home page: a marked screenshot first, then where to try it */
+.gradio-container .blk-cua {
+  gap: 28px;
+  align-items: center;
+  margin: 18px 0 30px;
+  padding: 22px;
+  border-radius: 20px;
+  background: var(--paper);
+  box-shadow: 0 0 0 1px var(--line), var(--shadow-subtle);
+}
+
+.blk-cua-shot {
+  margin: 0;
+}
+
+.gradio-container .blk-cua-shot img {
+  display: block;
+  width: 100%;
+  height: auto;
+  border-radius: 12px;
+  box-shadow: 0 0 0 1px var(--line);
+}
+
+.gradio-container .blk-cua-pitch {
+  margin: 4px 0 8px;
+  font-size: clamp(22px, 3.2vw, 34px);
+  font-weight: 600;
+  line-height: 1.12;
+  letter-spacing: -0.03em;
+  color: var(--ink);
+}
+
+.gradio-container .blk-cua-go {
+  gap: 10px;
+  margin-top: 14px;
+  flex-wrap: wrap;
+}
+
+.gradio-container .blk-cua-go button {
+  flex: 0 0 auto;
+  width: auto;
+  min-width: 0;
+}
+
+.gradio-container .blk-cua-next {
+  background: transparent;
+  box-shadow: 0 0 0 1px var(--line);
+}
+
+/* How it works: the screenshot path, in six steps */
+.blk-vsec {
+  margin: 34px 0 10px;
+}
+
+.gradio-container .blk-vsec ol.blk-vpipe {
+  display: grid;
+  grid-template-columns: repeat(5, minmax(0, 1fr));
+  gap: 12px;
+  margin: 14px 0 12px !important;
+  padding: 0 !important;
+  list-style: none;
+}
+
+.gradio-container .blk-vpipe li {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  margin: 0;
+  padding: 12px;
+  border-radius: 14px;
+  background: var(--paper);
+  box-shadow: 0 0 0 1px var(--line);
+  font-size: 12.5px;
+  line-height: 1.45;
+  color: var(--mid);
+  animation: blk-rise 0.4s var(--ease) both;
+  animation-delay: calc(var(--i) * 90ms);
+}
+
+.gradio-container .blk-vpipe li + li::before {
+  content: "";
+  position: absolute;
+  left: -12px;
+  top: 34px;
+  width: 12px;
+  height: 2px;
+  background: var(--blink-light);
+}
+
+.gradio-container .blk-vpipe b {
+  color: var(--ink);
+  font-size: 13.5px;
+  font-weight: 600;
+}
+
+.blk-vp-art {
+  display: flex;
+  align-items: center;
+  height: 48px;
+}
+
+.gradio-container .blk-vp-art img {
+  max-height: 48px;
+  width: auto;
+  border-radius: 6px;
+  box-shadow: 0 0 0 1px var(--line);
+}
+
+.blk-vp-art svg {
+  width: 30px;
+  height: 30px;
+  fill: none;
+  stroke: var(--blink);
+  stroke-width: 1.7;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+.blk-vp-n {
+  position: absolute;
+  top: 10px;
+  right: 12px;
+  font-family: var(--font-geist-mono);
+  font-size: 11px;
+  color: var(--mid);
+}
+
+.gradio-container .blk-vpipe li:last-child {
+  box-shadow: 0 0 0 2px var(--flash), 0 0 0 3px rgba(10, 10, 10, 0.25);
+}
+
+@media (max-width: 1100px) {
+  .gradio-container .blk-vsec ol.blk-vpipe {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+
+  .gradio-container .blk-vpipe li:nth-child(3n + 1)::before {
+    display: none;
+  }
+}
+
+@media (max-width: 640px) {
+  .gradio-container .blk-vsec ol.blk-vpipe {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .gradio-container .blk-vpipe li + li::before {
+    display: block;
+    left: 26px;
+    top: -12px;
+    width: 2px;
+    height: 12px;
+  }
+
+  .gradio-container .blk-cua {
+    padding: 14px;
+    gap: 14px;
+  }
+}
+
+.gradio-container .blk-vp-fact {
+  display: block;
+  margin-top: 4px;
+  padding: 0;
+  background: none;
+  font-family: var(--font-geist-mono);
+  font-size: 11px;
+  line-height: 1.45;
+  color: var(--mid);
+  overflow-wrap: anywhere;
+}
+
+.gradio-container .blk-good {
+  margin-top: 18px;
+}
+
+.gradio-container .blk-goodlist {
+  margin: 6px 0 4px;
+  padding-left: 18px;
+  font-size: 13.5px;
+  line-height: 1.55;
+  color: var(--mid);
+}
+
+
+/* --- the Computer use tab: runs first, then how, then try ------------------------- */
+
+.blk-cuax {
+  display: block;
+  min-width: 0;
+}
+
+.gradio-container .blk-cuax-title {
+  margin: 0 0 6px;
+  font-size: clamp(28px, 4.2vw, 46px);
+  font-weight: 600;
+  line-height: 1.05;
+  letter-spacing: -0.04em;
+  color: var(--ink);
+}
+
+.gradio-container .blk-cuax-pitch {
+  max-width: 640px;
+  margin: 0 0 18px;
+}
+
+/* the stage: a strip of real runs, or one run in the player */
+.blk-cuax-stage {
+  container-type: inline-size;
+  scroll-margin-top: 12px;
+}
+
+/* three reels fill the row exactly: two screens and a phone, or three screens */
+.blk-cuax-strip {
+  --fit: 3.8;
+  --reel-h: clamp(190px, calc((100cqw - 28px) / var(--fit)), 330px);
+  display: flex;
+  gap: 14px;
+  height: var(--reel-h);
+  overflow-x: auto;
+  overflow-y: hidden;
+  scroll-snap-type: x mandatory;
+  scrollbar-width: none;
+  padding: 2px 2px 6px;
+  margin: 0 -2px;
+}
+
+.blk-cuax-strip.wide {
+  --fit: 5;
+}
+
+.blk-cuax-strip::-webkit-scrollbar {
+  display: none;
+}
+
+.gradio-container a.blk-cuax-reel {
+  position: relative;
+  flex: none;
+  display: block;
+  height: 100%;
+  aspect-ratio: var(--ar);
+  overflow: hidden;
+  border-radius: 20px;
+  background: #0a0a0a;
+  box-shadow: 0 0 0 1px var(--line), var(--shadow-subtle);
+  padding: 0;
+  scroll-snap-align: start;
+  text-decoration: none;
+  color: var(--ink);
+  animation: blk-rise 0.5s var(--ease) both;
+  animation-delay: calc(var(--i) * 90ms);
+  transition: transform 0.25s var(--ease), box-shadow 0.25s var(--ease);
+}
+
+.gradio-container a.blk-cuax-reel:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 0 0 2px var(--blink), 0 10px 30px -12px rgba(10, 10, 10, 0.35);
+}
+
+.gradio-container .blk-cuax-reel video,
+.gradio-container .blk-cuax-reel img {
+  display: block;
+  width: 100%;
+  height: 100%;
+  margin: 0 !important;
+  object-fit: cover;
+  object-position: top center;
+  border-radius: 0;
+}
+
+.blk-cuax-cap {
+  position: absolute;
+  left: 10px;
+  bottom: 10px;
+  display: inline-flex;
+  align-items: baseline;
+  gap: 8px;
+  max-width: calc(100% - 20px);
+  padding: 5px 12px;
+  border-radius: var(--radius-pill);
+  background: rgba(255, 255, 255, 0.9);
+  -webkit-backdrop-filter: blur(8px);
+  backdrop-filter: blur(8px);
+  box-shadow: 0 0 0 1px rgba(10, 10, 10, 0.06), 0 2px 8px rgba(10, 10, 10, 0.12);
+  font-size: 12.5px;
+  line-height: 1.3;
+  white-space: nowrap;
+}
+
+.blk-cuax-cap b {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  font-weight: 600;
+}
+
+.blk-cuax-cap em {
+  font-style: normal;
+  color: var(--mid-c);
+  font-variant-numeric: tabular-nums;
+}
+
+/* a phone's reel is narrow: its name takes two lines, its runs the third; where the strip is shorter
+   than a desk's (gradio drops container queries, so the window decides), only its runs */
+@media (max-width: 1200px) {
+  .blk-cuax-reel.tall .blk-cuax-cap b {
+    display: none;
+  }
+}
+
+.blk-cuax-reel.tall .blk-cuax-cap {
+  right: 8px;
+  left: 8px;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 0;
+  padding: 5px 10px;
+  border-radius: 12px;
+  white-space: normal;
+}
+
+/* the headline numbers, as stat blocks */
+.blk-cuax-stats {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0;
+  margin: 18px 0 26px;
+  padding: 0;
+}
+
+.blk-cuax-stats span {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  min-width: 120px;
+  padding: 2px 22px 2px 0;
+  margin-right: 22px;
+  border-right: 1px solid var(--line);
+  font-size: 12.5px;
+  color: var(--mid-c);
+  animation: blk-rise 0.45s var(--ease) both;
+  animation-delay: calc(200ms + var(--i) * 80ms);
+}
+
+.blk-cuax-stats span:last-child {
+  border-right: 0;
+}
+
+.blk-cuax-stats b {
+  font-size: 26px;
+  font-weight: 600;
+  line-height: 1.1;
+  letter-spacing: -0.03em;
+  color: var(--ink);
+  font-variant-numeric: tabular-nums;
+}
+
+/* the scenarios: a poster each, its name, and every run it had */
+.gradio-container .blk-cuax-gl {
+  margin-top: 4px;
+}
+
+.blk-cuax-cards {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(196px, 1fr));
+  gap: 14px;
+  margin: 0 0 8px;
+}
+
+.gradio-container a.blk-cuax-card {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  min-width: 0;
+  padding: 8px 8px 12px;
+  border-radius: 18px;
+  background: var(--paper);
+  box-shadow: 0 0 0 1px var(--line), var(--shadow-subtle);
+  color: var(--ink);
+  text-decoration: none;
+  animation: blk-rise 0.45s var(--ease) both;
+  animation-delay: calc(var(--i) * 45ms);
+  transition: transform 0.2s var(--ease), box-shadow 0.2s var(--ease);
+}
+
+.gradio-container a.blk-cuax-card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 0 0 1px var(--line-strong), 0 12px 28px -14px rgba(10, 10, 10, 0.35);
+}
+
+.gradio-container a.blk-cuax-card.on {
+  box-shadow: 0 0 0 2px var(--blink), var(--shadow-subtle);
+}
+
+.blk-cuax-thumb {
+  position: relative;
+  display: block;
+  aspect-ratio: 5 / 3;
+  overflow: hidden;
+  border-radius: 12px;
+  background: var(--alt);
+  box-shadow: 0 0 0 1px var(--line);
+}
+
+.gradio-container .blk-cuax-thumb video,
+.gradio-container .blk-cuax-thumb img {
+  display: block;
+  width: 100%;
+  height: 100%;
+  margin: 0 !important;
+  object-fit: cover;
+  object-position: top center;
+  border-radius: 0;
+}
+
+.blk-cuax-thumb.tall {
+  background: linear-gradient(180deg, #eef1fe, #f5f5f5);
+}
+
+.gradio-container .blk-cuax-thumb.tall video,
+.gradio-container .blk-cuax-thumb.tall img {
+  width: 42%;
+  margin: 0 auto !important;
+  box-shadow: 0 0 0 1px var(--line), 0 6px 18px -8px rgba(10, 10, 10, 0.4);
+}
+
+.blk-cuax-kind {
+  position: absolute;
+  top: 8px;
+  right: 8px;
+  padding: 1px 9px;
+  border-radius: var(--radius-pill);
+  background: rgba(255, 255, 255, 0.92);
+  box-shadow: 0 0 0 1px rgba(10, 10, 10, 0.08);
+  font-size: 11px;
+  font-style: normal;
+  font-weight: 500;
+  line-height: 18px;
+  color: var(--ink-soft);
+}
+
+.gradio-container a.blk-cuax-card > b {
+  display: -webkit-box;
+  padding: 2px 4px 0;
+  font-size: 14px;
+  font-weight: 600;
+  line-height: 1.3;
+  overflow: hidden;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 2;
+}
+
+.blk-cuax-rate {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 0 4px;
+  font-size: 12.5px;
+  font-weight: 500;
+  color: var(--ink-soft);
+  font-variant-numeric: tabular-nums;
+}
+
+.blk-cuax-by {
+  padding: 0 4px;
+  font-family: var(--font-geist-mono);
+  font-size: 11px;
+  color: var(--mid);
+}
+
+/* one dot per run: filled when it finished, open when it did not; none is left out */
+.blk-cuax-dots {
+  display: inline-flex;
+  flex-wrap: wrap;
+  gap: 3px;
+  max-width: 120px;
+}
+
+.blk-cuax-dots i {
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: var(--blink);
+}
+
+.blk-cuax-dots i.no {
+  background: transparent;
+  box-shadow: inset 0 0 0 1.5px var(--mid);
+}
+
+/* --- the player ---------------------------------------------------------------------- */
+
+.blk-cuax-player {
+  display: grid;
+  gap: 10px;
+  padding: 14px 16px 12px;
+  border-radius: var(--radius-cards);
+  background: var(--paper);
+  box-shadow: 0 0 0 1px var(--line), var(--shadow-subtle);
+  animation: blk-rise 0.4s var(--ease) both;
+  outline: none;
+}
+
+.blk-cuax-bar {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  min-width: 0;
+}
+
+.gradio-container .blk-cuax-x {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  flex: none;
+  padding: 5px 12px 5px 8px;
+  border: 1px solid var(--line);
+  border-radius: var(--radius-pill);
+  background: var(--paper);
+  color: var(--ink-soft);
+  font-size: 12.5px;
+  font-weight: 500;
+  cursor: pointer;
+}
+
+.gradio-container .blk-cuax-x:hover {
+  border-color: var(--line-strong);
+  background: var(--alt);
+}
+
+.blk-cuax-x svg,
+.blk-cuax-step svg {
+  width: 16px;
+  height: 16px;
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 2;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+.gradio-container .blk-cuax-name {
+  margin: 0;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  font-size: 20px;
+  font-weight: 600;
+  letter-spacing: -0.02em;
+  color: var(--ink);
+}
+
+.blk-cuax-who {
+  flex: none;
+  margin-left: auto;
+  padding: 2px 10px;
+  border-radius: var(--radius-pill);
+  background: var(--blink-tint);
+  color: var(--blink-ink);
+  font-family: var(--font-geist-mono);
+  font-size: 11.5px;
+  line-height: 20px;
+}
+
+.gradio-container .blk-cuax-task {
+  margin: 0;
+  font-size: 13.5px;
+  line-height: 1.5;
+  color: var(--ink-soft);
+}
+
+.blk-cuax-task span {
+  display: inline-block;
+  margin-right: 8px;
+  padding: 0 7px;
+  border-radius: 6px;
+  background: var(--track);
+  color: var(--mid-c);
+  font-size: 11px;
+  font-weight: 500;
+  letter-spacing: 0.04em;
+  line-height: 18px;
+  text-transform: uppercase;
+}
+
+.blk-cuax-body {
+  display: grid;
+  grid-template-columns: minmax(0, 1.8fr) minmax(250px, 1fr);
+  grid-template-areas: "screen side" "nav side";
+  grid-template-rows: auto 1fr;
+  gap: 12px 18px;
+  align-items: start;
+}
+
+.blk-cuax-player.tall .blk-cuax-body {
+  grid-template-columns: minmax(0, 330px) minmax(0, 1fr);
+}
+
+/* under a phone's narrow screen, Video or Steps takes a line of its own above the steps */
+.blk-cuax-player.tall .blk-cuax-nav {
+  flex-direction: column;
+  align-items: stretch;
+}
+
+.blk-cuax-player.tall .blk-cuax-views {
+  justify-content: center;
+}
+
+.gradio-container .blk-cuax-player.tall .blk-cuax-views button {
+  flex: 1 1 0;
+}
+
+.blk-cuax-screen {
+  grid-area: screen;
+  min-width: 0;
+}
+
+.blk-cuax-side {
+  grid-area: side;
+}
+
+.blk-cuax-nav {
+  grid-area: nav;
+}
+
+.blk-cuax-vid {
+  overflow: hidden;
+  border-radius: 16px;
+  background: #0a0a0a;
+  box-shadow: 0 0 0 1px var(--line), var(--shadow-subtle);
+}
+
+.gradio-container .blk-cuax-vid video {
+  display: block;
+  width: 100%;
+  height: 100%;
+  margin: 0 !important;
+  object-fit: contain;
+  border-radius: 0;
+}
+
+.blk-cuax-side {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  min-width: 0;
+  animation: blk-fade 0.3s ease both;
+}
+
+.gradio-container .blk-cuax-side .blk-sv {
+  min-height: 64px;
+  padding: 10px 14px;
+  border-radius: 18px;
+}
+
+.gradio-container .blk-cuax-side .blk-sv h3 {
+  font-size: 19px;
+}
+
+.gradio-container .blk-cuax-side .blk-sv-mark {
+  width: 34px;
+  height: 34px;
+  font-size: 15px;
+}
+
+.gradio-container .blk-cuax-side .blk-opts {
+  margin: 0;
+}
+
+.gradio-container .blk-cuax-stepn {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 8px;
+  margin: 0;
+  font-size: 12.5px;
+  color: var(--mid-c);
+}
+
+.blk-cuax-stepn b {
+  font-weight: 600;
+  color: var(--ink);
+}
+
+.blk-cuax-stepn span {
+  font-family: var(--font-geist-mono);
+  font-variant-numeric: tabular-nums;
+}
+
+.gradio-container .blk-cuax-miss {
+  margin: -4px 0 0;
+  font-size: 12.5px;
+  color: var(--mid-c);
+}
+
+.blk-cuax-miss::before {
+  content: "";
+  display: inline-block;
+  width: 10px;
+  height: 10px;
+  margin: 0 6px -1px 0;
+  border: 1.5px dashed var(--ink-soft);
+  border-radius: 3px;
+}
+
+/* where the run was expected to act, when blink picked another box */
+.blk-shot.answered .blk-som.expect {
+  box-shadow: inset 0 0 0 2px var(--blink), 0 0 0 3px #ffffff, 0 0 0 5px var(--ink-soft);
+  outline: 2px dashed #ffffff;
+  outline-offset: 3px;
+}
+
+.gradio-container .blk-cuax-outcome {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px;
+  margin: 0;
+  font-size: 13px;
+  color: var(--mid-c);
+}
+
+.blk-cuax-outcome span {
+  padding: 3px 12px;
+  border-radius: var(--radius-pill);
+  background: var(--flash);
+  color: var(--color-flash-ink);
+  font-weight: 600;
+  animation: blk-pop 0.4s var(--ease) both;
+}
+
+.blk-cuax-outcome.no span {
+  background: transparent;
+  box-shadow: inset 0 0 0 1.5px var(--ink-soft);
+  color: var(--ink);
+}
+
+.blk-cuax-outcome em {
+  font-style: normal;
+}
+
+.gradio-container .blk-cuax-facts {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px 0;
+  margin: 0;
+  font-size: 13px;
+  color: var(--ink-soft);
+}
+
+.blk-cuax-facts span + span::before {
+  content: "\00b7";
+  margin: 0 8px;
+  color: var(--mid);
+}
+
+.blk-cuax-runs {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 6px 10px;
+  font-size: 13px;
+  color: var(--mid-c);
+}
+
+.blk-cuax-runs b {
+  font-weight: 600;
+  color: var(--ink);
+  font-variant-numeric: tabular-nums;
+}
+
+.gradio-container .blk-cuax-acc {
+  margin: -4px 0 0;
+  font-size: 12.5px;
+  color: var(--mid-c);
+}
+
+.gradio-container .blk-cuax-alt {
+  align-self: flex-start;
+  padding: 0;
+  border: 0;
+  background: none;
+  color: var(--blink);
+  font-size: 13px;
+  font-weight: 500;
+  text-decoration: underline;
+  text-underline-offset: 3px;
+  cursor: pointer;
+}
+
+.gradio-container .blk-cuax-cmp {
+  display: grid;
+  gap: 4px;
+  margin: -4px 0 0 !important;
+  padding: 0 !important;
+  list-style: none;
+}
+
+.gradio-container .blk-cuax-cmp li {
+  margin: 0;
+}
+
+.gradio-container .blk-cuax-cmp button {
+  display: grid;
+  grid-template-columns: 112px minmax(0, 1fr) auto;
+  align-items: center;
+  gap: 10px;
+  width: 100%;
+  padding: 5px 8px;
+  border: 0;
+  border-radius: 10px;
+  background: transparent;
+  color: var(--ink-soft);
+  font-size: 12.5px;
+  text-align: left;
+  cursor: pointer;
+}
+
+.gradio-container .blk-cuax-cmp button:hover {
+  background: var(--alt);
+}
+
+.gradio-container .blk-cuax-cmp li.on button {
+  background: var(--blink-tint);
+  color: var(--blink-ink);
+}
+
+.blk-cuax-cmp span {
+  font-family: var(--font-geist-mono);
+  font-size: 11.5px;
+}
+
+.blk-cuax-cmp i {
+  position: relative;
+  height: 6px;
+  border-radius: 999px;
+  background: var(--track);
+  overflow: hidden;
+}
+
+.blk-cuax-cmp i::after {
+  content: "";
+  position: absolute;
+  inset: 0 auto 0 0;
+  width: calc(var(--p) * 100%);
+  border-radius: 999px;
+  background: var(--blink-light);
+  transform-origin: left center;
+  animation: blk-wipe 0.6s var(--ease) both;
+}
+
+.blk-cuax-cmp li.on i::after {
+  background: var(--blink);
+}
+
+.blk-cuax-cmp b {
+  font-weight: 600;
+  font-variant-numeric: tabular-nums;
+}
+
+/* Video or Steps, then the steps themselves, on one line that never wraps */
+.blk-cuax-nav {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  min-width: 0;
+}
+
+.blk-cuax-walk {
+  display: flex;
+  flex: 1 1 auto;
+  align-items: center;
+  gap: 6px;
+  min-width: 0;
+}
+
+.blk-cuax-views {
+  display: inline-flex;
+  flex: none;
+  padding: 3px;
+  border-radius: var(--radius-pill);
+  background: var(--track);
+}
+
+.gradio-container .blk-cuax-views button {
+  padding: 4px 14px;
+  border: 0;
+  border-radius: var(--radius-pill);
+  background: transparent;
+  color: var(--mid-c);
+  font-size: 12.5px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: background-color 0.2s ease, color 0.2s ease, box-shadow 0.2s ease;
+}
+
+.gradio-container .blk-cuax-views button.on {
+  background: var(--paper);
+  color: var(--ink);
+  box-shadow: 0 1px 3px rgba(10, 10, 10, 0.12), 0 0 0 1px rgba(10, 10, 10, 0.04);
+}
+
+.gradio-container .blk-cuax-step {
+  display: grid;
+  place-items: center;
+  flex: none;
+  width: 30px;
+  height: 30px;
+  padding: 0;
+  border: 1px solid var(--line);
+  border-radius: 50%;
+  background: var(--paper);
+  color: var(--ink-soft);
+  cursor: pointer;
+}
+
+.gradio-container .blk-cuax-step:hover {
+  border-color: var(--line-strong);
+  background: var(--alt);
+}
+
+/* play the steps: the one control drawn filled, since it moves on its own */
+.gradio-container .blk-cuax-autoplay {
+  border-color: var(--blink);
+  color: var(--blink);
+}
+
+.gradio-container .blk-cuax-autoplay svg {
+  fill: currentColor;
+  stroke-width: 0;
+}
+
+.gradio-container .blk-cuax-autoplay[aria-pressed="true"] {
+  background: var(--blink);
+  color: #ffffff;
+}
+
+.gradio-container .blk-cuax-autoplay[aria-pressed="true"] svg {
+  fill: none;
+  stroke-width: 2.6;
+}
+
+.gradio-container ol.blk-cuax-rail {
+  display: flex;
+  flex: 1 1 auto;
+  gap: 6px;
+  min-width: 0;
+  margin: 0 !important;
+  padding: 3px 2px !important;
+  overflow-x: auto;
+  list-style: none;
+  scrollbar-width: thin;
+}
+
+.gradio-container .blk-cuax-rail li {
+  flex: none;
+  margin: 0;
+}
+
+.gradio-container .blk-cuax-rail button {
+  display: grid;
+  place-items: center;
+  width: 28px;
+  height: 28px;
+  padding: 0;
+  border: 0;
+  border-radius: 50%;
+  background: var(--paper);
+  box-shadow: inset 0 0 0 1.5px var(--blink-light);
+  color: var(--ink-soft);
+  font-family: var(--font-geist-mono);
+  font-size: 11px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: transform 0.2s var(--ease), background-color 0.2s ease, color 0.2s ease;
+}
+
+.gradio-container .blk-cuax-rail button.miss {
+  box-shadow: inset 0 0 0 1.5px var(--mid);
+  color: var(--mid-c);
+}
+
+.gradio-container .blk-cuax-rail button.gate {
+  box-shadow: inset 0 0 0 2px var(--ink);
+}
+
+.gradio-container .blk-cuax-rail button.done {
+  background: var(--flash);
+  box-shadow: inset 0 0 0 1px rgba(10, 10, 10, 0.3);
+  color: var(--color-flash-ink);
+}
+
+.gradio-container .blk-cuax-rail button.on {
+  background: var(--blink);
+  box-shadow: none;
+  color: #ffffff;
+  transform: scale(1.12);
+}
+
+/* --- how it reads a screenshot ---------------------------------------------------------- */
+
+.blk-cx {
+  margin: 30px 0 6px;
+}
+
+.gradio-container .blk-cx ol.blk-cx-flow {
+  display: grid;
+  grid-template-columns: repeat(6, minmax(0, 1fr));
+  gap: 12px;
+  margin: 14px 0 0 !important;
+  padding: 0 !important;
+  list-style: none;
+}
+
+.gradio-container .blk-cx-flow > li {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+  margin: 0;
+  padding: 10px 12px 12px;
+  border-radius: 16px;
+  background: var(--paper);
+  box-shadow: 0 0 0 1px var(--line);
+  font-size: 12.5px;
+  line-height: 1.4;
+  color: var(--mid-c);
+}
+
+/* the thread from one node to the next */
+.gradio-container .blk-cx-flow > li + li::before {
+  content: "";
+  position: absolute;
+  left: -12px;
+  top: 52px;
+  width: 12px;
+  height: 2px;
+  background: var(--blink-light);
+  transform-origin: left center;
+}
+
+.gradio-container .blk-cx-flow > li > b {
+  margin-top: 6px;
+  color: var(--ink);
+  font-size: 13.5px;
+  font-weight: 600;
+}
+
+.gradio-container .blk-cx-flow > li > code {
+  display: block;
+  margin-top: 2px;
+  padding: 0;
+  background: none;
+  font-family: var(--font-geist-mono);
+  font-size: 11px;
+  line-height: 1.4;
+  color: var(--blink-ink);
+  overflow-wrap: anywhere;
+}
+
+.blk-cx-n {
+  position: absolute;
+  top: 8px;
+  right: 10px;
+  font-family: var(--font-geist-mono);
+  font-size: 10.5px;
+  color: var(--mid);
+}
+
+.blk-cx-art {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: flex-start;
+  height: 84px;
+}
+
+/* 1: the numbered screenshot, with the sweep that reads it */
+.blk-cx-shot,
+.blk-cx-grid {
+  position: relative;
+  display: block;
+  height: 72px;
+  aspect-ratio: 5 / 3;
+  overflow: hidden;
+  border-radius: 8px;
+  background: var(--alt);
+  box-shadow: 0 0 0 1px var(--line);
+}
+
+.gradio-container .blk-cx-shot img,
+.gradio-container .blk-cx-grid img {
+  display: block;
+  width: 100%;
+  height: 100%;
+  margin: 0 !important;
+  object-fit: cover;
+  border-radius: 0;
+}
+
+.blk-cx-shot::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(180deg, rgba(36, 71, 245, 0) 0%, rgba(36, 71, 245, 0.08) 40%,
+    rgba(36, 71, 245, 0.3) 49.5%, rgba(36, 71, 245, 0) 50.5%);
+  background-size: 100% 200%;
+  opacity: 0;
+}
+
+/* 2: the encoder's blocks, lit one after another */
+.blk-cx-enc {
+  display: flex;
+  flex-direction: column-reverse;
+  justify-content: center;
+  gap: 1px;
+  height: 72px;
+  padding: 0 6px;
+}
+
+.blk-cx-enc i {
+  display: block;
+  width: 64px;
+  height: 1.6px;
+  border-radius: 1px;
+  background: var(--blink);
+  opacity: 0.85;
+}
+
+/* 3: the screenshot cut into the patches that become image tokens */
+.blk-cx-cells {
+  position: absolute;
+  inset: 0;
+  background-image:
+    linear-gradient(to right, rgba(36, 71, 245, 0.55) 1px, transparent 1px),
+    linear-gradient(to bottom, rgba(36, 71, 245, 0.55) 1px, transparent 1px);
+  background-size: calc(100% / var(--cols)) calc(100% / var(--rows));
+  background-color: rgba(36, 71, 245, 0.1);
+}
+
+.blk-cx-count {
+  position: absolute;
+  right: 5px;
+  bottom: 5px;
+  padding: 0 6px;
+  border-radius: 5px;
+  background: var(--blink);
+  color: #ffffff;
+  font-family: var(--font-geist-mono);
+  font-size: 11px;
+  font-weight: 600;
+  line-height: 17px;
+  font-variant-numeric: tabular-nums;
+}
+
+/* 4: three typed questions */
+.blk-cx-qs {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 4px;
+}
+
+.blk-cx-qs em {
+  padding: 1px 9px;
+  border-radius: var(--radius-pill);
+  background: var(--blink-tint);
+  box-shadow: inset 0 0 0 1px var(--blink-light);
+  color: var(--blink-ink);
+  font-size: 11.5px;
+  font-style: normal;
+  font-weight: 500;
+  line-height: 18px;
+}
+
+/* 5: a probability for every offered answer */
+.gradio-container ul.blk-cx-bars {
+  display: grid;
+  gap: 3px;
+  width: 100%;
+  margin: 0 !important;
+  padding: 0 !important;
+  list-style: none;
+}
+
+.gradio-container .blk-cx-bars li {
+  display: grid;
+  grid-template-columns: 42px minmax(0, 1fr) 30px;
+  align-items: center;
+  gap: 5px;
+  margin: 0;
+  padding: 0;
+  font-size: 10px;
+  line-height: 12px;
+  color: var(--mid-c);
+}
+
+.blk-cx-bars span {
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+}
+
+.blk-cx-bars i {
+  position: relative;
+  height: 5px;
+  border-radius: 999px;
+  background: var(--track);
+  overflow: hidden;
+}
+
+.blk-cx-bars i::after {
+  content: "";
+  position: absolute;
+  inset: 0 auto 0 0;
+  width: calc(var(--p) * 100%);
+  border-radius: 999px;
+  background: var(--blink-light);
+  transform-origin: left center;
+}
+
+.blk-cx-bars li.win i::after {
+  background: var(--blink);
+}
+
+.gradio-container .blk-cx-bars b {
+  margin: 0;
+  font-family: var(--font-geist-mono);
+  font-size: 10px;
+  font-weight: 500;
+  text-align: right;
+  color: var(--ink-soft);
+}
+
+/* 6: the action, in the flash colour */
+.blk-cx-act b {
+  display: inline-block;
+  padding: 6px 14px;
+  border-radius: 12px;
+  background: var(--flash);
+  box-shadow: 0 0 0 1px rgba(10, 10, 10, 0.3);
+  color: var(--color-flash-ink);
+  font-size: 15px;
+  font-weight: 600;
+}
+
+.gradio-container .blk-cx-flow > li:last-child {
+  box-shadow: 0 0 0 2px var(--flash), 0 0 0 3px rgba(10, 10, 10, 0.2);
+}
+
+/* told in order once it is on screen; without the script it simply stands still */
+.blk-cx.arm:not(.on) .blk-cx-flow > li {
+  opacity: 0;
+}
+
+.blk-cx.on .blk-cx-flow > li {
+  animation: blk-rise 0.5s var(--ease) both;
+  animation-delay: calc(var(--i) * 420ms);
+}
+
+.blk-cx.on .blk-cx-flow > li + li::before {
+  animation: blk-wipe 0.35s var(--ease) both;
+  animation-delay: calc(var(--i) * 420ms - 120ms);
+}
+
+.blk-cx.on .blk-cx-shot::after {
+  opacity: 1;
+  animation: blk-scan 1.1s linear 0.2s 2 both;
+}
+
+.blk-cx.on .blk-cx-enc i {
+  animation: blk-cx-layer 0.5s var(--ease) both;
+  animation-delay: calc(420ms + var(--k) * 26ms);
+}
+
+.blk-cx.on .blk-cx-cells {
+  animation: blk-cx-sweep 1.3s var(--ease) 0.9s both;
+}
+
+.blk-cx.on .blk-cx-qs em {
+  animation: blk-pop 0.35s var(--ease) both;
+  animation-delay: calc(1260ms + var(--k) * 140ms);
+}
+
+.blk-cx.on .blk-cx-bars i::after {
+  animation: blk-wipe 0.7s var(--ease) both;
+  animation-delay: calc(1700ms + var(--i) * 90ms);
+}
+
+.blk-cx.on .blk-cx-act b {
+  animation: blk-pop 0.45s var(--ease) 2.2s both, blk-flash 0.6s ease-out 2.4s both;
+}
+
+@keyframes blk-cx-layer {
+  from {
+    opacity: 0.12;
+    transform: scaleX(0.35);
+  }
+  to {
+    opacity: 0.85;
+    transform: none;
+  }
+}
+
+@keyframes blk-cx-sweep {
+  from {
+    clip-path: inset(0 0 100% 0);
+  }
+  to {
+    clip-path: inset(0 0 0 0);
+  }
+}
+
+/* --- try it, and beyond clicks ---------------------------------------------------------- */
+
+.blk-cuax-try {
+  margin: 34px 0 6px;
+  scroll-margin-top: 12px;
+}
+
+.gradio-container .blk-cuax-try h3 {
+  margin: 0;
+  font-size: var(--text-heading-sm);
+  font-weight: 600;
+  letter-spacing: -0.025em;
+  color: var(--ink);
+}
+
+.blk-cuax-more {
+  margin: 36px 0 8px;
+}
+
+.blk-cuax-tiles {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(172px, 1fr));
+  gap: 12px;
+  margin-top: 12px;
+}
+
+.gradio-container .blk-cuax-tile {
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+  gap: 6px;
+  min-width: 0;
+  padding: 8px 8px 12px;
+  border: 0;
+  border-radius: 18px;
+  background: var(--paper);
+  box-shadow: 0 0 0 1px var(--line), var(--shadow-subtle);
+  color: var(--ink);
+  text-align: left;
+  cursor: pointer;
+  animation: blk-rise 0.45s var(--ease) both;
+  animation-delay: calc(var(--i) * 60ms);
+  transition: transform 0.2s var(--ease), box-shadow 0.2s var(--ease);
+}
+
+.gradio-container .blk-cuax-tile:hover {
+  transform: translateY(-2px);
+}
+
+.gradio-container .blk-cuax-tile.on {
+  box-shadow: 0 0 0 2px var(--blink), var(--shadow-subtle);
+}
+
+.blk-cuax-still {
+  position: relative;
+  display: block;
+  aspect-ratio: 16 / 10;
+  overflow: hidden;
+  border-radius: 12px;
+  background: var(--alt);
+  box-shadow: 0 0 0 1px var(--line);
+}
+
+.gradio-container .blk-cuax-still img {
+  display: block;
+  width: 100%;
+  height: 100%;
+  margin: 0 !important;
+  object-fit: cover;
+  border-radius: 0;
+}
+
+.blk-cuax-play {
+  position: absolute;
+  inset: 0;
+  margin: auto;
+  width: 38px;
+  height: 38px;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.92);
+  box-shadow: 0 2px 10px rgba(10, 10, 10, 0.25);
+}
+
+.blk-cuax-play::after {
+  content: "";
+  position: absolute;
+  left: 15px;
+  top: 12px;
+  border-style: solid;
+  border-width: 7px 0 7px 11px;
+  border-color: transparent transparent transparent var(--ink);
+}
+
+.gradio-container .blk-cuax-tile > b {
+  padding: 2px 4px 0;
+  font-size: 14px;
+  font-weight: 600;
+}
+
+.blk-cuax-metric {
+  display: flex;
+  align-items: baseline;
+  gap: 6px;
+  padding: 0 4px;
+  font-size: 12px;
+  color: var(--mid-c);
+}
+
+.blk-cuax-metric strong {
+  font-size: 17px;
+  font-weight: 600;
+  letter-spacing: -0.02em;
+  color: var(--ink);
+  font-variant-numeric: tabular-nums;
+}
+
+.blk-cuax-open {
+  margin-top: 14px;
+}
+
+.blk-cuax-pane {
+  display: grid;
+  gap: 10px;
+  padding: 16px;
+  border-radius: var(--radius-cards);
+  background: var(--paper);
+  box-shadow: 0 0 0 1px var(--line), var(--shadow-subtle);
+  animation: blk-rise 0.35s var(--ease) both;
+}
+
+.gradio-container .blk-cuax-pane h4 {
+  margin: 0;
+  font-size: 18px;
+  font-weight: 600;
+  color: var(--ink);
+}
+
+.gradio-container .blk-cuax-pane .blk-note {
+  margin: -6px 0 0;
+}
+
+.gradio-container .blk-cuax-pane video,
+.gradio-container .blk-cuax-pane .blk-cuax-chart {
+  display: block;
+  width: 100%;
+  max-height: 70vh;
+  margin: 0 !important;
+  border-radius: 14px;
+  background: #0a0a0a;
+  object-fit: contain;
+}
+
+.gradio-container .blk-cuax-pane .blk-cuax-chart {
+  max-width: 880px;
+  background: var(--paper);
+  box-shadow: 0 0 0 1px var(--line);
+}
+
+.blk-cuax-imgs {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+  gap: 8px;
+}
+
+.gradio-container .blk-cuax-imgs img {
+  display: block;
+  width: 100%;
+  margin: 0 !important;
+  border-radius: 10px;
+  box-shadow: 0 0 0 1px var(--line);
+}
+
+.gradio-container .blk-cuax-sound {
+  margin: -4px 0 0;
+  font-size: 12.5px;
+  color: var(--mid-c);
+}
+
+/* the home page's figure: a real run, looping */
+.gradio-container .blk-cua-shot video {
+  display: block;
+  width: 100%;
+  height: auto;
+  border-radius: 12px;
+  box-shadow: 0 0 0 1px var(--line);
+  background: #0a0a0a;
+}
+
+.gradio-container .blk-cua-shot figcaption {
+  margin-top: 8px;
+  font-size: 12.5px;
+  color: var(--mid-c);
+}
+
+/* inside a media query gradio scopes every selector, so these name only what sits inside */
+@media (max-width: 1100px) {
+  .blk-cx .blk-cx-flow {
+    grid-template-columns: repeat(3, minmax(0, 1fr)) !important;
+  }
+
+  .blk-cx-flow > li:nth-child(3n + 1)::before {
+    display: none;
+  }
+}
+
+@media (max-width: 860px) {
+  .blk-cuax-body,
+  .blk-cuax-player.tall .blk-cuax-body {
+    grid-template-columns: minmax(0, 1fr) !important;
+    grid-template-areas: "screen" "nav" "side" !important;
+    grid-template-rows: auto !important;
+  }
+
+  .blk-cuax-player.tall .blk-cuax-screen {
+    width: min(100%, 340px);
+    justify-self: center;
+  }
+}
+
+@media (max-width: 720px) {
+  /* a phone shows one reel and the edge of the next, so the strip reads as one to swipe */
+  .blk-cuax-strip {
+    --reel-h: 180px;
+    gap: 10px;
+  }
+
+  .blk-cuax-stats {
+    display: grid !important;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 12px 14px !important;
+  }
+
+  .blk-cuax-stats span {
+    min-width: 0 !important;
+    margin: 0 !important;
+    padding: 0 !important;
+    border-right: 0 !important;
+  }
+
+  .blk-cuax-stats b {
+    font-size: 22px !important;
+  }
+
+  .blk-cuax-cards {
+    grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+    gap: 10px !important;
+  }
+
+  .blk-cuax-tiles {
+    grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+    gap: 10px !important;
+  }
+
+  .blk-cuax-player {
+    padding: 12px 12px 10px !important;
+  }
+
+  .blk-cuax-bar {
+    flex-wrap: wrap;
+  }
+
+  .blk-cuax-name {
+    order: 3;
+    flex-basis: 100%;
+    font-size: 18px !important;
+  }
+
+  .blk-cuax-nav {
+    flex-direction: column;
+    align-items: stretch !important;
+  }
+
+  .blk-cuax-views {
+    justify-content: center;
+  }
+
+  .blk-cuax-views button {
+    flex: 1 1 0;
+  }
+
+  .blk-cuax-cmp button {
+    grid-template-columns: 100px minmax(0, 1fr) auto !important;
+  }
+
+  .blk-cx .blk-cx-flow {
+    grid-template-columns: minmax(0, 1fr) !important;
+    gap: 10px !important;
+  }
+
+  .blk-cx-flow > li {
+    display: grid !important;
+    grid-template-columns: 124px minmax(0, 1fr);
+    grid-template-rows: auto auto auto;
+    column-gap: 12px;
+    align-items: start;
+  }
+
+  .blk-cx-flow > li > .blk-cx-art {
+    grid-row: 1 / span 3;
+    height: 76px;
+  }
+
+  .blk-cx-flow > li > b {
+    margin-top: 0 !important;
+  }
+
+  .blk-cx-flow > li + li::before {
+    display: block !important;
+    left: 62px !important;
+    top: -10px !important;
+    width: 2px !important;
+    height: 10px !important;
+  }
+
+  .blk-cx-shot,
+  .blk-cx-grid {
+    height: 64px !important;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .blk-cx.arm:not(.on) .blk-cx-flow > li {
+    opacity: 1;
+  }
+}
+
+/* a run's steps on their way: its poster stands in, three dots breathe */
+.gradio-container .blk-cuax-vid.wait img {
+  display: block;
+  width: 100%;
+  height: 100%;
+  margin: 0 !important;
+  object-fit: contain;
+  opacity: 0.55;
+  border-radius: 0;
+}
+
+.gradio-container .blk-cuax-load {
+  display: flex;
+  gap: 6px;
+  margin: 8px 0;
+}
+
+.blk-cuax-load i {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: var(--blink-light);
+  animation: blk-pulse 1s ease-in-out infinite;
+}
+
+.blk-cuax-load i:nth-child(2) {
+  animation-delay: 0.15s;
+}
+
+.blk-cuax-load i:nth-child(3) {
+  animation-delay: 0.3s;
 }

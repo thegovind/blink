@@ -100,11 +100,11 @@ async def main() -> int:
            cards[0].startswith("How many r in strawberry"))
         drafted = await page.evaluate(
             f"""() => (document.querySelector('{PROVENANCE}') || {{}}).textContent || ''""")
-        ok(f"provenance shown: {drafted!r}", "drafted by" in drafted and "generated tokens" in drafted)
+        ok(f"provenance shown: {drafted!r}", "drafted by" in drafted and "generated" not in drafted)
         zero = await page.evaluate(
             """() => Array.from(document.querySelectorAll('.blk-stats span'))
                  .map(s => s.textContent.trim()).join(' | ')""")
-        ok(f"blink still reports none of its own: {zero[:60]}", "0 generated" in zero)
+        ok(f"no generated-token chip: {zero[:60]}", zero and "generated" not in zero)
         ok("the draft can be opened next door",
            await page.evaluate("() => !!document.querySelector('#ask-open')"))
         await page.screenshot(path=os.path.join(OUT, "ask-desktop.png"), full_page=True)

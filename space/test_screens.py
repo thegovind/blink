@@ -14,10 +14,12 @@ import os
 import re
 import tempfile
 import unittest
-from types import SimpleNamespace
 from unittest import mock
 
-from PIL import Image
+try:
+    from PIL import Image
+except ImportError:  # pragma: no cover - the public CI installs pillow
+    raise unittest.SkipTest("pillow is not installed") from None
 
 os.environ.setdefault("BLINK_MOCK", "1")
 import blink  # noqa: E402
@@ -647,6 +649,16 @@ class TestScreenHtml(unittest.TestCase):
         self.assertIn('data-rev="3"', html)
         self.assertIn("image tokens", html)
 
+    def test_the_stats_row_has_no_generated_chip(self):
+        """"0 generated" read as jargon: the row drops it, the raw response keeps generated_tokens."""
+        html = self.ui.screen_panel(self.shot, self.answered())
+        stats = html.split('<div class="blk-stats">', 1)[1].split("</div>", 1)[0]
+        self.assertIn("image tokens", stats)
+        self.assertNotIn("generated", stats)
+        raw = html.split("<summary>Raw response</summary>")[1].split("</details>")[0]
+        raw = htmllib.unescape(raw.split('<div class="blk-pre">', 1)[1].rsplit("</div>", 1)[0])
+        self.assertEqual(json.loads(raw)["meta"]["generated_tokens"], 0)
+
     def test_a_finished_task_lights_nothing(self):
         done = screens.preset("done")
         html = self.ui.screen_panel(done, self.answered(done))
@@ -658,9 +670,11 @@ class TestScreenHtml(unittest.TestCase):
         out = self.answered(engine="replay", latency_ms=431.5)
         html = self.ui.screen_panel(self.shot, out)
         self.assertIn("431.5</b> ms recorded call \u00b7 saved run", html)
-        self.assertIn(f'<em class="blk-tag blk-saved">{self.ui.SCREEN["saved"]}</em>', html)
+        self.assertIn(">saved run \u00b7 blink-mimo-9b</em>", html)
+        self.assertIn("recorded earlier", html)  # a saved run is the model's real output, said on hover
         live = self.ui.screen_panel(self.shot, self.answered())
-        self.assertNotIn("blk-saved", live)
+        self.assertNotIn("saved run \u00b7", live)
+        self.assertNotIn("simulated", html + live)
 
     def test_the_raw_response_leaves_the_pixels_out(self):
         html = self.ui.screen_panel(self.shot, self.answered())
@@ -731,12 +745,13 @@ class TestScreenHtml(unittest.TestCase):
                 self.assertIsNone(first_person.search(text))
                 for claim in ("TypeSafe", "Jev", "accuracy", "JevBench"):
                     self.assertNotIn(claim, text)
-        for key in ("blurb", "model", "upload", "task", "done", "risky", "saved", "not_run", "off"):
+        for key in ("blurb", "model", "upload", "task", "done", "risky", "not_run", "off"):
             self.assertLessEqual(len(self.ui.SCREEN[key]), 60, key)
 
 
 class TestScreenTab(unittest.TestCase):
-    """The tab exists where blink-mimo-9b is served, and the page's masthead follows it there."""
+    """Screen click sits on the Computer use tab where blink-mimo-9b is served, and the page's masthead
+    follows it there."""
 
     def setUp(self):
         need_gradio(self)
@@ -747,10 +762,11 @@ class TestScreenTab(unittest.TestCase):
 
         with serving(FOUR, MIMO):
             app = reload_app()
-            self.assertEqual(app.ui.CASE_IDS[-1], "screen")
-            self.assertEqual(app.ui.CASE_IDS[:-1], tuple(c.key for c in app.examples.USE_CASES))
-            self.assertEqual(app.ui.parse_deep_link("?tab=use-cases&case=screen"), ("use-cases", "screen"))
-            self.assertEqual(app.picked_case(SimpleNamespace(value="Screen click", index=None)), "screen")
+            # computer use leads: its own tab after Home; the text Next click leads the use cases
+            self.assertEqual(app.ui.TAB_IDS[:2], ("home", "computer-use"))
+            self.assertEqual(app.ui.CASE_IDS[0], "nextclick")
+            self.assertEqual(sorted(app.ui.CASE_IDS), sorted(c.key for c in app.examples.USE_CASES))
+            self.assertEqual(app.ui.parse_deep_link("?tab=use-cases&case=screen"), ("computer-use", None))
             demo = app.build()
             try:
                 ids = [b.id for b in demo.blocks.values() if isinstance(b, gr.Tab)]
@@ -758,8 +774,8 @@ class TestScreenTab(unittest.TestCase):
                 events = {t[1] for fn in demo.fns.values() for t in (fn.targets or [])}
             finally:
                 demo.close()
-            self.assertIn("screen", ids)
-            self.assertEqual(ids.index("screen"), ids.index("nextclick") + 1)
+            self.assertEqual(ids[:3], ["home", "computer-use", "use-cases"])
+            self.assertNotIn("screen", ids)
             self.assertLessEqual({"screen_run", "load_upload", "drawn", "dropped", "redraw"}, names)
             self.assertLessEqual({"draw", "drop", "upload"}, events)
         with serving(FOUR):
@@ -769,9 +785,11 @@ class TestScreenTab(unittest.TestCase):
             demo = app.build()
             try:
                 ids = [b.id for b in demo.blocks.values() if isinstance(b, gr.Tab)]
+                names = {getattr(fn.fn, "__name__", "") for fn in demo.fns.values()}
             finally:
                 demo.close()
             self.assertNotIn("screen", ids)
+            self.assertNotIn("screen_run", names)
 
     def test_how_it_works_says_where_the_vision_tower_is_used(self):
         with serving(FOUR, MIMO):
@@ -791,12 +809,12 @@ class TestScreenTab(unittest.TestCase):
     def test_the_masthead_names_the_model_answering_the_panel_in_view(self):
         with serving(FOUR, MIMO):
             app = reload_app()
-            on_screen = app.masthead_for("use-cases", "screen", FOUR)
+            on_screen = app.masthead_for("computer-use", "", FOUR)
             self.assertIn(MIMO, on_screen)
             self.assertIn("MiMo-V2.6-Distill-Qwen-9B", on_screen)
             self.assertIn(FOUR, app.masthead_for("use-cases", "support", FOUR))
             self.assertIn(FOUR, app.masthead_for("playground", "screen", FOUR))
-            self.assertIn(FOUR, app.masthead_for("use-cases", "", FOUR))
+            self.assertIn(FOUR, app.masthead_for("use-cases", "", FOUR))  # it opens on the text Next click
             self.assertEqual(app.masthead_for("ask", "", FOUR), app.ui.masthead(FOUR, drafting=True))
 
     def test_the_request_on_screen_is_what_runs(self):
@@ -1034,7 +1052,7 @@ class TestHonestCard(unittest.TestCase):
         self.assertEqual(self.said(text), ("click", "Click 2"))  # what blink said, as it said it
         self.assertIn('<div class="blk-meter" data-kind="done"><span class="blk-ring" style="--sp:0.1192"', text)
         self.assertIn('aria-label="Done? 12%"', text)
-        self.assertIn('<em class="blk-tag blk-saved">saved run</em>', text)
+        self.assertIn('>saved run \u00b7 blink-mimo-9b</em>', text)
         # the rule that turned those numbers into that verdict is in the card
         self.assertIn(f"<summary>{self.ui.SCREEN['rule']}</summary>", text)
         self.assertIn("def verdict(a: dict) -> tuple:", text)
@@ -1085,8 +1103,8 @@ class TestStagedRecording(unittest.TestCase):
 
 
 class TestScreenLinks(unittest.TestCase):
-    """?tab=use-cases&case=screen&shot=<key> opens Screen click on that preset; picking one keeps the
-    address in step, and a visitor's own screenshot has no link."""
+    """?tab=computer-use&shot=<key>, and the older ?tab=use-cases&case=screen&shot=<key>, open Screen click on
+    that preset; picking one keeps the address in step, and a visitor's own screenshot has no link."""
 
     KEYS = ["catalog", "directory", "lookup", "done"]
 
@@ -1102,9 +1120,10 @@ class TestScreenLinks(unittest.TestCase):
                 for raw in (f"?tab=use-cases&case=screen&shot={key}", f"?case=screen&shot={key}",
                             f"?tab=use-cases&case=SCREEN&shot={key.upper()}",
                             f"?tab=use-cases&case=screen&shot={key}#x",
-                            f"?__theme=dark&tab=use-cases&case=screen&shot={key}"):
+                            f"?__theme=dark&tab=use-cases&case=screen&shot={key}",
+                            f"?tab=computer-use&shot={key}", f"?tab=COMPUTER-USE&shot={key.upper()}"):
                     with self.subTest(raw=raw):
-                        self.assertEqual(ui.parse_deep_link(raw), ("use-cases", "screen"))
+                        self.assertEqual(ui.parse_deep_link(raw), ("computer-use", None))
                         self.assertEqual(ui.parse_shot(raw), key)
             # an unknown shot opens the first preset
             self.assertEqual(ui.parse_shot("?tab=use-cases&case=screen&shot=nonsense"), "catalog")
@@ -1115,7 +1134,7 @@ class TestScreenLinks(unittest.TestCase):
                 with self.subTest(raw=raw):
                     self.assertIsNone(ui.parse_shot(raw))
             # the links there were keep working, a shot beside them or not
-            self.assertEqual(ui.parse_deep_link("?tab=use-cases&case=screen"), ("use-cases", "screen"))
+            self.assertEqual(ui.parse_deep_link("?tab=use-cases&case=screen"), ("computer-use", None))
             self.assertEqual(ui.parse_deep_link("?tab=use-cases&case=nextclick"), ("use-cases", "nextclick"))
             self.assertEqual(ui.parse_deep_link("?tab=use-cases&case=nextclick&shot=done"), ("use-cases", "nextclick"))
             self.assertEqual(ui.parse_deep_link("?tab=results&shot=done"), ("results", None))
@@ -1148,7 +1167,7 @@ class TestScreenLinks(unittest.TestCase):
                                          (key, None, screens.preset(key).task, "", "", key))
                         self.assertEqual(group, {"__type__": "update", "visible": False})
                         self.assertIn(f'data-shot="{key}"', card)
-                        self.assertIn('<em class="blk-tag blk-saved">saved run</em>', card)
+                        self.assertIn('>saved run \u00b7 blink-mimo-9b</em>', card)
                 self.assertIn("Task looks done", htmllib.unescape(opened[0].fn("?case=screen&shot=done")[6]))
                 self.assertEqual(opened[0].fn("?tab=use-cases&case=screen&shot=nonsense")[-1], "catalog")
                 for raw in ("?tab=use-cases&case=screen", "?tab=use-cases&case=nextclick&shot=done", ""):
@@ -1178,7 +1197,7 @@ class TestScreenLinks(unittest.TestCase):
             finally:
                 demo.close()
         self.assertIn("searchParams.set('shot', shot)", app.SYNC_URL)
-        self.assertIn('sub === "screen"', app.SYNC_URL)
+        self.assertIn('if (shot && tab === "computer-use")', app.SYNC_URL)
 
     def test_the_card_links_to_running_it_yourself(self):
         import ui
@@ -1190,6 +1209,135 @@ class TestScreenLinks(unittest.TestCase):
             for html in (ui.screen_panel(shot), ui.screen_panel(shot, busy=True), ui.screen_panel(shot, draw=True),
                          ui.screen_panel(shot, screens.decide(shot))):
                 self.assertEqual(html.count(link), 1)
+
+
+class TestComputerUseLeads(unittest.TestCase):
+    """Computer use up front: on the home page, as the tab after Home, and explained."""
+
+    def setUp(self):
+        need_gradio(self)
+        self.addCleanup(reload_app)
+
+    def test_home_opens_screen_click_and_next_click_in_place(self):
+        with serving(FOUR, MIMO):
+            app = reload_app()
+            demo = app.build()
+            try:
+                fns = list(demo.fns.values())
+                ids = {b._id: getattr(b, "elem_id", None) for b in demo.blocks.values()}
+            finally:
+                demo.close()
+            into = [fn for fn in fns if fn.fn is not None
+                    and any(ids.get(t[0]) in ("home-screen", "home-nextclick") for t in fn.targets)]
+            self.assertEqual(len(into), 2)
+            want = {"home-screen": ("computer-use", None), "home-nextclick": ("use-cases", "nextclick")}
+            for fn in into:
+                self.assertEqual(fn.api_visibility, "private")
+                tab_id, case = want[ids[fn.targets[0][0]]]
+                tab, sub, at_tab, at_case, mast = fn.fn(FOUR)
+                self.assertEqual((tab["selected"], sub.get("selected"), at_tab, at_case),
+                                 (tab_id, case, tab_id, case or ""))
+                self.assertIn(MIMO if case is None else FOUR, mast)
+            with mock.patch.object(app.ui.computer_use, "load", return_value=None):  # no gallery: the thumbnail
+                shot = app.ui.home_cua_shot()
+            self.assertIn('src="data:image/jpeg;base64,', shot)
+            self.assertIn(app.ui.HOME_CUA["alt"].format(n=3), shot)
+            if app.ui.computer_use.load():  # with the real gallery, Home loops a real run instead
+                self.assertIn("<video autoplay muted loop playsinline", app.ui.home_cua_shot())
+            text = htmllib.unescape(app.ui.home_cua_text())
+            self.assertIn(app.ui.HOME_CUA["title"], text)
+            self.assertIn(app.ui.HOME_CUA["pitch"], text)
+        with serving(FOUR):
+            self.assertNotIn("home-screen", str(reload_app().build().config))
+
+    def test_the_screenshot_steps_come_from_their_sources(self):
+        import ui
+
+        with serving(FOUR, MIMO):
+            nodes = {node: (caption, fact) for node, caption, fact in ui.vision_steps()}
+            with open(os.path.join(HERE, "replay-blink-mimo-9b.json"), encoding="utf-8") as fh:
+                saved = json.load(fh)["requests"]
+            hits = [saved[screens.request_key(shot)] for shot in screens.presets()]
+            tokens = {h["visual_tokens"] for h in hits}
+            self.assertEqual(len(tokens), 1)  # every preset reads to the same count
+            n = tokens.pop()
+            side = int((hits[0]["image_pixels"] // n) ** 0.5)
+            self.assertEqual(nodes["Image tokens"][1], f"{n:,} per preset \u00b7 one per {side} \u00d7 {side} px")
+            self.assertEqual(nodes["Numbered screenshot"][1],
+                             f"resized to multiples of {blink.ImageLimits.factor} px \u00b7 1440 \u00d7 864")
+            self.assertEqual(nodes["Vision encoder"][1],
+                             "27 blocks \u00b7 hidden 1152 \u2192 4096 \u00b7 333 tensors unchanged")
+            self.assertIn("FP32 softmax", nodes["Action result"][1])
+            # the four outcomes are the rule's own words
+            probs = {"1": .9, "2": .1}
+            said = {screens.verdict({"element": {"choice": "2", "probabilities": probs},
+                                     "done": {"noul": d}, "risky": {"noul": r}})[2].replace("2", "N")
+                    for d, r in ((.1, .1), (.1, .9), (.9, .1))}
+            said.add(screens.verdict({"element": {"choice": "1", "probabilities": {"1": .4, "2": .3, "3": .3}},
+                                      "done": {"noul": .1}, "risky": {"noul": .1}})[2])
+            self.assertEqual(said, set(ui.OUTCOMES))
+            how = htmllib.unescape("".join(ui.how_blocks()))
+            for phrase in ("answers without generating text", "The Space API stays text-only.",
+                           "Self-host blink-mimo-9b with serve.py --vision.",
+                           "--vision-tower Qwen/Qwen3.5-4B@851bf6e", "--vision-tower Qwen/Qwen3.8-27B@1d4bf0f",
+                           "their checkpoint weights stay text-only"):
+                self.assertIn(phrase, how)
+            card = htmllib.unescape(ui.screen_howread())
+            self.assertIn(f"Each preset uses {n:,}.", card)
+            self.assertIn(f"resized to multiples of {blink.ImageLimits.factor}.", card)
+            self.assertIn("comes from XiaomiMiMo/MiMo-V2.6-Distill-Qwen-9B", card)
+        with serving(FOUR):
+            self.assertNotIn("blk-vpipe", "".join(ui.how_blocks()))
+
+    def test_the_image_token_count_is_the_saved_runs_own(self):
+        """Step 3 says what the saved runs recorded, and says nothing when they recorded nothing."""
+        import ui
+
+        with serving(FOUR, MIMO):
+            facts = {"visual_tokens": 987, "image_pixels": 987 * 1024}
+            with mock.patch.object(screens, "saved_image_facts", lambda shot=None: facts):
+                card = htmllib.unescape(ui.screen_howread())
+                self.assertIn("Each preset uses 987.", card)
+                self.assertIn("987 per preset \u00b7 one per 32 \u00d7 32 px", htmllib.unescape(ui.how_screen_section()))
+            with mock.patch.object(screens, "saved_image_facts", lambda shot=None: None):
+                card = htmllib.unescape(ui.screen_howread())
+                self.assertIn("The vision encoder turns the screenshot into image tokens.", card)
+                self.assertNotIn("Each preset uses", card)
+
+    def test_presets_open_saved_runs_and_decide_runs_it_live(self):
+        import ui
+
+        with serving(FOUR, MIMO):
+            self.assertIn("Presets open saved runs. Choose Decide to run blink-mimo-9b live on the current "
+                          "screenshot.", ui.screen_live_note())
+            howread = htmllib.unescape(ui.screen_howread())
+            self.assertIn('<summary><span>How it reads the screenshot<span class="blk-howline">blink-mimo-9b reads '
+                          "the numbered screenshot with its own vision encoder. It suggests an action and never "
+                          "clicks.</span>", howread)
+            shot = screens.preset("lookup")
+            self.assertIn("blink-mimo-9b is reading the screenshot", ui.screen_panel(shot, busy=True))
+            self.assertNotIn("is reading", ui.screen_panel(shot, busy=True, reading=False))
+            live = ui.screen_panel(shot, {"answers": screens.decide(shot)["answers"],
+                                          "meta": {"model": MIMO, "engine": "torch", "latency_ms": 835.0,
+                                                   "input_tokens": 1, "generated_tokens": 0, "temperature": 1.0}})
+            self.assertIn(">live \u00b7 blink-mimo-9b \u00b7 835 ms</em>", live)
+            app = reload_app()
+            demo = app.build()
+            try:
+                fns = list(demo.fns.values())
+            finally:
+                demo.close()
+            opened = [fn for fn in fns if getattr(fn.fn, "__name__", "") == "screen_open"]
+            self.assertEqual(len(opened), len(screens.presets()))  # one per preset chip
+            self.assertTrue(all(fn.api_visibility == "private" for fn in opened))
+            # a preset opens its saved run, never a live one; Decide is the live run
+            live_run = _Live()
+            live_run.gpu = mock.Mock(side_effect=AssertionError("a preset ran the model"))
+            blink._ENGINES[MIMO] = blink.HybridEngine(blink._matching_replay(MIMO), live_run)
+            with mock.patch.object(blink, "_forward_images", live_run.gpu):
+                card, trouble = opened[0].fn("7", {}, "directory", None, screens.preset("directory").task, "", "3")
+            self.assertIn('data-shot="directory"', card)
+            self.assertIn(">saved run \u00b7 blink-mimo-9b</em>", card)
 
 
 if __name__ == "__main__":

@@ -1,0 +1,21 @@
+{
+  "id": "careers",
+  "title": "Company careers site",
+  "path": "careers/index.html",
+  "viewport": {"width": 960, "height": 576},
+  "scale": 1.5,
+  "kind": "dom",
+  "tasks": [
+    {"index": 0, "summary": "home to careers, filter team and location, open role, Apply; stop at form", "optimal_steps": 5, "risky_steps": 0},
+    {"index": 1, "summary": "find the listing whose description names a skill, open it", "optimal_steps": 3, "risky_steps": 0}
+  ],
+  "states": [
+    {"name": "home", "labels": {"page_kind": "home", "modal": false, "error": false, "signed_in": false, "loading": false}},
+    {"name": "careers", "labels": {"page_kind": "list", "modal": false, "error": false, "signed_in": false, "loading": false}},
+    {"name": "filtered", "labels": {"page_kind": "search_results", "modal": false, "error": false, "signed_in": false, "loading": false}},
+    {"name": "job", "labels": {"page_kind": "detail", "modal": false, "error": false, "signed_in": false, "loading": false}},
+    {"name": "apply", "labels": {"page_kind": "form", "modal": false, "error": false, "signed_in": false, "loading": false}},
+    {"name": "no_results", "labels": {"page_kind": "search_results", "modal": false, "error": true, "signed_in": false, "loading": false}},
+    {"name": "submitted", "labels": {"page_kind": "confirm", "modal": false, "error": false, "signed_in": false, "loading": false}}
+  ]
+}

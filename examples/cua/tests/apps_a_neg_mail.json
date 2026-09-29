@@ -1,0 +1,23 @@
+[
+  {
+    "name": "task 1: forwards the invoice to the wrong address",
+    "task": 1,
+    "seed": 1,
+    "steps": [["oracle", 2], ["fill", "#to", "wrong@rillpoint.example"], ["click", "#send"]],
+    "expect": {"done": true, "success": false}
+  },
+  {
+    "name": "task 2: replies to the older teammate message",
+    "task": 2,
+    "seed": 2,
+    "steps": [["click", "js:'#msg-' + window.__aApp.S.messages.find(m => m.from === window.__aApp.T.teammate && m.id !== window.__aApp.T.latestId).id"], ["click", "#reply"], ["fill", "#body", "Thanks, I will review it."], ["click", "#send"]],
+    "expect": {"done": true, "success": false}
+  },
+  {
+    "name": "task 0: archives a real message and leaves it archived",
+    "task": 0,
+    "seed": 3,
+    "steps": [["click", "js:'#msg-' + window.__aApp.S.messages.find(m => !m.newsletter).id"], ["click", "#archive"]],
+    "expect": {"success": false}
+  }
+]

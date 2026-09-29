@@ -1,0 +1,377 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Orbit Dash</title>
+<style>
+  html, body { margin: 0; width: 100%; height: 100%; overflow: hidden; background: #080c1b; }
+  canvas { display: block; width: 100vw; height: 100vh; }
+</style>
+</head>
+<body>
+<canvas id="game" aria-label="Orbit Dash game canvas"></canvas>
+<script src="../common/blink-scenario.js"></script>
+<script>
+(function () {
+  "use strict";
+  const K = window.BlinkScenarioKit;
+  const q = new URLSearchParams(location.search);
+  const forcedTheme = q.get("theme");
+  const theme = forcedTheme === "light" ? "light" : "dark";
+  document.documentElement.dataset.theme = theme;
+
+  const canvas = document.getElementById("game");
+  const ctx = canvas.getContext("2d", { alpha: false });
+  const W = 960, H = 576;
+  const N = 20;
+  const speed = q.get("speed") === "slow" ? "slow" : "normal";
+  const settings = speed === "slow"
+    ? { fall: 218, interval: 1.38, first: 0.78, badge: "Slow" }
+    : { fall: 330, interval: 1.02, first: 0.62, badge: "Normal" };
+  const laneW = 168, gap = 28, laneTop = 76, laneBottom = H - 18;
+  const laneH = laneBottom - laneTop;
+  const laneXs = [W / 2 - laneW - gap, W / 2, W / 2 + laneW + gap];
+  const laneIds = ["left", "middle", "right"];
+  const playerY = H - 94;
+  const targetRects = laneXs.map((cx, i) => ({
+    id: laneIds[i], name: (i === 0 ? "Left" : i === 1 ? "Middle" : "Right") + " lane", role: "button",
+    rect: { x: Math.round(cx - laneW / 2), y: laneTop, w: laneW, h: laneH }
+  }));
+
+  function resize() {
+    const dpr = window.devicePixelRatio || 1;
+    canvas.style.width = window.innerWidth + "px";
+    canvas.style.height = window.innerHeight + "px";
+    canvas.width = Math.max(1, Math.round(window.innerWidth * dpr));
+    canvas.height = Math.max(1, Math.round(window.innerHeight * dpr));
+    ctx.setTransform(dpr * window.innerWidth / W, 0, 0, dpr * window.innerHeight / H, 0, 0);
+  }
+  window.addEventListener("resize", resize);
+  resize();
+
+  const waveRng = K.stream("waves");
+  const starRng = K.stream("stars");
+  const rockRng = K.stream("rocks");
+  const waves = [];
+  let previousSafe = 1;
+  for (let i = 0; i < N; i++) {
+    const count = waveRng() < 0.46 ? 2 : 1;
+    let safe = K.between(waveRng, 0, 2);
+    if (i > 0 && waveRng() < 0.58) safe = Math.max(0, Math.min(2, previousSafe + (waveRng() < 0.5 ? -1 : 1)));
+    const blocked = [0, 1, 2].filter(v => v !== safe);
+    const lanes = count === 2 ? blocked : [K.pick(waveRng, blocked)];
+    waves.push({ index: i + 1, spawn: settings.first + i * settings.interval, lanes, safe, passed: false });
+    previousSafe = safe;
+  }
+  const rocks = [];
+  for (let i = 0; i < N * 2; i++) {
+    const pts = [];
+    const n = 9 + Math.floor(rockRng() * 4);
+    for (let p = 0; p < n; p++) {
+      const a = p / n * Math.PI * 2;
+      pts.push({ a, r: 0.74 + rockRng() * 0.42 });
+    }
+    rocks.push({ pts, rot: rockRng() * Math.PI * 2, shade: rockRng(), crater: rockRng() });
+  }
+  const stars = [0, 1, 2].map(layer => {
+    const arr = [];
+    const count = [54, 38, 26][layer];
+    for (let i = 0; i < count; i++) arr.push({ x: starRng() * W, y: starRng() * H, r: 0.6 + starRng() * (layer + 1), a: 0.32 + starRng() * 0.62 });
+    return arr;
+  });
+
+  let simTime = 0;
+  let accumulator = 0;
+  let lastReal = 0;
+  let paused = false;
+  let showPauseOverlay = false;
+  let lane = 1;
+  let targetLane = 1;
+  let slideFrom = laneXs[1];
+  let slideTo = laneXs[1];
+  let slideT = 1;
+  let hits = 0;
+  let crashed = false;
+  let completed = false;
+  let passedCount = 0;
+  let hitTimer = 0;
+  let flash = 0;
+  let shake = 0;
+  let score = 0;
+  let activeStateOverride = "";
+
+  function resetForState(name) {
+    simTime = 0; accumulator = 0; lastReal = 0; paused = false; showPauseOverlay = false;
+    lane = targetLane = 1; slideFrom = slideTo = laneXs[1]; slideT = 1;
+    hits = 0; crashed = false; completed = false; passedCount = 0; hitTimer = 0; flash = 0; shake = 0; score = 0;
+    waves.forEach(w => { w.passed = false; w.hit = false; });
+    activeStateOverride = "";
+    if (name === "playing" || name === "paused") {
+      simTime = waves[5].spawn + 0.58;
+      waves.forEach(w => { if (obstacleY(w) > playerY + 64) { w.passed = true; passedCount++; score += 1200; } });
+      targetLane = lane = safestLane();
+      slideFrom = slideTo = laneXs[lane];
+      showPauseOverlay = name === "paused";
+      paused = name === "paused";
+    } else if (name === "hit") {
+      simTime = waves[3].spawn + (playerY + 18) / settings.fall;
+      lane = targetLane = waves[3].lanes[0];
+      slideFrom = slideTo = laneXs[lane];
+      hits = 1; hitTimer = 0.52; flash = 0.52; shake = 0.52;
+      activeStateOverride = "hit";
+    } else if (name === "complete") {
+      simTime = waves[N - 1].spawn + (playerY + 130) / settings.fall;
+      completed = true; passedCount = N; score = N * 1200;
+      waves.forEach(w => { w.passed = true; });
+    } else if (name === "crashed") {
+      simTime = waves[4].spawn + (playerY + 18) / settings.fall;
+      lane = targetLane = waves[4].lanes[0];
+      slideFrom = slideTo = laneXs[lane];
+      hits = 3; crashed = true; passedCount = 4; flash = 0.2; shake = 0.2;
+    }
+  }
+
+  resetForState(K.params.state || "ready");
+  // A named state is a frozen snapshot, and paused=1 starts frozen at t=0 (lockstep evals); pause(false) resumes.
+  if (K.params.state || new URLSearchParams(location.search).get("paused") === "1") paused = true;
+
+  function obstacleY(w) { return (simTime - w.spawn) * settings.fall - 66; }
+  function playerX() {
+    const t = Math.min(1, slideT);
+    const e = t < 0.5 ? 4 * t * t * t : 1 - Math.pow(-2 * t + 2, 3) / 2;
+    return slideFrom + (slideTo - slideFrom) * e;
+  }
+  function incomingDistanceFor(l) {
+    let best = Infinity;
+    for (const w of waves) {
+      if (!w.lanes.includes(l)) continue;
+      const y = obstacleY(w);
+      if (y < playerY + 42) best = Math.min(best, playerY - y);
+    }
+    return best;
+  }
+  function safestLane() {
+    const ds = [0, 1, 2].map(incomingDistanceFor);
+    const max = Math.max(ds[0], ds[1], ds[2]);
+    const eps = 0.0001;
+    const tied = [0, 1, 2].filter(i => max === Infinity ? ds[i] === Infinity : Math.abs(ds[i] - max) < eps);
+    if (tied.includes(targetLane)) return targetLane;
+    tied.sort((a, b) => Math.abs(a - targetLane) - Math.abs(b - targetLane) || a - b);
+    return tied[0];
+  }
+  function setLane(i) {
+    if (crashed || completed || i === targetLane) return;
+    slideFrom = playerX(); slideTo = laneXs[i]; slideT = 0; targetLane = i; lane = i;
+  }
+
+  canvas.addEventListener("click", ev => {
+    const r = canvas.getBoundingClientRect();
+    const x = (ev.clientX - r.left) * W / r.width;
+    const y = (ev.clientY - r.top) * H / r.height;
+    for (let i = 0; i < targetRects.length; i++) {
+      const rr = targetRects[i].rect;
+      if (x >= rr.x && x <= rr.x + rr.w && y >= rr.y && y <= rr.y + rr.h) { setLane(i); return; }
+    }
+  });
+  window.addEventListener("keydown", ev => {
+    if (ev.key === "ArrowLeft") setLane(Math.max(0, targetLane - 1));
+    if (ev.key === "ArrowRight") setLane(Math.min(2, targetLane + 1));
+    if (ev.key === "p" || ev.key === "P") { paused = !paused; showPauseOverlay = paused; }
+  });
+
+  function step(dt) {
+    if (crashed || completed) return;
+    simTime += dt;
+    if (slideT < 1) slideT = Math.min(1, slideT + dt / 0.12);
+    if (hitTimer > 0) hitTimer = Math.max(0, hitTimer - dt);
+    if (hitTimer <= 0) activeStateOverride = "";
+    if (flash > 0) flash = Math.max(0, flash - dt);
+    if (shake > 0) shake = Math.max(0, shake - dt);
+    for (const w of waves) {
+      const y = obstacleY(w);
+      if (!w.passed && y > playerY + 64) {
+        w.passed = true; passedCount++; score += 1200 + Math.max(0, 3 - hits) * 40;
+        if (passedCount >= N) completed = true;
+      }
+      if (!w.hit && y > playerY - 32 && y < playerY + 30 && w.lanes.includes(targetLane)) {
+        w.hit = true; hits++; hitTimer = 0.58; flash = 0.42; shake = 0.36;
+        if (hits >= 3) crashed = true;
+      }
+    }
+  }
+  function advanceSim(ms) {
+    accumulator += Math.max(0, ms) / 1000;
+    const fixed = 1 / 120;
+    let guard = 0;
+    while (accumulator >= fixed && guard++ < 20000) { step(fixed); accumulator -= fixed; }
+    render();
+  }
+
+  function stateName() {
+    if (crashed) return "crashed";
+    if (completed) return "complete";
+    if (showPauseOverlay) return "paused";
+    if (hitTimer > 0 || activeStateOverride === "hit") return "hit";
+    if (simTime < settings.first) return "ready";
+    return "playing";
+  }
+  function expected() {
+    if (completed || crashed) return { target: null, action: "none", value: null, done: true, risky: false };
+    return { target: laneIds[safestLane()], action: "click", value: null, done: false, risky: false };
+  }
+  function check() {
+    const done = completed || crashed;
+    return { done, success: done && completed && !crashed && hits <= 1, detail: "wave " + passedCount + "/" + N + ", hits " + hits };
+  }
+  function targets() { return (completed || crashed) ? [] : targetRects.map(t => ({ id: t.id, name: t.name, role: t.role, rect: Object.assign({}, t.rect) })); }
+
+  const api = K.register({
+    id: "game",
+    task: "Dodge the asteroids for 20 waves: keep the rocket in a safe lane.",
+    values: [], check, expected, state: stateName, targets
+  });
+  document.documentElement.dataset.theme = theme;
+  api.pause = function (v) { paused = !!v; if (!paused && K.params.state !== "paused") showPauseOverlay = false; render(); };
+  api.advance = function (ms) { advanceSim(ms); };
+  api.speed = speed;
+  api.waves = N;
+
+  function bgGradient() {
+    const g = ctx.createLinearGradient(0, 0, 0, H);
+    if (theme === "light") { g.addColorStop(0, "#d8ecff"); g.addColorStop(0.48, "#8fb8d7"); g.addColorStop(1, "#1f3453"); }
+    else { g.addColorStop(0, "#050816"); g.addColorStop(0.52, "#0b1230"); g.addColorStop(1, "#160d28"); }
+    return g;
+  }
+  function roundRect(x, y, w, h, r) {
+    ctx.beginPath(); ctx.moveTo(x + r, y); ctx.arcTo(x + w, y, x + w, y + h, r); ctx.arcTo(x + w, y + h, x, y + h, r); ctx.arcTo(x, y + h, x, y, r); ctx.arcTo(x, y, x + w, y, r); ctx.closePath();
+  }
+  function drawStars() {
+    stars.forEach((layer, li) => {
+      const drift = (simTime * (12 + li * 18)) % H;
+      ctx.fillStyle = theme === "light" ? "rgba(255,255,255,.65)" : "rgba(220,236,255,.85)";
+      for (const s of layer) {
+        const y = (s.y + drift) % H;
+        ctx.globalAlpha = s.a;
+        ctx.beginPath(); ctx.arc(s.x, y, s.r, 0, Math.PI * 2); ctx.fill();
+      }
+      ctx.globalAlpha = 1;
+    });
+  }
+  function drawLanes() {
+    for (let i = 0; i < 3; i++) {
+      const x = laneXs[i] - laneW / 2;
+      const grd = ctx.createLinearGradient(x, laneTop, x + laneW, laneBottom);
+      grd.addColorStop(0, theme === "light" ? "rgba(45,72,103,.22)" : "rgba(49,72,124,.24)");
+      grd.addColorStop(0.55, theme === "light" ? "rgba(18,44,77,.32)" : "rgba(21,34,80,.42)");
+      grd.addColorStop(1, theme === "light" ? "rgba(14,25,44,.52)" : "rgba(15,18,50,.68)");
+      ctx.fillStyle = grd; roundRect(x, laneTop, laneW, laneH, 22); ctx.fill();
+      ctx.strokeStyle = i === targetLane ? "rgba(255,214,102,.62)" : "rgba(116,229,255,.22)";
+      ctx.lineWidth = i === targetLane ? 2.4 : 1.2; ctx.stroke();
+      ctx.save(); ctx.beginPath(); roundRect(x, laneTop, laneW, laneH, 22); ctx.clip();
+      const off = (simTime * settings.fall * 0.72) % 64;
+      for (let y = laneTop - 80 + off; y < laneBottom + 70; y += 64) {
+        ctx.fillStyle = "rgba(158,232,255,.16)";
+        roundRect(laneXs[i] - 20, y, 40, 18, 8); ctx.fill();
+      }
+      ctx.restore();
+    }
+    for (const x of [(laneXs[0] + laneXs[1]) / 2, (laneXs[1] + laneXs[2]) / 2]) {
+      const g = ctx.createLinearGradient(x, laneTop, x, laneBottom);
+      g.addColorStop(0, "rgba(113,243,255,0)"); g.addColorStop(0.5, "rgba(113,243,255,.55)"); g.addColorStop(1, "rgba(113,243,255,0)");
+      ctx.strokeStyle = g; ctx.lineWidth = 2; ctx.beginPath(); ctx.moveTo(x, laneTop + 10); ctx.lineTo(x, laneBottom - 8); ctx.stroke();
+    }
+  }
+  function drawRock(w, laneNo, idx) {
+    const y = obstacleY(w), x = laneXs[laneNo];
+    if (y < -110 || y > H + 90) return;
+    const r = 31 + (w.index % 3) * 5;
+    const rock = rocks[(w.index * 2 + idx) % rocks.length];
+    ctx.save(); ctx.translate(x, y); ctx.rotate(rock.rot + simTime * 0.55 * (idx ? -1 : 1));
+    const grad = ctx.createRadialGradient(-r * .35, -r * .38, r * .12, 0, 0, r * 1.25);
+    grad.addColorStop(0, "#ffcfa3"); grad.addColorStop(0.44, "#b4704c"); grad.addColorStop(1, "#4b2b36");
+    ctx.fillStyle = grad; ctx.strokeStyle = "rgba(255,223,185,.55)"; ctx.lineWidth = 2;
+    ctx.beginPath();
+    rock.pts.forEach((p, pi) => {
+      const px = Math.cos(p.a) * r * p.r, py = Math.sin(p.a) * r * p.r;
+      if (pi === 0) ctx.moveTo(px, py); else ctx.lineTo(px, py);
+    });
+    ctx.closePath(); ctx.fill(); ctx.stroke();
+    ctx.fillStyle = "rgba(52,30,42,.5)";
+    [[-.28,-.12,.16],[.24,.2,.11],[.06,-.34,.09]].forEach(c => { ctx.beginPath(); ctx.ellipse(c[0]*r, c[1]*r, c[2]*r, c[2]*r*.72, 0, 0, Math.PI*2); ctx.fill(); });
+    ctx.restore();
+  }
+  function drawRocket() {
+    const x = playerX();
+    ctx.save(); ctx.translate(x, playerY);
+    const flame = 22 + Math.sin(simTime * 26) * 7;
+    ctx.fillStyle = "rgba(255,117,54,.86)"; ctx.beginPath(); ctx.moveTo(-13, 30); ctx.quadraticCurveTo(0, 38 + flame, 13, 30); ctx.lineTo(7, 22); ctx.lineTo(-7, 22); ctx.closePath(); ctx.fill();
+    ctx.fillStyle = "rgba(255,232,120,.88)"; ctx.beginPath(); ctx.moveTo(-7, 28); ctx.quadraticCurveTo(0, 34 + flame * .55, 7, 28); ctx.lineTo(0, 20); ctx.closePath(); ctx.fill();
+    const body = ctx.createLinearGradient(-24, -34, 24, 36);
+    body.addColorStop(0, "#f7fbff"); body.addColorStop(.45, "#9fe7ff"); body.addColorStop(1, "#355d85");
+    ctx.fillStyle = body; ctx.strokeStyle = "rgba(255,255,255,.72)"; ctx.lineWidth = 2;
+    ctx.beginPath(); ctx.moveTo(0, -42); ctx.bezierCurveTo(30, -14, 24, 21, 0, 34); ctx.bezierCurveTo(-24, 21, -30, -14, 0, -42); ctx.closePath(); ctx.fill(); ctx.stroke();
+    ctx.fillStyle = "#ffcf5c"; ctx.beginPath(); ctx.moveTo(-21, 9); ctx.lineTo(-42, 31); ctx.lineTo(-14, 25); ctx.closePath(); ctx.fill(); ctx.beginPath(); ctx.moveTo(21, 9); ctx.lineTo(42, 31); ctx.lineTo(14, 25); ctx.closePath(); ctx.fill();
+    ctx.fillStyle = "rgba(15,41,77,.9)"; ctx.beginPath(); ctx.arc(0, -12, 11, 0, Math.PI * 2); ctx.fill();
+    ctx.strokeStyle = "rgba(255,255,255,.7)"; ctx.stroke();
+    ctx.restore();
+  }
+  function drawHud() {
+    ctx.font = "700 22px ui-sans-serif, system-ui, -apple-system, Segoe UI, sans-serif"; ctx.textBaseline = "middle";
+    ctx.fillStyle = theme === "light" ? "#102033" : "#eef7ff";
+    ctx.fillText("Orbit Dash", 24, 25);
+    ctx.font = "600 16px ui-sans-serif, system-ui, -apple-system, Segoe UI, sans-serif";
+    ctx.fillStyle = theme === "light" ? "rgba(16,32,51,.78)" : "rgba(238,247,255,.74)";
+    ctx.fillText("Score " + score.toString().padStart(5, "0"), 24, 52);
+    ctx.textAlign = "center"; ctx.fillStyle = theme === "light" ? "#13263a" : "#f6fbff";
+    ctx.font = "700 18px ui-sans-serif, system-ui, -apple-system, Segoe UI, sans-serif";
+    ctx.fillText("Wave " + Math.min(N, passedCount + 1) + " / " + N, W / 2, 28);
+    roundRect(W / 2 - 135, 48, 270, 8, 4); ctx.fillStyle = "rgba(255,255,255,.22)"; ctx.fill();
+    roundRect(W / 2 - 135, 48, 270 * (passedCount / N), 8, 4); ctx.fillStyle = "#ffcf5c"; ctx.fill();
+    ctx.textAlign = "right"; ctx.font = "700 15px ui-sans-serif, system-ui, -apple-system, Segoe UI, sans-serif";
+    ctx.fillStyle = "rgba(116,229,255,.20)"; roundRect(W - 173, 16, 75, 29, 14); ctx.fill(); ctx.strokeStyle = "rgba(116,229,255,.45)"; ctx.stroke();
+    ctx.fillStyle = theme === "light" ? "#122940" : "#eafaff"; ctx.fillText(settings.badge, W - 114, 31);
+    for (let i = 0; i < 3; i++) { ctx.fillStyle = i < 3 - hits ? "#58f0b3" : "rgba(255,255,255,.2)"; ctx.beginPath(); ctx.arc(W - 72 + i * 18, 31, 6, 0, Math.PI * 2); ctx.fill(); }
+    ctx.textAlign = "left";
+  }
+  function drawOverlay(title, sub, danger) {
+    ctx.fillStyle = danger ? "rgba(54,8,20,.70)" : "rgba(4,10,28,.68)"; ctx.fillRect(0, 0, W, H);
+    ctx.fillStyle = danger ? "#ffbec7" : "#f8fbff"; ctx.textAlign = "center";
+    ctx.font = "800 46px ui-sans-serif, system-ui, -apple-system, Segoe UI, sans-serif"; ctx.fillText(title, W / 2, H / 2 - 18);
+    ctx.font = "600 20px ui-sans-serif, system-ui, -apple-system, Segoe UI, sans-serif"; ctx.fillStyle = danger ? "#ffd9df" : "#d7ecff"; ctx.fillText(sub, W / 2, H / 2 + 25);
+    ctx.textAlign = "left";
+  }
+  function render() {
+    ctx.save();
+    const sx = shake > 0 ? Math.sin(simTime * 88) * 5 * (shake / .36) : 0;
+    const sy = shake > 0 ? Math.cos(simTime * 70) * 3 * (shake / .36) : 0;
+    ctx.translate(sx, sy);
+    ctx.fillStyle = bgGradient(); ctx.fillRect(-10, -10, W + 20, H + 20);
+    drawStars(); drawLanes();
+    waves.forEach(w => w.lanes.forEach((ln, idx) => drawRock(w, ln, idx)));
+    drawRocket(); drawHud();
+    if (stateName() === "ready") {
+      ctx.textAlign = "center"; ctx.fillStyle = theme === "light" ? "rgba(10,31,53,.82)" : "rgba(244,250,255,.9)";
+      ctx.font = "800 34px ui-sans-serif, system-ui, -apple-system, Segoe UI, sans-serif"; ctx.fillText("Wave 1 incoming", W / 2, 122);
+      ctx.font = "600 16px ui-sans-serif, system-ui, -apple-system, Segoe UI, sans-serif"; ctx.fillText("Pick the open lane", W / 2, 151); ctx.textAlign = "left";
+    }
+    if (flash > 0) { ctx.fillStyle = "rgba(255,45,70," + (0.32 * flash / .42).toFixed(3) + ")"; ctx.fillRect(-10, -10, W + 20, H + 20); }
+    ctx.restore();
+    if (showPauseOverlay && !completed && !crashed) drawOverlay("Paused", "Simulation is held for inspection", false);
+    if (completed) drawOverlay("Mission complete", "Score " + score + "  Shields lost " + hits, false);
+    if (crashed) drawOverlay("Rocket lost", "Game over at wave " + passedCount + " / " + N, true);
+  }
+
+  function frame(now) {
+    if (!lastReal) lastReal = now;
+    const dt = Math.min(0.05, (now - lastReal) / 1000);
+    lastReal = now;
+    if (!paused) advanceSim(dt * 1000); else render();
+    requestAnimationFrame(frame);
+  }
+  render();
+  requestAnimationFrame(frame);
+})();
+</script>
+</body>
+</html>

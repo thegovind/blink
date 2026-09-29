@@ -1073,7 +1073,6 @@ def latency_strip(lat: dict) -> str:
         f'<span><b>{lat["p50_ms"]:g}</b> ms median</span>'
         f'<span><b>{lat["max_ms"]:g}</b> ms slowest</span>'
         f'<span><b>{lat["requests"]}</b> requests</span>'
-        f'<span><b>{lat["generated_tokens"]}</b> generated</span>'
         "</div>"
         f'<p class="blk-note">{_e(lat["caption"])}</p></figure>'
     )
