@@ -39,6 +39,7 @@ COPY = {
     "gallery": "Pick an app",
     "phone": "phone",
     "canvas": "canvas app",
+    "turns": "turn-based",
     # the player
     "close": "Back to apps",
     "video": "Video",
@@ -271,7 +272,9 @@ def cards(g: dict) -> str:
         if ep is None:
             continue
         w, h = ep["frame"]
-        tag = COPY["phone"] if sc["device"] == "phone" else COPY["canvas"] if sc["kind"] != "dom" else ""
+        # the game waits for each decision (the harness lockstep clock), so its card says so
+        tag = (COPY["phone"] if sc["device"] == "phone" else COPY["turns"] if sc["kind"] == "game"
+               else COPY["canvas"] if sc["kind"] != "dom" else "")
         out.append(
             f'<a class="blk-cuax-card" href="{esc(_link(sc["id"]))}" data-sid="{esc(sc["id"])}" style="--i:{i}">'
             f'<span class="blk-cuax-thumb{" tall" if h > w else ""}">{_video(g, ep, auto=False)}'

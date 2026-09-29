@@ -51,7 +51,9 @@ Tasks done per app:
 | Mail | 22/30 | 22/30 | 19/30 |
 | Careers | 14/20 | 9/20 | 10/20 |
 | Travel | 11/20 | 5/20 | 8/20 |
-| Game (canvas) | 4/10 | 1/10 | 2/10 |
+| Game (canvas, turn-based) | 4/10 | 1/10 | 2/10 |
+
+The game waits for each decision (turn-based). In real time, none of the nine runs cleared all 20 waves; the best lasted 14.
 
 A step (three questions) takes a median of about 0.7 s on blink-4b, 0.9 s on blink-mimo-9b and 1.7 s on blink-27b, one run per server.
 

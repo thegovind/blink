@@ -611,7 +611,7 @@
   {
     "dest": "space/computer_use.py",
     "reason": "",
-    "sha256": "15fafe350a84ad9a120011cddf3fa35de48c6f1977af999aa34742b41986fc67",
+    "sha256": "48b62e22a2e522d0b31ed67689c85397161f9865b11e362a67f10c6cb6fb8790",
     "src": "space/computer_use.py",
     "transform": "scrub_python"
   },
@@ -625,7 +625,7 @@
   {
     "dest": "space/test_cua.py",
     "reason": "",
-    "sha256": "640e55a95190746fcbe721343545dcb299a8be277a3eb5bd09d29f381c2a97c5",
+    "sha256": "4aa7996369500f8779c18ce8432b125a43fd3420ecfa60fe094f0a304b2c0767",
     "src": "space/test_cua.py",
     "transform": "scrub_python"
   },
@@ -1353,7 +1353,7 @@
   {
     "dest": "docs/computer-use.md",
     "reason": "repository scaffold",
-    "sha256": "d504fcb524eddf1d78eefd4abdafa86674229c04e792a756089e6cbb8df19296",
+    "sha256": "21808d8fcd844a2d7ce2e2daec005a7b91b90c7bec53c64b44bea2acbec597ba",
     "src": "<generated>",
     "transform": "generate"
   },
@@ -1367,7 +1367,7 @@
   {
     "dest": "examples/cua/README.md",
     "reason": "repository scaffold",
-    "sha256": "a4d0030db282b3323cce52215e0e447b0f8b4c75a0b79b2b7163207cd461a8be",
+    "sha256": "48370594420b6bde245118483e95e40a944a92d0bbe2943f6e95d4e255414f71",
     "src": "<generated>",
     "transform": "generate"
   },

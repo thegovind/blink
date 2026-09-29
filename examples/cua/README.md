@@ -74,7 +74,9 @@ Matched zero-shot sweep over ten apps and seeds 1-10 using the same harness. Tas
 | Mail | 22/30 | 22/30 | 19/30 |
 | Careers | 14/20 | 9/20 | 10/20 |
 | Travel | 11/20 | 5/20 | 8/20 |
-| Game (canvas) | 4/10 | 1/10 | 2/10 |
+| Game (canvas, turn-based) | 4/10 | 1/10 | 2/10 |
+
+The game waits for each decision (turn-based). In real time, none of the nine runs cleared all 20 waves; the best lasted 14.
 
 Videos, marked screenshots and per-step records for these runs are in the [thegovind/blink-cua](https://huggingface.co/datasets/thegovind/blink-cua) dataset; [watch them in the Space](https://huggingface.co/spaces/thegovind/blink?tab=computer-use).
 

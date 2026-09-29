@@ -470,6 +470,13 @@ class TestTab(unittest.TestCase):
         self.assertEqual(computer_use.hero_order({"hero": ["a", "b", "c", "d"], "episodes": eps}), ["a", "b", "c", "d"])
         self.assertEqual(computer_use.hero_order({"hero": ["b", "a", "c"], "episodes": eps}), ["a", "b", "c"])
 
+    def test_the_game_card_says_it_waits_for_each_decision(self):
+        g = json.loads(json.dumps(self.g))
+        g["scenarios"][0]["kind"] = "game"  # the shop card, relabelled as the lane game
+        html = computer_use.cards(g)
+        self.assertIn(f'<em class="blk-cuax-kind">{computer_use.COPY["turns"]}</em>', html)
+        self.assertNotIn(f'<em class="blk-cuax-kind">{computer_use.COPY["canvas"]}</em>', html)
+
     def test_without_runs_the_tab_still_explains(self):
         top = computer_use.top(None, "<section>how</section>")
         self.assertIn('data-g="null"', top)
