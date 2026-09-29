@@ -359,9 +359,9 @@
   {
     "dest": "examples/cua/tests/test_apps_b.py",
     "reason": "CPU scenario and harness tests",
-    "sha256": "d9e45d9a8b01d96d32efbf916ff54ae6e6a6709917bf8301cbc05c5450f23bf3",
+    "sha256": "0dc8b440d8ab646e23f522978d483a3cd25410db1088d82cbcb10a3a5aab61ed",
     "src": "cua/scenarios/tests/test_apps_b.py",
-    "transform": "cua_apps_b_test"
+    "transform": "cua_text"
   },
   {
     "dest": "examples/cua/tests/test_harness_core.py",
@@ -1367,7 +1367,7 @@
   {
     "dest": "examples/cua/README.md",
     "reason": "repository scaffold",
-    "sha256": "48370594420b6bde245118483e95e40a944a92d0bbe2943f6e95d4e255414f71",
+    "sha256": "a6c42c605672ab064aaf6e2d7c57169b30e9c7097cf42e35f7a35015ce3ade26",
     "src": "<generated>",
     "transform": "generate"
   },

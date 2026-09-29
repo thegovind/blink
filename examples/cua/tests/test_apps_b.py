@@ -196,7 +196,7 @@ def base():
     srv.shutdown()
 
 
-@pytest.fixture(scope="module")
+@pytest.fixture(scope="session")
 def browser():
     from playwright.sync_api import sync_playwright
 

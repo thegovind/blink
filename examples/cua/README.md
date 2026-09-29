@@ -96,11 +96,15 @@ docker run --rm --network host \
   --server "blink-mimo-9b=$BLINK_SERVER_URL" --runs-dir /runs --run-id container-shop
 ```
 
-To run the CPU tests without a server:
+To run the CPU tests without a server, run each file in a separate pytest
+process. The synchronous browser tests keep an event loop active until their
+process exits:
 
 ```sh
-uv run --no-project --python 3.12 --with playwright --with pillow --with httpx \
-  --with imageio-ffmpeg --with pytest python -m pytest -q examples/cua/tests
+for file in examples/cua/tests/test_*.py; do
+  uv run --no-project --python 3.12 --with playwright --with pillow --with httpx \
+    --with imageio-ffmpeg --with pytest python -m pytest -q -p no:cacheprovider "$file" || exit 1
+done
 ```
 
 Code: Apache-2.0. Weights: non-commercial research and evaluation only; see each model card's license.
