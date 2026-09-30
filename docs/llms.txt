@@ -14,6 +14,7 @@ Screenshots are opt-in on self-hosted v1.3 or later; see the [API example](https
 - [Computer use](https://thegovind.github.io/blink/computer-use.md): Try Screen click, set up screenshots and connect browser agents.
 - [Computer-use scenarios](https://thegovind.github.io/blink/computer-use.md#scenarios): Results over ten apps, per-app tables and videos.
 - [Runnable CUA examples](https://github.com/thegovind/blink/tree/main/examples/cua): Offline apps, harness, tests and setup.
+- [Run on a Mac with MLX](https://github.com/thegovind/blink/tree/main/examples/mlx): Text decisions on Apple silicon, no server.
 
 ## Models
 

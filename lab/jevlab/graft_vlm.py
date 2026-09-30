@@ -71,6 +71,9 @@ def main() -> None:
     ap.add_argument("--check-vlm", action="store_true")
     ap.add_argument("--drop-prefix", default="mtp.", help="parent tensors the text checkpoint cannot carry (multi-token "
                     "prediction heads, stale after fine-tuning); dropped and reported")
+    ap.add_argument("--full-ft", action="store_true", help="the text checkpoint is a full fine-tune of every decoder "
+                    "layer: any `.layers.N.` tensor may change; embeddings, final norm and lm_head must still equal "
+                    "the parent")
     a = ap.parse_args()
 
     parent = a.parent if os.path.isdir(a.parent) else snapshot_download(a.parent)
@@ -89,14 +92,18 @@ def main() -> None:
     for tk, pk in mapping.items():
         t, p = text[tk], orig[pk]
         assert t.shape == p.shape, (tk, t.shape, p.shape)
-        if any(f".{name}." in tk for name in TARGETS):
+        trained = (".layers." in tk) if a.full_ft else any(f".{name}." in tk for name in TARGETS)
+        if trained:
             n_target += 1
             n_changed += int(not torch.equal(t, p.to(t.dtype)))
             merged[pk] = t.to(p.dtype)
         else:
             n_frozen += 1
-            assert torch.equal(t, p.to(t.dtype)), f"{tk} differs from the parent, but LoRA never touched it"
-    assert n_changed == n_target, f"only {n_changed} of {n_target} LoRA-targeted tensors changed"
+            assert torch.equal(t, p.to(t.dtype)), f"{tk} differs from the parent, but training never touched it"
+    if a.full_ft:
+        assert n_changed >= 0.9 * n_target, f"only {n_changed} of {n_target} decoder-layer tensors changed"
+    else:
+        assert n_changed == n_target, f"only {n_changed} of {n_target} LoRA-targeted tensors changed"
     os.makedirs(a.out, exist_ok=True)
     shards, cur, size = [], {}, 0
     for k in pw:  # the parent's tensor order
@@ -119,8 +126,11 @@ def main() -> None:
     for f in kept:
         shutil.copy(os.path.join(parent, f), os.path.join(a.out, f))
     report = {"parent": a.parent, "text": a.text, "tensors": len(pw), "language_model": len(lm_keys),
-              "vision": len(pw) - len(lm_keys), "lora_targeted_changed": n_changed, "untouched_bitwise_equal": n_frozen,
+              "vision": len(pw) - len(lm_keys), "mode": "full-ft" if a.full_ft else "lora",
+              "trained_tensors": n_target, "trained_changed": n_changed, "untouched_bitwise_equal": n_frozen,
               "dropped": len(dropped), "shards": len(shards), "files_kept": kept}
+    if not a.full_ft:
+        report["lora_targeted_changed"] = n_changed  # the key earlier merge reports carry
 
     if a.check_vlm:
         from transformers import AutoModelForImageTextToText

@@ -21,9 +21,23 @@
     "transform": "copy"
   },
   {
+    "dest": "examples/mlx/README.md",
+    "reason": "MLX example",
+    "sha256": "a827d38d538885e9693197a81fb5c53a6c9e9068fa0c5d367b99ee8baba93b96",
+    "src": "examples/mlx/README.md",
+    "transform": "copy"
+  },
+  {
+    "dest": "examples/mlx/blink_mlx.py",
+    "reason": "MLX example",
+    "sha256": "7a0aff11b04f87099bc68da009cec08f3be95b410899f98f8ed3003cff35defc",
+    "src": "examples/mlx/blink_mlx.py",
+    "transform": "scrub_python"
+  },
+  {
     "dest": "examples/cua/SPEC.md",
     "reason": "offline computer-use contract",
-    "sha256": "8ebd7a8617d68bc4de179919f1281a5e28619b76c57f6321a682d6b9bd12522f",
+    "sha256": "e2bf587ac97a53e148e569cbeb8964ff992ccbef50afaf0478849b41db43a8c5",
     "src": "cua/scenarios/SPEC.md",
     "transform": "cua_spec"
   },
@@ -275,7 +289,7 @@
   {
     "dest": "examples/cua/harness/agent.py",
     "reason": "local screenshot agent harness",
-    "sha256": "f35b63bd96fe36571f84cc598e6ef3daacd76ff367021d55bb1529e45c51a2d0",
+    "sha256": "bdefec50cb0b7dc0814d0301fd39a7875800bb41de64f41a990495863af8c617",
     "src": "cua/scenarios/harness/agent.py",
     "transform": "cua_text"
   },
@@ -317,7 +331,7 @@
   {
     "dest": "examples/cua/harness/sweep.py",
     "reason": "local screenshot agent harness",
-    "sha256": "6832ce6108c15c6ee1478d1cb35b6f5127b35125186878f6192cd4b01e06167e",
+    "sha256": "23df578c6f06dd59d6c7bdc8deddeacda735177d4f3ed4be70019207268de9e6",
     "src": "cua/scenarios/harness/sweep.py",
     "transform": "cua_sweep"
   },
@@ -366,7 +380,7 @@
   {
     "dest": "examples/cua/tests/test_harness_core.py",
     "reason": "CPU scenario and harness tests",
-    "sha256": "5d196321269aad669c2eb02ff32bef586de14017abdff7c2f3cf0b75df87061d",
+    "sha256": "30639c2c5789a007457392c63507b75aacb0347a601abfcaf25f08bc4b3b0d19",
     "src": "cua/scenarios/tests/test_harness_core.py",
     "transform": "cua_core_test"
   },
@@ -471,14 +485,14 @@
   {
     "dest": "space/ui.py",
     "reason": "",
-    "sha256": "a57325c87edcf7104b332739530fcd5221931d469efcb044b6b4daefd363d946",
+    "sha256": "ce3a966a42009178757e529511cf0b23d3d76437a99132c3e4fdef773cbca60f",
     "src": "space/ui.py",
     "transform": "scrub_python"
   },
   {
     "dest": "space/api_doc.py",
     "reason": "",
-    "sha256": "7b3afc2e92aff36716bfc2c983438bfae6be1e26007c2598904fa5cbd1265019",
+    "sha256": "ad03ad252db401d875a0779e8fe68a12ae28494a450ce72c36c7f031b56c18f1",
     "src": "space/api_doc.py",
     "transform": "scrub_python"
   },
@@ -541,7 +555,7 @@
   {
     "dest": "space/test_blink.py",
     "reason": "",
-    "sha256": "cfaf7a444f1436e5c6b9b440da3245eee754f0d889521cccc4cece305937c051",
+    "sha256": "0bd0586965087a96d51eb867a8b131cb0596a6dbe92987c76d7f1dd9bd5242b4",
     "src": "space/test_blink.py",
     "transform": "scrub_python"
   },
@@ -1066,7 +1080,7 @@
   {
     "dest": "lab/jevlab/graft_vlm.py",
     "reason": "training/data-generation",
-    "sha256": "8fe534cc6857076b2e4981409a5047cebf4ad0e37dc7b0abd0a476840a4300a1",
+    "sha256": "abd41b8b5f526a4c9acf4d3a27e51f9dbc54a9d826242c2cdf504c12121f74cc",
     "src": "lab/jevlab/graft_vlm.py",
     "transform": "scrub_python"
   },
@@ -1304,7 +1318,7 @@
   {
     "dest": "README.md",
     "reason": "repository scaffold",
-    "sha256": "a84162946441c1cc77ed78c44325894ddb7db5c1cf49689c3470cb67da2be508",
+    "sha256": "4d1af0dc95bb058a9644b009610fed94524ebd234259d7e62dd3383520b7c731",
     "src": "<generated>",
     "transform": "generate"
   },
@@ -1325,7 +1339,7 @@
   {
     "dest": "docs/index.md",
     "reason": "repository scaffold",
-    "sha256": "00f4e207eca60cff92bc963d2cb7e58fca6d5979aed50fdc6e11b6e5ebb7f62b",
+    "sha256": "6a4952bd80f8af910b264819e6e24bfe86ca65e5925bb95774bb2cf3db3749af",
     "src": "<generated>",
     "transform": "generate"
   },
@@ -1346,7 +1360,7 @@
   {
     "dest": "docs/models.md",
     "reason": "repository scaffold",
-    "sha256": "559487c30bed1a5623419f36258be39134015204400b569e4bbb4770dcc460b4",
+    "sha256": "46955fee8dcb9033ab74799c42852609f04dedeaf1ae2d660f21b4cf4703d484",
     "src": "<generated>",
     "transform": "generate"
   },
@@ -1360,7 +1374,7 @@
   {
     "dest": "docs/llms.txt",
     "reason": "repository scaffold",
-    "sha256": "83a469e4a45b713f5524d31e35a405037d8386cb203c067fd430e5bfa29838cc",
+    "sha256": "ca2960b2f045e0bf64eac85d59122ff8534bb99a0692b0751cd47db5b0a45685",
     "src": "<generated>",
     "transform": "generate"
   },

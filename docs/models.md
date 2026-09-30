@@ -17,6 +17,8 @@ Code: Apache-2.0. Weights: non-commercial research and evaluation only; see each
 | `serve.py` (default) | [4B](https://huggingface.co/thegovind/blink-4b), [MiMo 9B](https://huggingface.co/thegovind/blink-mimo-9b), [27B](https://huggingface.co/thegovind/blink-27b) | Text; screenshots opt-in | Reference path. |
 | `serve_vllm.py` (opt-in) | 4B only | Text only | Higher throughput. |
 
+On a Mac with Apple silicon, `blink_mlx.py` runs all three models with MLX for text decisions, memory permitting; see the [MLX guide](https://github.com/thegovind/blink/tree/main/examples/mlx). It is not a server.
+
 | Model / server | JevBench p50 / p95 (ms) | c16 q/s | Longest TypeSafe p95 (s) |
 | --- | ---: | ---: | ---: |
 | 4B / default | 64 / 175 | 12.2 | 22.2 |

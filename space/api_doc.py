@@ -91,6 +91,16 @@ COPY = {
               "Over a limit gets 422.",
     "models": "Model list",
     "space": "Call this Space",
+    "mlx": "Run it on a Mac (MLX)",
+    "mlx_notes": (
+        "blink_mlx.py keeps the model repo's blink.py for prompts, option labels and answers. MLX runs the "
+        "forward pass on Apple silicon.",
+        "Text and JSON state only, bf16 weights only. Answers have the same fields as blink.decide.",
+        "It was checked on Linux. Run --check once on your Mac: it compares your answers with this Space's "
+        "saved runs for blink-4b and blink-mimo-9b.",
+        "It is not a server. TypeSafe clients need serve.py.",
+    ),
+    "mlx_docs": "MLX guide: memory, checks and limits",
     "space_notes": (
         "This Space is not a TypeSafe endpoint. Its Gradio API takes the same request fields and "
         "returns TypeSafe's answer fields plus meta. Use gradio_client or the Gradio API over HTTP.",
@@ -181,6 +191,12 @@ python blink-4b/serve.py --model ./blink-4b --port 8000"""
 
 DOCKER_RUN = """cd blink-4b
 docker build -t blink-4b . && docker run --rm --gpus all -p 127.0.0.1:8000:8000 blink-4b"""
+
+MLX_URL = "https://github.com/thegovind/blink/tree/main/examples/mlx"
+MLX_RUN = """pip install "mlx-lm>=0.31.3"
+curl -O https://raw.githubusercontent.com/thegovind/blink/main/examples/mlx/blink_mlx.py
+python blink_mlx.py --model thegovind/blink-4b
+python blink_mlx.py --check   # compare with the Space's saved runs"""
 
 KEY_RUN = """BLINK_API_KEY=your-key python blink-4b/serve.py --model ./blink-4b --port 8000
 # Docker: docker run --rm --gpus all -e BLINK_API_KEY=your-key -p 127.0.0.1:8000:8000 blink-4b"""

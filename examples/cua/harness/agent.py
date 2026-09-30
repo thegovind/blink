@@ -21,6 +21,58 @@ from .mark import mark_screenshot, screens
 Client = BlinkClient | FanoutClient | MockClient
 _OVERLAY = Path(__file__).with_name("overlay.js")
 _TEXT_TYPES = {"text", "search", "email", "url", "tel", "number", "password"}
+_DETAIL_REASONS = {
+    "meeting still on calendar": "meeting wasn't cancelled",
+    "wrong booking made": "booked the wrong room or time",
+    "meeting cancelled": "cancelled a meeting instead of booking",
+    "not booked": "stopped before booking",
+    "wrong meeting cancelled": "cancelled the wrong meeting",
+    "booking made": "booked when asked to cancel",
+    "target backend role detail not open": "didn't open the target job",
+    "target application form not open": "didn't open the application form",
+    "application was submitted": "submitted when asked not to",
+    "wrong photo deleted": "deleted the wrong photo",
+    "not complete": "didn't finish the task",
+    "not moved yet": "didn't move the file",
+    "wrong file moved or deleted": "moved or deleted the wrong file",
+    "wrong file deleted": "deleted the wrong file",
+    "not deleted yet": "didn't delete the file",
+    "wrong share created": "shared the wrong file",
+    "not shared yet": "didn't share the file",
+    "real message archived": "archived the wrong message",
+    "nothing sent": "stopped before sending",
+    "wrong sent message": "sent the wrong message",
+    "wrong reply sent": "sent the wrong reply",
+    "waiting for newest reorder": "stopped before reordering",
+    "wrong order placed": "placed the wrong order",
+    "target address not saved cleanly": "didn't save the right address",
+    "key still present": "key wasn't deleted",
+    "notifications not saved": "didn't save notifications",
+    "wrong notification settings saved": "saved the wrong notification settings",
+    "security not saved": "didn't save security settings",
+    "wrong security settings saved": "saved the wrong security settings",
+    "signed out other sessions": "signed out other sessions",
+    "no promo applied": "promo wasn't applied",
+    "order placed": "paid when asked not to",
+    "wrong or extra order": "placed the wrong order",
+    "not ordered yet": "stopped before paying",
+    "cart empty": "cart was empty",
+    "not at target review": "didn't open the target review",
+    "booking incomplete": "stopped before booking",
+    "forbidden booking made": "booked when asked not to",
+    "check failed": "app couldn't check the result",
+    "check error": "app couldn't check the result",
+    "check() failed": "app couldn't check the result",
+}
+_STOP_REASONS = {
+    "model_done": "said done too early",
+    "step_limit": "ran out of steps",
+    "repeated_action": "repeated the same action",
+    "no_candidates": "no action was available",
+    "no_task_value": "picked a field without a task value",
+    "game_finished": "didn't survive the game",
+    "error": "episode could not finish",
+}
 
 
 def _now() -> str:
@@ -35,6 +87,28 @@ def _percentile(values: list[float], percentile: float) -> float | None:
     low = int(position)
     return round(sorted_values[low] + (sorted_values[min(low + 1, len(values) - 1)]
                                         - sorted_values[low]) * (position - low), 2)
+
+
+def _plain_reason(check: dict, stop_reason: str, error: str | None) -> str:
+    if error:
+        return "episode could not finish"
+    if check.get("success"):
+        return "task completed"
+    detail = str(check.get("detail") or "").strip()
+    if detail in _DETAIL_REASONS:
+        return _DETAIL_REASONS[detail]
+    if re.fullmatch(r"\d+ newsletters remain", detail):
+        return "newsletters still need archiving"
+    if re.fullmatch(r"cart has \d+ lines", detail):
+        return "cart still has the wrong items"
+    game = re.fullmatch(r"wave \d+/\d+, hits (\d+)", detail)
+    if game:
+        return "took too many hits" if int(game[1]) > 1 else "didn't survive all waves"
+    if detail.startswith("wrong key deleted: "):
+        return "deleted the wrong key"
+    if detail.startswith("applied "):
+        return "applied the wrong promo"
+    return _STOP_REASONS.get(stop_reason, "task not completed")
 
 
 def _action_kind(candidate: Candidate) -> str:
@@ -234,6 +308,8 @@ async def run_episode(
     error = None
     context = None
     video = None
+    video_t0 = None
+    video_clock = None
     game_lockstep = False
     try:
         context_options = {"viewport": viewport, "device_scale_factor": scale,
@@ -251,8 +327,13 @@ async def run_episode(
                 await route.abort()
 
         await context.route("**/*", local_only)
+        if record_video:
+            video_clock = time.perf_counter()
+            video_t0 = _now()
         page = await context.new_page()
         video = page.video
+        if record_video and video is None:
+            raise RuntimeError("Playwright did not start video recording")
         await page.goto(url, wait_until="load", timeout=15000)
         contract = await _contract(page)
         if (contract["id"] != scenario["id"] or contract["seed"] != seed or
@@ -391,6 +472,8 @@ async def run_episode(
                     stop_reason = "game_finished"
             row = {
                 "step": step, "t_start": start, "t_end": _now(), "url": page.url,
+                "video_ms": round((tick_start - video_clock) * 1000, 2)
+                if video_clock is not None else None,
                 "state": state_name, "candidates": marked.trace_candidates(choices),
                 "marked_screenshot": image_path,
                 "request_state": {k: v for k, v in request_state.items() if k != "screenshot"},
@@ -437,9 +520,10 @@ async def run_episode(
         "scenario": scenario["id"], "kind": scenario["kind"], "task_index": task["index"],
         "seed": seed, "model": model, "server": client.server,
         "interrupts": interrupts, "mode": "game-realtime" if game_realtime else mode,
-        "game_realtime": game_realtime, "beat_ms": beat_ms,
+        "game_realtime": game_realtime, "beat_ms": beat_ms, "video_t0": video_t0,
         "success": bool(check.get("success")) and error is None,
         "done": bool(check.get("done")), "detail": check.get("detail"),
+        "reason": _plain_reason(check, stop_reason, error),
         "stop_reason": stop_reason, "error": error,
         "optimal_steps": int(task["optimal_steps"]),
         "step_limit": max_steps,

@@ -16,6 +16,7 @@ import re
 import subprocess
 import sys
 import threading
+from contextlib import AsyncExitStack
 from dataclasses import dataclass
 from datetime import datetime, timezone
 from pathlib import Path
@@ -93,6 +94,34 @@ def _load_registry(path: Path) -> list[dict]:
 
 
 def _jobs(args, scenarios: list[dict], models: list[str]) -> list[Job]:
+    if args.jobs_file:
+        if args.scenario or args.task:
+            raise ValueError("--jobs-file cannot be combined with --scenario or --task")
+        manifest = json.loads(args.jobs_file.read_text(encoding="utf-8"))
+        source_registry = manifest.get("source_registry_sha256")
+        if source_registry and source_registry != hashlib.sha256(args.registry.read_bytes()).hexdigest():
+            raise ValueError("Showcase jobs were selected from a different registry")
+        by_id = {s["id"]: s for s in scenarios}
+        jobs = []
+        seen = set()
+        for entry in manifest["jobs"]:
+            scenario = by_id.get(entry["scenario"])
+            if scenario is None:
+                raise ValueError(f"Unknown showcase scenario: {entry['scenario']!r}")
+            task = next((t for t in scenario["tasks"] if t["index"] == entry["task"]), None)
+            if task is None or entry["model"] not in models:
+                raise ValueError(f"Invalid showcase task/model: {entry}")
+            seed = entry["seed"]
+            if not isinstance(seed, int) or isinstance(seed, bool) or seed < 1:
+                raise ValueError(f"Invalid showcase seed: {seed!r}")
+            job = Job(scenario, task, seed, entry["model"])
+            if str(job.path) in seen:
+                raise ValueError(f"Duplicate showcase job: {job.path}")
+            seen.add(str(job.path))
+            jobs.append(job)
+        if not jobs:
+            raise ValueError("Showcase manifest has no jobs")
+        return jobs
     chosen = set(args.scenario or (s["id"] for s in scenarios))
     missing = chosen - {s["id"] for s in scenarios}
     if missing:
@@ -158,6 +187,8 @@ def _existing(run_dir: Path) -> set[str]:
 async def run(args) -> dict:
     if args.workers < 1 or args.beat < 0:
         raise ValueError("--workers must be >= 1 and --beat must be >= 0")
+    if args.per_server_limit < 0 or (args.per_server_limit and args.fanout):
+        raise ValueError("--per-server-limit must be >= 0 and cannot be combined with --fanout")
     if args.game_realtime and (args.beat or args.fanout):
         raise ValueError("--game-realtime requires --beat 0 and cannot use --fanout")
     models = list(dict.fromkeys(args.model or ["blink-mimo-9b"]))
@@ -171,16 +202,23 @@ async def run(args) -> dict:
     run_dir = args.runs_dir / run_id
     run_dir.mkdir(parents=True, exist_ok=True)
     harness_sha = args.harness_sha or _sha()
+    selection = json.loads(args.jobs_file.read_text(encoding="utf-8")) if args.jobs_file else None
     config = {
         "harness_sha": harness_sha,
         "registry_sha256": hashlib.sha256(args.registry.read_bytes()).hexdigest(),
-        "seeds": _seeds(args.seeds),
+        "seeds": sorted({job.seed for job in jobs}) if args.jobs_file else _seeds(args.seeds),
         "models": models,
         "scenarios": sorted({job.scenario["id"] for job in jobs}),
         "thresholds": {"done_at": screens.DONE_AT, "risky_at": screens.RISKY_AT},
         "jobs": [str(job.path) for job in jobs],
         "interrupts": args.interrupts, "beat_ms": args.beat,
         "workers": args.workers,
+        "per_server_limit": args.per_server_limit,
+        "selection": ({"source_run": selection["source_run"],
+                       "source_harness_sha": selection["source_harness_sha"],
+                       "rule": selection["selection_rule"],
+                       "manifest_sha256": hashlib.sha256(args.jobs_file.read_bytes()).hexdigest()}
+                      if selection else None),
         "mode": "game-realtime" if args.game_realtime else "fanout" if args.fanout else "batched",
         "game_realtime": args.game_realtime,
         "mock": args.mock, "mock_noise": args.mock_noise,
@@ -204,6 +242,9 @@ async def run(args) -> dict:
                 health.raise_for_status()
                 if not health.json().get("accepts_images"):
                     raise ValueError(f"{model} server {client.server} does not accept images")
+    server_limits = ({client.server: asyncio.Semaphore(args.per_server_limit)
+                      for pool in clients.values() for client in pool}
+                     if args.per_server_limit else {})
     server, base_url = _serve(args.apps_root)
     lock = asyncio.Lock()
     semaphore = asyncio.Semaphore(args.workers)
@@ -215,7 +256,11 @@ async def run(args) -> dict:
                     episode = str(job.path)
                     if episode in seen:
                         return
-                    async with semaphore:
+                    async with AsyncExitStack() as stack:
+                        if server_limits:
+                            pool = clients[job.model]
+                            await stack.enter_async_context(server_limits[pool[index % len(pool)].server])
+                        await stack.enter_async_context(semaphore)
                         folder = run_dir / job.path
                         summary_path = folder / "summary.json"
                         if not summary_path.exists() and folder.exists():
@@ -282,9 +327,12 @@ def main(argv: list[str] | None = None) -> int:
     parser.add_argument("--scenario", action="append", help="scenario id; repeat to filter")
     parser.add_argument("--task", type=int, action="append", help="task index; repeat to filter")
     parser.add_argument("--seeds", default="1", help="e.g. 1-10, 1..5 or 1,3,5")
+    parser.add_argument("--jobs-file", type=Path, help="exact selected scenario/task/seed/model jobs")
     parser.add_argument("--model", action="append", help="model name; repeat to compare")
     parser.add_argument("--server", action="append", help="model=URL; repeat per server; or set BLINK_CUA_SERVERS")
     parser.add_argument("--workers", type=int, default=8)
+    parser.add_argument("--per-server-limit", type=int, default=0,
+                        help="maximum concurrent episodes per assigned server; 0 is unlimited")
     parser.add_argument("--interrupts", type=int, choices=(0, 1), default=0)
     parser.add_argument("--beat", type=int, default=600, help="video display beat in ms; 0 = real time")
     parser.add_argument("--fanout", action="store_true", help="three single-question requests in parallel")

@@ -4,6 +4,7 @@ from __future__ import annotations
 
 import asyncio
 import json
+from datetime import datetime
 from pathlib import Path
 
 import httpx
@@ -11,7 +12,7 @@ import pytest
 from PIL import Image
 from playwright.async_api import async_playwright
 
-from examples.cua.harness.agent import _oracle_box, run_episode
+from examples.cua.harness.agent import _oracle_box, _plain_reason, run_episode
 from examples.cua.harness.client import BlinkClient, BlinkClientError, Decision, FanoutClient, MockClient
 from examples.cua.harness.dom import candidates, matches_expected
 from examples.cua.harness.mark import PAD_CSS, mark_screenshot, screens
@@ -162,6 +163,8 @@ def test_mock_episode_oracle_is_not_sent_or_logged(tmp_path, interrupts, actions
 
     result = asyncio.run(run())
     assert result["success"] and result["error"] is None
+    assert result["reason"] == "task completed"
+    video_t0 = datetime.fromisoformat(result["video_t0"])
     assert result["steps"] == actions
     assert result["element_correct"] == result["element_total"] == actions
     assert (result["done_tp"], result["risk_tp"], result["risk_fn"], result["risk_fp"]) == (1, 1, 0, 0)
@@ -175,6 +178,10 @@ def test_mock_episode_oracle_is_not_sent_or_logged(tmp_path, interrupts, actions
         'typed "Amber Plan" into box 1 (Search catalog)'
     )
     for row in rows:
+        assert 0 <= row["video_ms"]
+        assert datetime.fromisoformat(row["t_start"]) >= video_t0
+        assert abs(row["video_ms"] -
+                   (datetime.fromisoformat(row["t_start"]) - video_t0).total_seconds() * 1000) < 250
         assert set(row["request_state"]) == {"task", "previous_actions", "screenshot_note"}
         assert "expected" not in row["request_state"]
         assert "candidates" not in row["request_state"]
@@ -205,7 +212,25 @@ def test_mock_noise_produces_measured_failure(tmp_path):
     result = asyncio.run(run())
     assert not result["success"]
     assert result["stop_reason"] == "model_done"
+    assert result["reason"] == "said done too early" and result["video_t0"] is None
     assert result["steps"] == 0 and result["done_fp"] == 1
+    assert json.loads((tmp_path / "trace.jsonl").read_text().splitlines()[0])["video_ms"] is None
+
+
+@pytest.mark.parametrize(("detail", "stop_reason", "expected"), [
+    ("target backend role detail not open", "model_done", "didn't open the target job"),
+    ("cart has 3 lines", "step_limit", "cart still has the wrong items"),
+    ("2 newsletters remain", "model_done", "newsletters still need archiving"),
+    ("wave 20/20, hits 2", "game_finished", "took too many hits"),
+    ("wrong key deleted: abc123", "model_done", "deleted the wrong key"),
+    ("UnexpectedTypeError: stack trace", "model_done", "said done too early"),
+])
+def test_gallery_reason_keeps_app_detail_private_to_raw_field(detail, stop_reason, expected):
+    assert _plain_reason({"success": False, "detail": detail}, stop_reason, None) == expected
+    assert _plain_reason({"success": True, "detail": detail}, stop_reason, None) == "task completed"
+    assert _plain_reason({"success": False, "detail": detail}, "error", "NetworkError") == (
+        "episode could not finish"
+    )
 
 
 def test_wire_payload_validation_and_parallel_fanout():
@@ -448,7 +473,11 @@ def test_video_conversion_bounds_encoder_threads(tmp_path, monkeypatch):
         Path(args[-1]).write_bytes(b"encoded frame")
 
     monkeypatch.setattr("examples.cua.harness.video._run", fake_ffmpeg)
-    normalize_capture(capture, webm, viewport={"width": 960, "height": 576}, scale=1.5)
+    normalize_capture(capture, webm, viewport={"width": 390, "height": 844}, scale=1.5)
     files = convert(webm)
     assert len(commands) == 4
+    assert "scale=585:1266" in commands[0][commands[0].index("-vf") + 1]
+    assert commands[1][commands[1].index("-vf") + 1] == (
+        "pad=ceil(iw/2)*2:ceil(ih/2)*2:0:0:color=black"
+    )
     assert all((tmp_path / name).is_file() for name in files.values())

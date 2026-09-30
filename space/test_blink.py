@@ -1743,6 +1743,7 @@ class TestHomeAndAskTabs(unittest.TestCase):
             self.assertIn(f"huggingface.co/thegovind/{name}", joined)
         self.assertIn("spaces/multimodalart/jev-decision-index", joined)
         self.assertIn("jevbench/issues/81", joined)
+        self.assertIn("github.com/thegovind/blink#get-started", joined)
 
     def test_home_numbers_come_from_the_board(self):
         import results
@@ -3566,8 +3567,9 @@ class TestApiTab(unittest.TestCase):
             self.assertIn(self.ui.esc(row[1]), html)
         self.assertEqual("blk-copytag" in html, self.d.DRAFT)
         for code in (self.d.SERVER_RUN, self.d.DOCKER_RUN, self.d.PYTHON_CLIENT, self.d.JS_CLIENT,
-                     self.d.HTTP_CLIENT, self.d.SPACE_PYTHON, self.d.SPACE_CURL):
+                     self.d.HTTP_CLIENT, self.d.SPACE_PYTHON, self.d.SPACE_CURL, self.d.MLX_RUN):
             self.assertIn(self.ui.esc(code), html)
+        self.assertIn(f'href="{self.ui.esc(self.d.MLX_URL)}"', html)
 
     def test_the_tab_is_built(self):
         gr = need_gradio(self)

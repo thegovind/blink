@@ -703,6 +703,8 @@ HOME_LINKS = (
 )
 
 HOME_EXTERNAL = (
+    ("https://github.com/thegovind/blink#get-started", "Get started",
+     "Call the API, self-host, or run it on a Mac."),
     ("https://huggingface.co/thegovind/blink-4b", "blink-4b", "Model files on Hugging Face."),
     ("https://huggingface.co/thegovind/blink-27b", "blink-27b", "Model files on Hugging Face."),
     ("https://huggingface.co/thegovind/blink-mimo-9b", "blink-mimo-9b", "Model files on Hugging Face."),
@@ -1346,6 +1348,7 @@ def api_blocks() -> list[str]:
         + _api_code(d.SPACE_REPLY)
         + _api_notes(c["space_notes"][1:])
     )
+    mlx = _api_notes(c["mlx_notes"]) + _api_code(d.MLX_RUN) + links_html(((c["mlx_docs"], d.MLX_URL),))
     diff = "<ul>" + "".join(f"<li>{esc(n)}</li>" for n in c["diff_notes"]) + "</ul>"
     return [
         f'<h2 class="blk-h2">{esc(c["heading"])}{draft}</h2><p class="blk-note">{esc(c["lede"])}</p>'
@@ -1354,6 +1357,7 @@ def api_blocks() -> list[str]:
         api_steps(),
         '<div class="blk-api">'
         + _api_fold(c["server"], server)
+        + _api_fold(c["mlx"], mlx)
         + _api_fold(c["client"], client)
         + _api_fold(c["example"], example)
         + _api_fold(c["errors"], errors)

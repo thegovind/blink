@@ -135,11 +135,13 @@ calendar, files, search_results, error, login, dialog, game`), `modal` (bool), `
   `advance(ms)`, hold simulation during inference and advance one cadence per decision;
   record simulation time separately from request latency and video display time.
 - Outputs per episode, in `runs/<run_id>/<scenario>/<task>-<seed>-<model>/`:
-  `trace.jsonl` (one line per step: step, t_start/t_end, url, state(), candidates [{n, box, role, name}],
+  `trace.jsonl` (one line per step: step, t_start/t_end, video_ms from recording start,
+  url, state(), candidates [{n, box, role, name}],
   marked screenshot file, request questions, answers with probabilities, chosen action, wall_ms,
   expected() at that step, gate fired, check() after the action), `steps/NNN.png` (marked screenshots),
-  `video.webm` (real speed), `summary.json` (success, steps, optimal_steps, gates, per-step
-  element accuracy vs expected, p50/p95 wall_ms, model, server, seed, harness git sha).
+  `video.webm` (real speed), `summary.json` (success, raw detail, short plain reason,
+  video_t0 in the same UTC ISO clock as trace t_start/t_end, steps, optimal_steps, gates,
+  per-step element accuracy vs expected, p50/p95 wall_ms, model, server, seed, harness git sha).
 - Video: Playwright `record_video` at the viewport size times the scale. After the clean
   screenshot is taken, draw an in-page overlay (pointer-events: none) with the same numbered boxes, then
   on the answer highlight the chosen box and show a small card: action, top probabilities, p(done),
