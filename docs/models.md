@@ -19,6 +19,8 @@ Code: Apache-2.0. Weights: non-commercial research and evaluation only; see each
 
 On a Mac with Apple silicon, `blink_mlx.py` runs all three models with MLX for text decisions, memory permitting; see the [MLX guide](https://github.com/thegovind/blink/tree/main/examples/mlx). It is not a server.
 
+To fine-tune any of them on your own decisions, see [Customize](customize.md).
+
 | Model / server | JevBench p50 / p95 (ms) | c16 q/s | Longest TypeSafe p95 (s) |
 | --- | ---: | ---: | ---: |
 | 4B / default | 64 / 175 | 12.2 | 22.2 |

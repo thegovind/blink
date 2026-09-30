@@ -54,6 +54,7 @@ SOURCES = {
                        "![readout](img/r.png)\n"),
     "docs/computer-use.md": ("# Computer use\n\nTry [Screen click]"
                              "(https://huggingface.co/spaces/thegovind/blink?tab=use-cases&case=screen).\n"),
+    "docs/customize.md": "# Customize\n\nFine-tune on your own decisions, then call it as in the [API guide](api.md).\n",
     "docs/llms.txt": f"# blink\n\n> Typed decisions.\n\n- [API]({SITE}api.md): the wire format\n",
     "skills/blink/SKILL.md": SKILL,
     "AGENTS.md": "# Coding agents\n",
@@ -93,7 +94,7 @@ class Helpers(unittest.TestCase):
         self.assertEqual(build.rel_url("api", ""), "../")
         self.assertEqual(build.rel_url("models/blink-4b", "models/"), "../../models/")
         self.assertEqual([build.markdown_path(p.slug) for p in build.PAGES], ["index.md", "api.md", "agents.md", "models.md",
-                                                                                 "computer-use.md"])
+                                                                                 "computer-use.md", "customize.md"])
         self.assertEqual(build.page_path(""), "")
         self.assertEqual(build.page_path("api"), "api/")
 
@@ -221,10 +222,10 @@ class Built(unittest.TestCase):
         return (self.out / rel).read_text(encoding="utf-8")
 
     def test_outputs(self):
-        self.assertEqual(self.report, {"pages": 5, "markdown": 5, "redirects": len(build.REDIRECTS), "files": 2,
+        self.assertEqual(self.report, {"pages": 6, "markdown": 6, "redirects": len(build.REDIRECTS), "files": 2,
                                        "images": 1})
         for rel in ("index.html", "api/index.html", "agents/index.html", "models/index.html",
-                    "computer-use/index.html", "index.md", "api.md", "agents.md", "models.md", "computer-use.md", "llms.txt", "skills/blink/SKILL.md", "404.html", "sitemap.xml",
+                    "computer-use/index.html", "customize/index.html", "index.md", "api.md", "agents.md", "models.md", "computer-use.md", "customize.md", "llms.txt", "skills/blink/SKILL.md", "404.html", "sitemap.xml",
                     ".nojekyll", "assets/site.css", "assets/site.js", "assets/favicon.svg", "docs/img/r.png"):
             self.assertTrue((self.out / rel).is_file(), rel)
         self.assertEqual(self.read("llms.txt"), SOURCES["docs/llms.txt"])

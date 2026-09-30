@@ -1,0 +1,31 @@
+$schema: https://azuremlschemas.azureedge.net/latest/managedOnlineDeployment.schema.json
+# serve.py in its own container behind the endpoint. A template the maintainers have not run: the schema is
+# checked, the deployment is not. Build and push the image from the merged folder the training job wrote:
+#
+#   cd merged && docker build -t <registry>.azurecr.io/blink-mine:1 . && docker push <registry>.azurecr.io/blink-mine:1
+#   az ml online-deployment create -f examples/train/azureml/deployment.yml --all-traffic \
+#     --resource-group <group> --workspace-name <workspace>
+#
+# Give the workspace permission to pull from the registry, and pick a GPU instance type your subscription has
+# quota for. Send requests to the endpoint's scoring URI with the same JSON body as POST /v1/systemone and the
+# endpoint key as a bearer token.
+name: blue
+endpoint_name: blink-mine
+environment:
+  image: yourregistry.azurecr.io/blink-mine:1
+  inference_config:
+    liveness_route:
+      port: 8000
+      path: /healthz
+    readiness_route:
+      port: 8000
+      path: /healthz
+    scoring_route:
+      port: 8000
+      path: /v1/systemone
+instance_type: your-gpu-instance-type
+instance_count: 1
+liveness_probe:
+  initial_delay: 600
+readiness_probe:
+  initial_delay: 600

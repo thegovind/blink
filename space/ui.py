@@ -705,6 +705,8 @@ HOME_LINKS = (
 HOME_EXTERNAL = (
     ("https://github.com/thegovind/blink#get-started", "Get started",
      "Call the API, self-host, or run it on a Mac."),
+    ("https://thegovind.github.io/blink/customize/", "Customize",
+     "Fine-tune on your own decisions."),
     ("https://huggingface.co/thegovind/blink-4b", "blink-4b", "Model files on Hugging Face."),
     ("https://huggingface.co/thegovind/blink-27b", "blink-27b", "Model files on Hugging Face."),
     ("https://huggingface.co/thegovind/blink-mimo-9b", "blink-mimo-9b", "Model files on Hugging Face."),

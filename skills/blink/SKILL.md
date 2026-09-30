@@ -132,3 +132,4 @@ Errors: `400` the body isn't a JSON object (or isn't valid JSON), `401` the serv
 - [Docs](https://thegovind.github.io/blink/)
 - [Agent docs index](https://thegovind.github.io/blink/llms.txt)
 - [API reference](https://thegovind.github.io/blink/api.md)
+- [Customize guide](https://thegovind.github.io/blink/customize.md): fine-tune on your own decisions

@@ -48,6 +48,7 @@ PAGES = (
     Page("agents", "docs/agents.md", "nav.agents"),
     Page("models", "docs/models.md", "nav.models"),
     Page("computer-use", "docs/computer-use.md", "nav.cua"),
+    Page("customize", "docs/customize.md", "nav.customize"),
 )
 # addresses that moved: old page -> the page that has its content now
 REDIRECTS = {

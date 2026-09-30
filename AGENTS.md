@@ -10,6 +10,9 @@ Start here before changing code.
 | `space/` | Runtime `blink.py` and the Space app |
 | `serve.py` | Standalone server shipped in each model repo |
 | `lab/` | Training and evaluation tools |
+| `examples/train/` | Data format, `prepare.py`, the training script and Azure Machine Learning templates |
+| `examples/mlx/` | Run and fine-tune on Apple silicon with MLX |
+| `examples/rl/` | Learning from outcomes and RL, with a reward demo |
 | `site/` | Docs builder |
 | `skills/blink/` | blink Agent Skill |
 

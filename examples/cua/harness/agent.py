@@ -135,8 +135,20 @@ def _select_options(options: list[dict]) -> list[dict]:
             for i, option in enumerate(options) if not option["disabled"]]
 
 
+def _pick(policy, qkey: str, answer: dict, question: dict, greedy: str | None,
+          context: dict) -> str | None:
+    """The greedy decision, unless an RL policy hook draws a different offered key.
+
+    ``policy is None`` is the evaluated harness: this returns ``greedy`` unchanged.
+    """
+    if policy is None:
+        return greedy
+    return policy.choose(qkey, answer, question, greedy, context)
+
+
 async def _followup(page: Page, candidate: Candidate, state: dict, expected: dict,
-                    client: Client, values: list[str]) -> tuple[Decision, dict, str, int | None]:
+                    client: Client, values: list[str], policy=None,
+                    context: dict | None = None) -> tuple[Decision, dict, str, int | None]:
     kind = _action_kind(candidate)
     if kind == "type":
         if not values:
@@ -164,7 +176,9 @@ async def _followup(page: Page, candidate: Candidate, state: dict, expected: dic
             oracle_choice = "1"
     response = await client.ask(state, question, expected=expected,
                                 oracle_choices={"value": oracle_choice})
-    chosen = options[int(response.answers["value"]["choice"]) - 1]
+    key = _pick(policy, "value", response.answers["value"], question["value"],
+                response.answers["value"]["choice"], {**(context or {}), "state": state})
+    chosen = options[int(key) - 1]
     return response, question, chosen["label"], chosen["index"]
 
 
@@ -277,6 +291,7 @@ async def run_episode(
     model: str, client: Client, output: Path, harness_sha: str,
     interrupts: int = 0, beat_ms: int = 600, record_video: bool = True,
     convert_video: bool = True, mode: str = "batched", game_realtime: bool = False,
+    policy=None,
 ) -> dict:
     """Run and persist one episode, including errors rather than replacing failed results."""
     if beat_ms < 0 or interrupts not in (0, 1):
@@ -400,9 +415,19 @@ async def run_episode(
             followup_usage: dict = {}
             p_done = main.answers["done"]["noul"] if not kind_game else 0.0
             p_risky = main.answers["risky"]["noul"] if not kind_game else 0.0
-            done = not kind_game and p_done >= screens.DONE_AT
-            chosen_n = (main.answers.get("lane" if kind_game else "element", {}).get("choice")
-                        if not done else None)
+            pick_context = {"step": step, "state": request_state, "image": output / image_path,
+                            "image_path": image_path, "expected": expected,
+                            "candidates": [c.n for c in choices]}
+            element_key = "lane" if kind_game else "element"
+            done = False
+            if not kind_game:
+                done = _pick(policy, "done", main.answers["done"], questions["done"],
+                             "yes" if p_done >= screens.DONE_AT else "no", pick_context) == "yes"
+            chosen_n = None
+            if not done and element_key in main.answers:
+                chosen_n = _pick(policy, element_key, main.answers[element_key],
+                                 questions[element_key], main.answers[element_key].get("choice"),
+                                 pick_context)
             chosen = next((c for c in choices if str(c.n) == chosen_n), None)
             action_kind = "done" if done else _action_kind(chosen) if chosen else "none"
             invalid_action = None
@@ -414,14 +439,18 @@ async def run_episode(
             request_questions = questions.copy()
             if action_kind in ("type", "select"):
                 extra, question, value, option_index = await _followup(
-                    page, chosen, request_state, expected, client, contract["values"]
+                    page, chosen, request_state, expected, client, contract["values"],
+                    policy=policy, context=pick_context,
                 )
                 answers.update(extra.answers)
                 request_questions.update(question)
                 followup_ms = extra.wall_ms
                 followup_usage = extra.usage
             wall_ms = round(main.wall_ms + followup_ms, 2)
-            gate = not done and chosen is not None and not invalid_action and p_risky >= screens.RISKY_AT
+            gate_key = "no" if kind_game else _pick(
+                policy, "risky", main.answers["risky"], questions["risky"],
+                "yes" if p_risky >= screens.RISKY_AT else "no", pick_context)
+            gate = not done and chosen is not None and not invalid_action and gate_key == "yes"
             label = ("Task complete" if done else f"No value for {chosen_n}" if invalid_action else
                      f"{action_kind.capitalize()} {chosen_n}"
                      if chosen else "No action available")
@@ -539,6 +568,8 @@ async def run_episode(
         "hits": _game_score(check)[1] if kind_game and error is None else None,
         **_scores(rows, scenario["kind"] == "game"),
     }
+    if policy is not None:
+        summary["policy"] = getattr(policy, "name", "custom")
     if record_video and convert_video and (output / "video.capture.webm").exists():
         from .video import convert, normalize_capture
         try:

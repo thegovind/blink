@@ -1744,6 +1744,7 @@ class TestHomeAndAskTabs(unittest.TestCase):
         self.assertIn("spaces/multimodalart/jev-decision-index", joined)
         self.assertIn("jevbench/issues/81", joined)
         self.assertIn("github.com/thegovind/blink#get-started", joined)
+        self.assertIn("thegovind.github.io/blink/customize/", joined)
 
     def test_home_numbers_come_from_the_board(self):
         import results

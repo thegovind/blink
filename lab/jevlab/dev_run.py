@@ -7,6 +7,7 @@ import argparse
 import collections
 import json
 import math
+from pathlib import Path
 
 from .render import Renderer
 from .scorer import Scorer, load_model
@@ -21,8 +22,9 @@ def main():
     ap.add_argument("--template", default="semif")
     ap.add_argument("--temperature", type=float, default=1.0)
     ap.add_argument("--max-len", type=int, default=32768)
+    ap.add_argument("--device", default="cuda", help="cuda, or cpu for small checks")
     a = ap.parse_args()
-    tok, model = load_model(a.model, adapter=a.adapter)
+    tok, model = load_model(a.model, adapter=a.adapter, device=a.device)
     sc = Scorer(model, tok, temperature=a.temperature, max_tokens=a.max_len)
     rd = Renderer(tok, template=a.template)
     rows = [json.loads(l) for l in open(a.dev)]
@@ -69,6 +71,7 @@ def main():
     macro = sum(v["acc"] for v in summ.values()) / len(summ)
     out = {"model": a.model, "adapter": a.adapter, "temperature": a.temperature, "macro_acc": macro,
            "overall_ece": ece(allc), "by_src": summ}
+    Path(a.out).parent.mkdir(parents=True, exist_ok=True)
     json.dump({"summary": out, "records": recs}, open(a.out, "w"))
     print(f"macro_acc {macro:.4f} ece {out['overall_ece']:.4f}")
     for s, v in summ.items():

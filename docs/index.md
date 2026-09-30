@@ -18,6 +18,10 @@ Run the [offline computer-use scenarios](https://github.com/thegovind/blink/tree
 
 Follow the [API guide](api.md) to send `noul`, `choice`, and `score` questions.
 
+## Train it on your decisions
+
+Follow the [customize guide](customize.md) to fine-tune on your data, keep the probabilities honest, and serve the result with PyTorch, on a Mac with MLX, or on Foundry.
+
 ## Give it to your agent
 
 Copy the blink skill, then follow the [agent experience guide](agents.md).

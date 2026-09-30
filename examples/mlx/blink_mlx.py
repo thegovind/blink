@@ -12,6 +12,8 @@ are not supported here.
   python blink_mlx.py --request request.json           # {"state": ..., "questions": {...}}
   python blink_mlx.py --model thegovind/blink-mimo-9b  # its text side only
   python blink_mlx.py --check                          # compare with the Space's saved runs
+  python blink_mlx.py --adapter runs/mine              # with a LoRA adapter from train_mlx.py
+  python blink_mlx.py --model ./my-model               # a local folder that holds blink.py
 
 In Python, with this file next to your code:
 
@@ -58,27 +60,51 @@ def _import_blink(path: Path, model: str):
     return module
 
 
+def model_path(model: str, revision: str = REVISION) -> Path:
+    """A local model folder as is, or the Hub repo's files at `revision`."""
+    local = Path(model).expanduser()
+    if local.is_dir():
+        if not (local / "blink.py").is_file():
+            raise SystemExit(f"{local} has no blink.py; copy it from the model repo you fine-tuned")
+        return local
+    from huggingface_hub import snapshot_download
+
+    return Path(snapshot_download(model, revision=revision, allow_patterns=FILES))
+
+
+def load_text_model(path: Path, adapter: str | None = None):
+    """MLX's model for a blink checkpoint (text side only), with an MLX LoRA adapter folder if given."""
+    from mlx_lm import load as mlx_load
+
+    config = json.loads((path / "config.json").read_text())
+    override = {"model_type": "qwen3_5"} if config.get("model_type") == "qwen3_5_text" else None
+    model, _ = mlx_load(str(path), model_config=override, adapter_path=adapter)
+    return model
+
+
+def readout_head(model):
+    """The output rows the offered letters are read from: the tied embeddings, or lm_head."""
+    text = model.language_model
+    return text.model.embed_tokens if text.args.tie_word_embeddings else text.lm_head
+
+
 class MlxEngine:
     """blink.py's TorchEngine text path with MLX doing the forward pass."""
 
     name = "mlx"
     accepts_images = False
 
-    def __init__(self, blink, path: Path, model_id: str, temperature: float):
+    def __init__(self, blink, path: Path, model_id: str, temperature: float, adapter: str | None = None):
         import mlx.core as mx
-        from mlx_lm import load as mlx_load
         from transformers import AutoTokenizer
 
         self.blink = blink
         self.model_id = model_id
         self.temperature = float(temperature)
         self.tok = AutoTokenizer.from_pretrained(str(path))
-        config = json.loads((path / "config.json").read_text())
-        override = {"model_type": "qwen3_5"} if config.get("model_type") == "qwen3_5_text" else None
-        model, _ = mlx_load(str(path), model_config=override)
-        text = model.language_model
-        self.backbone = text.model
-        head = self.backbone.embed_tokens if text.args.tie_word_embeddings else text.lm_head
+        model = load_text_model(path, adapter)
+        self.backbone = model.language_model.model
+        head = readout_head(model)
         if not hasattr(head, "weight") or getattr(head, "scales", None) is not None:
             raise blink.BlinkError("use the published bf16 weights; quantized checkpoints are not supported")
         self.head = head.weight
@@ -108,13 +134,13 @@ class MlxEngine:
 
 
 class Blink:
-    def __init__(self, model: str = MODELS[0], revision: str = REVISION, temperature: float | None = None):
-        from huggingface_hub import snapshot_download
-
-        path = Path(snapshot_download(model, revision=revision, allow_patterns=FILES))
+    def __init__(self, model: str | None = None, revision: str = REVISION, temperature: float | None = None,
+                 adapter: str | None = None):
+        model = adapter_base(adapter, model) if adapter else (model or MODELS[0])
+        path = model_path(model, revision)
         self.module = _import_blink(path, model)
         self.engine = MlxEngine(self.module, path, model,
-                                self.module.TEMPERATURE if temperature is None else temperature)
+                                self.module.TEMPERATURE if temperature is None else temperature, adapter)
         self.module._ENGINE = self.engine
 
     def decide(self, state, questions: dict, temperature: float | None = None) -> dict:
@@ -123,8 +149,20 @@ class Blink:
         return out
 
 
-def load(model: str = MODELS[0], revision: str = REVISION, temperature: float | None = None) -> Blink:
-    return Blink(model, revision, temperature)
+def adapter_base(adapter: str, model: str | None) -> str:
+    """The model an adapter from train_mlx.py was trained on; refuses a different explicit --model."""
+    try:
+        base = json.loads((Path(adapter) / "adapter_config.json").read_text()).get("base_model")
+    except (OSError, ValueError) as exc:
+        raise SystemExit(f"{adapter}: not an adapter folder from train_mlx.py ({exc})") from None
+    if model and base and model != base:
+        raise SystemExit(f"{adapter} was trained on {base}, not {model}; pass --model {base} or leave --model out")
+    return model or base or MODELS[0]
+
+
+def load(model: str | None = None, revision: str = REVISION, temperature: float | None = None,
+         adapter: str | None = None) -> Blink:
+    return Blink(model, revision, temperature, adapter)
 
 
 def _softmax(xs):
@@ -190,15 +228,21 @@ def check(blink: Blink, reference: str | None = None) -> dict:
 
 def main(argv=None) -> None:
     ap = argparse.ArgumentParser(description=__doc__.split("\n\n")[0])
-    ap.add_argument("--model", default=MODELS[0], help=f"one of {', '.join(MODELS)} (default: %(default)s)")
+    ap.add_argument("--model", help=f"one of {', '.join(MODELS)}, or a local model folder (default: {MODELS[0]}, "
+                                    "or the base model an --adapter was trained on)")
     ap.add_argument("--revision", default=REVISION, help="model repo revision (default: %(default)s)")
+    ap.add_argument("--adapter", help="an MLX LoRA adapter folder from train_mlx.py")
+    ap.add_argument("--temperature", type=float,
+                    help="divide the letter scores by T before the softmax (fit T with lab/jevlab/fit_temp.py)")
     ap.add_argument("--request", help='JSON file with {"state": ..., "questions": {...}}')
     ap.add_argument("--check", action="store_true", help="compare with the Space's saved runs")
     ap.add_argument("--reference", help="with --check: your own recording (space/record_replay.py format)")
     a = ap.parse_args(argv)
     if a.reference and not a.check:
         ap.error("--reference needs --check")
-    blink = load(a.model, a.revision)
+    if a.temperature is not None and not a.temperature > 0:
+        ap.error("--temperature must be positive")
+    blink = load(a.model, a.revision, temperature=a.temperature, adapter=a.adapter)
     if a.check:
         print(json.dumps(check(blink, a.reference), indent=1))
         return

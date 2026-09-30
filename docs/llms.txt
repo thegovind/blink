@@ -12,9 +12,12 @@ Screenshots are opt-in on self-hosted v1.3 or later; see the [API example](https
 - [Agent experience](https://thegovind.github.io/blink/agents.md): Install the skill and find agent-ready docs.
 - [Models](https://thegovind.github.io/blink/models.md): Pick a model and open its card.
 - [Computer use](https://thegovind.github.io/blink/computer-use.md): Try Screen click, set up screenshots and connect browser agents.
+- [Customize](https://thegovind.github.io/blink/customize.md): Fine-tune on your own decisions, evaluate calibration, serve the result, and learn from outcomes or RL.
 - [Computer-use scenarios](https://thegovind.github.io/blink/computer-use.md#scenarios): Results over ten apps, per-app tables and videos.
 - [Runnable CUA examples](https://github.com/thegovind/blink/tree/main/examples/cua): Offline apps, harness, tests and setup.
-- [Run on a Mac with MLX](https://github.com/thegovind/blink/tree/main/examples/mlx): Text decisions on Apple silicon, no server.
+- [Run on a Mac with MLX](https://github.com/thegovind/blink/tree/main/examples/mlx): Text decisions and LoRA fine-tuning on Apple silicon, no server.
+- [Training examples](https://github.com/thegovind/blink/tree/main/examples/train): Data format, prepare.py, the reference trainer and Foundry job templates.
+- [RL examples](https://github.com/thegovind/blink/tree/main/examples/rl): Learning from outcomes, reward choice, and RL in an environment.
 
 ## Models
 

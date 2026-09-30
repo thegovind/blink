@@ -107,4 +107,8 @@ for file in examples/cua/tests/test_*.py; do
 done
 ```
 
+## Sample instead of choosing greedily
+
+`run_episode` in `harness/agent.py` takes a `policy` hook. With `policy=None` (the default) the harness makes the greedy choices every result here used. A policy's `choose(qkey, answer, question, greedy, context)` can return a different offered key, for example one sampled from blink's probabilities, which is how RL rollouts in these apps start. [examples/rl](../rl/README.md) has a sampling policy, the recipe and the results.
+
 Code: Apache-2.0. Weights: non-commercial research and evaluation only; see each model card's license.

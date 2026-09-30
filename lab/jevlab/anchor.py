@@ -8,6 +8,7 @@ import argparse
 import json
 import math
 import random
+from pathlib import Path
 
 from .render import Renderer
 from .scorer import Scorer, load_model
@@ -20,11 +21,12 @@ def main():
     ap.add_argument("--out", required=True)
     ap.add_argument("--limit", type=int, default=None)
     ap.add_argument("--template", default="semif")
+    ap.add_argument("--device", default="cuda", help="cuda, or cpu for small checks")
     a = ap.parse_args()
     rows = [json.loads(l) for l in open(a.inp)]
     random.Random(0).shuffle(rows)
     rows = rows[: a.limit]
-    tok, model = load_model(a.model)
+    tok, model = load_model(a.model, device=a.device)
     sc = Scorer(model, tok, max_tokens=16384)
     rd = Renderer(tok, template=a.template)
     work = []
@@ -33,6 +35,7 @@ def main():
         work.append((r, keys, tok(prompt, add_special_tokens=False)["input_ids"], cand))
     lps = sc.score([w[2] for w in work], [w[3] for w in work])
     n = 0
+    Path(a.out).parent.mkdir(parents=True, exist_ok=True)
     with open(a.out, "w") as f:
         for (r, keys, _, _), lp in zip(work, lps):
             if lp is None:

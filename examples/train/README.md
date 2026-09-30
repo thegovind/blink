@@ -1,10 +1,78 @@
-# Train a decision adapter
+# Train blink on your own decisions
 
-Fine-tune a compatible text checkpoint for a set of typed decisions, then merge
-the adapter into a standalone folder for `serve.py`. The example data is
-invented and demonstrates the file format and commands, **not** a useful
-trained model or an accuracy result. Supply independently collected training
-and disjoint development data for a real task.
+Fine-tune blink for your typed decisions with a LoRA adapter, check that it got better without losing calibration,
+and serve it. The [customize guide](https://thegovind.github.io/blink/customize/) explains the choices; this page has
+the commands. On a Mac, use [examples/mlx](../mlx/README.md) instead of the PyTorch trainer; for RL and learning from
+outcomes, see [examples/rl](../rl/README.md).
+
+## From your rows to a served model
+
+Run these from the repository root after `python -m pip install -e '.[train]'`. The PyTorch trainer expects a GPU;
+the CPU smoke run below checks the commands on a small model.
+
+1. **Check and split your rows** (format below; `prepare.py` also takes `votes` and `outcome` shortcuts):
+
+   ```sh
+   python examples/train/prepare.py rows.jsonl --out-dir data --dev-fraction 0.15 --model thegovind/blink-4b
+   ```
+
+2. **Make anchor rows** so the model keeps its general skills: general decisions labeled with the probabilities of
+   the model you start from. Aim for about one anchor row per ten training rows.
+
+   ```sh
+   PYTHONPATH=lab python -m jevlab.synth_core_v5 data/general.jsonl 200 general   # about a tenth of your rows
+   PYTHONPATH=lab python -m jevlab.anchor --model thegovind/blink-4b --inp data/general.jsonl --out data/anchors.jsonl
+   ```
+
+3. **Measure the model you start from** on your dev rows (accuracy, log loss, Brier score and calibration error,
+   per `src`):
+
+   ```sh
+   PYTHONPATH=lab python -m jevlab.dev_run --model thegovind/blink-4b --dev data/dev.jsonl --out runs/base-dev.json
+   ```
+
+4. **Train** a LoRA adapter (rank 16, alpha 32 by default). Add processes with `--nproc_per_node` on a machine
+   with several GPUs:
+
+   ```sh
+   PYTHONPATH=lab python -m torch.distributed.run --standalone --nproc_per_node=1 --module jevlab.train \
+     --model thegovind/blink-4b --data data/train.jsonl,data/anchors.jsonl --dev data/dev.jsonl --out runs/mine \
+     --lr 4e-5 --epochs 1 --budget 8192 --max-len 8192 --warmup 10
+   ```
+
+5. **Compare and calibrate.** Read the same dev rows with the adapter, and fit one temperature if the
+   probabilities drifted (then serve with `BLINK_TEMPERATURE=<T>` and confirm on held-out rows):
+
+   ```sh
+   PYTHONPATH=lab python -m jevlab.dev_run --model thegovind/blink-4b --adapter runs/mine/final \
+     --dev data/dev.jsonl --out runs/mine-dev.json
+   PYTHONPATH=lab python -m jevlab.fit_temp runs/mine-dev.json
+   ```
+
+6. **Merge and serve**, or average with the release first (`python -m jevlab.soup OUT merged <release folder>`)
+   if the fine-tune lost calibration or general skill:
+
+   ```sh
+   PYTHONPATH=lab python -m jevlab.merge --base thegovind/blink-4b --adapter runs/mine/final --out merged
+   cp serve.py space/blink.py space/graft_keys.py merged/
+   python merged/serve.py --model merged --port 8000
+   ```
+
+`anchor.py` and `dev_run.py` take `--device cpu` for small checks. Every command above was run on a small model
+with blink-4b's architecture on CPU; the settings in step 4 follow the released models (learning rates of 3e-5 to
+5e-5, one epoch).
+
+**Azure AI Foundry.** [`azureml/train-job.yml`](azureml/train-job.yml) runs steps 4 and 6 as an Azure Machine
+Learning command job on your GPU cluster, reading `train.jsonl`, `dev.jsonl` and `anchors.jsonl` from the repository's
+`data/` folder, and writes a servable folder with a Dockerfile.
+[`azureml/endpoint.yml`](azureml/endpoint.yml) and [`azureml/deployment.yml`](azureml/deployment.yml) serve that
+image on a managed online endpoint. They are templates: checked against the Azure Machine Learning schemas, not run
+by the maintainers.
+
+## A smoke run on sample data
+
+`train.sh` runs a small version of steps 4 and 6 on `sample.jsonl`. The sample data is invented: it shows the file
+format and the commands, not a useful model or an accuracy result.
 
 From the repository root, install the project's `train` dependencies
 (`python -m pip install -e '.[train]'`), then run:
@@ -61,6 +129,8 @@ For example (each object belongs on its own JSONL line):
 {"id":"n1","state":{"deadline":"soon"},"question":{"type":"noul","instructions":"Is a reply needed soon?","criteria":{"true":"Soon","false":"Later"}},"target":{"yes":0.8,"no":0.2}}
 {"id":"s1","state":"All fictional test accounts are blocked.","question":{"type":"score","instructions":"Rate the impact.","criteria":["None","Partial","Complete"]},"gold":"2"}
 ```
+
+`prepare.py` also accepts two shortcuts and writes the fields above: `votes` (counts per option key from several labelers, which become a soft `target`) and `outcome` (the option that turned out right, which becomes `gold`). It also takes `gold: true`/`false` for yes/no and an integer `gold` for score levels.
 
 `target` takes precedence over `gold` when present: nonnegative values with
 a positive sum are normalised over **offered** keys; omitted offered keys

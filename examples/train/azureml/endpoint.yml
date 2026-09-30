@@ -1,0 +1,8 @@
+$schema: https://azuremlschemas.azureedge.net/latest/managedOnlineEndpoint.schema.json
+# A managed online endpoint for your fine-tuned blink (Azure Machine Learning, Azure AI Foundry).
+# A template the maintainers have not run: the schema is checked, the endpoint is not.
+#
+#   az ml online-endpoint create -f examples/train/azureml/endpoint.yml \
+#     --resource-group <group> --workspace-name <workspace>
+name: blink-mine
+auth_mode: key

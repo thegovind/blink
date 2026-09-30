@@ -2,7 +2,7 @@
   {
     "dest": "examples/train/README.md",
     "reason": "training example",
-    "sha256": "7d524c7ecbe418d1479de2b5a106bff03965fd29435f72f78c3e45e4d2f443fe",
+    "sha256": "1576cefbd52a266813c9ad6570a830f57de9babfc7bafcd212e6f28cf6d9b4ce",
     "src": "examples/train/README.md",
     "transform": "copy"
   },
@@ -21,17 +21,73 @@
     "transform": "copy"
   },
   {
+    "dest": "examples/train/prepare.py",
+    "reason": "training example",
+    "sha256": "7b606afa53080c66e64e0f307aae947c4076f4263d75d180d96be55dac66adad",
+    "src": "examples/train/prepare.py",
+    "transform": "scrub_python"
+  },
+  {
+    "dest": "examples/train/azureml/train-job.yml",
+    "reason": "Azure Machine Learning template",
+    "sha256": "92045f29adf035e9461c30838e2f085cea6a28ec82b0af9f2d791efe62826240",
+    "src": "examples/train/azureml/train-job.yml",
+    "transform": "copy"
+  },
+  {
+    "dest": "examples/train/azureml/endpoint.yml",
+    "reason": "Azure Machine Learning template",
+    "sha256": "43c70bee347e1eecd8a4690f0dfbd4f73cf1576bea50997b5ddfcfb7acd65a6c",
+    "src": "examples/train/azureml/endpoint.yml",
+    "transform": "copy"
+  },
+  {
+    "dest": "examples/train/azureml/deployment.yml",
+    "reason": "Azure Machine Learning template",
+    "sha256": "6cf0116e6ff8b493a4eb47abb7d17ae4beb417e23d90478d2b93f9970e11c6c8",
+    "src": "examples/train/azureml/deployment.yml",
+    "transform": "copy"
+  },
+  {
     "dest": "examples/mlx/README.md",
     "reason": "MLX example",
-    "sha256": "a827d38d538885e9693197a81fb5c53a6c9e9068fa0c5d367b99ee8baba93b96",
+    "sha256": "5b2a45c7c7c88e220304d8a81441d583d280f1ebbc57a463dd24d892bbf03581",
     "src": "examples/mlx/README.md",
     "transform": "copy"
   },
   {
     "dest": "examples/mlx/blink_mlx.py",
     "reason": "MLX example",
-    "sha256": "7a0aff11b04f87099bc68da009cec08f3be95b410899f98f8ed3003cff35defc",
+    "sha256": "d87ffc2bd43678381ea2cd2affd55ded73985c4adf9215fd2fd4862f270d2f3c",
     "src": "examples/mlx/blink_mlx.py",
+    "transform": "scrub_python"
+  },
+  {
+    "dest": "examples/mlx/train_mlx.py",
+    "reason": "MLX example",
+    "sha256": "ee44df256422d8f6b5a534475f49a2c12e4e5bc23087cbbf179737c165c42c05",
+    "src": "examples/mlx/train_mlx.py",
+    "transform": "scrub_python"
+  },
+  {
+    "dest": "examples/mlx/anchor_mlx.py",
+    "reason": "MLX example",
+    "sha256": "e726f09737e455b8311e3ca244c738a78805710676be1949e6aacfe3027d01fd",
+    "src": "examples/mlx/anchor_mlx.py",
+    "transform": "scrub_python"
+  },
+  {
+    "dest": "examples/rl/README.md",
+    "reason": "RL example",
+    "sha256": "f1315fb9576481701716dac24ab532470d4708dd27164c056b64757f4521e1f6",
+    "src": "examples/rl/README.md",
+    "transform": "copy"
+  },
+  {
+    "dest": "examples/rl/reward_demo.py",
+    "reason": "RL example",
+    "sha256": "10e3fa9dbe94ef3ced3d2a7ef16b421316320c3ae37cb8cb852eab590fec3932",
+    "src": "examples/rl/reward_demo.py",
     "transform": "scrub_python"
   },
   {
@@ -289,7 +345,7 @@
   {
     "dest": "examples/cua/harness/agent.py",
     "reason": "local screenshot agent harness",
-    "sha256": "bdefec50cb0b7dc0814d0301fd39a7875800bb41de64f41a990495863af8c617",
+    "sha256": "c72b5a58650b0f40d039c9352cee05dd2c998809f0055586456b3b27e5040dd4",
     "src": "cua/scenarios/harness/agent.py",
     "transform": "cua_text"
   },
@@ -485,14 +541,14 @@
   {
     "dest": "space/ui.py",
     "reason": "",
-    "sha256": "ce3a966a42009178757e529511cf0b23d3d76437a99132c3e4fdef773cbca60f",
+    "sha256": "0ab0a6015e524b719f78e4f25d1dd4eef3136f56083eac4588efb0938a8ec43d",
     "src": "space/ui.py",
     "transform": "scrub_python"
   },
   {
     "dest": "space/api_doc.py",
     "reason": "",
-    "sha256": "ad03ad252db401d875a0779e8fe68a12ae28494a450ce72c36c7f031b56c18f1",
+    "sha256": "f7c9d0689ee9487a41e08ecb70088612bce0de4ae3bfdecfebe4b4c1138b781e",
     "src": "space/api_doc.py",
     "transform": "scrub_python"
   },
@@ -555,7 +611,7 @@
   {
     "dest": "space/test_blink.py",
     "reason": "",
-    "sha256": "0bd0586965087a96d51eb867a8b131cb0596a6dbe92987c76d7f1dd9bd5242b4",
+    "sha256": "095137a7a4ce7e4c2b41d9deb289d4a21c7f8dc8ef1a7eaeecdfdd7e679b9224",
     "src": "space/test_blink.py",
     "transform": "scrub_python"
   },
@@ -989,7 +1045,7 @@
   {
     "dest": "lab/jevlab/anchor.py",
     "reason": "training/data-generation",
-    "sha256": "3a03ac14d59a8f9894e9436c8459782709f75a2cbc4dcf70a77f39db109d6adc",
+    "sha256": "1f1676ce9b061a6c0eb9f793aeb95865708f7bf8600845ad534080d41edc1362",
     "src": "lab/jevlab/anchor.py",
     "transform": "scrub_python"
   },
@@ -1052,7 +1108,7 @@
   {
     "dest": "lab/jevlab/dev_run.py",
     "reason": "training/data-generation",
-    "sha256": "c6a9faa72cb6a36d8378a16f9ac3ab81647b6a92fddf92adcab1261fa8f02d0b",
+    "sha256": "4f291016397289528372761f89ed1fc5d43cfd61c7f03209ff908670de9e480a",
     "src": "lab/jevlab/dev_run.py",
     "transform": "scrub_python"
   },
@@ -1267,6 +1323,20 @@
     "transform": "scrub_python"
   },
   {
+    "dest": "lab/tests/test_prepare.py",
+    "reason": "unit test",
+    "sha256": "d2b8ee1f235e48c7a940a90df4e47b275eaa6aa18bb3b00b570315462ed79b8e",
+    "src": "lab/tests/test_prepare.py",
+    "transform": "scrub_python"
+  },
+  {
+    "dest": "lab/tests/test_reward_demo.py",
+    "reason": "unit test",
+    "sha256": "9c18dc82f07767b090ea8c8088d605b989b121320b16b4d23fe05f23fc82ee9f",
+    "src": "lab/tests/test_reward_demo.py",
+    "transform": "scrub_python"
+  },
+  {
     "dest": "lab/tests/test_synth_core.py",
     "reason": "unit test",
     "sha256": "b78f6606dd45fceb09c49a050b707507e7f6ce574cd6cb3f7afd1c6b2e48c009",
@@ -1297,7 +1367,14 @@
   {
     "dest": ".gitignore",
     "reason": "repository scaffold",
-    "sha256": "97605b0133973642198a4b6743f003f0015140dfa2ed25e2ed4ab5d289c7cbd5",
+    "sha256": "99ecb66138bcb5cf5a6c0128197c01fbd81cc4eb2a3c226aba39695fd14cc4a2",
+    "src": "<generated>",
+    "transform": "generate"
+  },
+  {
+    "dest": ".amlignore",
+    "reason": "repository scaffold",
+    "sha256": "78e8d36ece0946b56d75fccc504ab3e552ff75bbe4d746b77739bbe6351d8c3d",
     "src": "<generated>",
     "transform": "generate"
   },
@@ -1318,28 +1395,28 @@
   {
     "dest": "README.md",
     "reason": "repository scaffold",
-    "sha256": "4d1af0dc95bb058a9644b009610fed94524ebd234259d7e62dd3383520b7c731",
+    "sha256": "3c63768ac8b2990a3349a5f2874818912b0227754ffc618c1f4bc7ccc78ddb1e",
     "src": "<generated>",
     "transform": "generate"
   },
   {
     "dest": "AGENTS.md",
     "reason": "repository scaffold",
-    "sha256": "ec21d82696b48a9e85f4c05d140361e7c6aa8191ac6d5c3be7a0701477aba6d2",
+    "sha256": "093aa4fe3376192ee52cfdbb85989d3bb923f070591a5cfe822001dfeb10833b",
     "src": "<generated>",
     "transform": "generate"
   },
   {
     "dest": "skills/blink/SKILL.md",
     "reason": "repository scaffold",
-    "sha256": "64f3ef981108589f9235ba1b9277b65f200eeffb22353b22e6572290076dbd50",
+    "sha256": "fe8a19560f277790c4e007f8546e3f0e431843a2c4e2239ddd269acee13a5c20",
     "src": "<generated>",
     "transform": "generate"
   },
   {
     "dest": "docs/index.md",
     "reason": "repository scaffold",
-    "sha256": "6a4952bd80f8af910b264819e6e24bfe86ca65e5925bb95774bb2cf3db3749af",
+    "sha256": "ebfdd767731f666f976cc3d49ecd7ed1bb6c6a81fc0033a34bfcaadfae28a721",
     "src": "<generated>",
     "transform": "generate"
   },
@@ -1360,7 +1437,7 @@
   {
     "dest": "docs/models.md",
     "reason": "repository scaffold",
-    "sha256": "46955fee8dcb9033ab74799c42852609f04dedeaf1ae2d660f21b4cf4703d484",
+    "sha256": "b19cc910f5305924c80ad3b2665ef4e2b780481e00d8b55f25f5eb2710220518",
     "src": "<generated>",
     "transform": "generate"
   },
@@ -1372,16 +1449,23 @@
     "transform": "generate"
   },
   {
+    "dest": "docs/customize.md",
+    "reason": "repository scaffold",
+    "sha256": "39065852e777046ba6e717ea62fdadebeff57ae2594434c3db7fa4fd7fa128cb",
+    "src": "<generated>",
+    "transform": "generate"
+  },
+  {
     "dest": "docs/llms.txt",
     "reason": "repository scaffold",
-    "sha256": "ca2960b2f045e0bf64eac85d59122ff8534bb99a0692b0751cd47db5b0a45685",
+    "sha256": "bec71580f9307cc3fb9e7226f19c460bc24dd4954fd2a64b3082193ac747c60e",
     "src": "<generated>",
     "transform": "generate"
   },
   {
     "dest": "examples/cua/README.md",
     "reason": "repository scaffold",
-    "sha256": "a6c42c605672ab064aaf6e2d7c57169b30e9c7097cf42e35f7a35015ce3ade26",
+    "sha256": "0e1718d3116f92e3fa2d1f7516b88497da5e2bdc9e0d2d58f8eab7874acead6b",
     "src": "<generated>",
     "transform": "generate"
   },
@@ -1563,7 +1647,7 @@
   {
     "dest": "site/build.py",
     "reason": "docs site",
-    "sha256": "b6848faa250e930e8f240a20741c200ea5d65b95e44ac637bb7e75cac1d36567",
+    "sha256": "409b3bb21476d4c16d5b4b090dbc75cd795a8fc53432a0fae32faa50b783a935",
     "src": "<site>",
     "transform": "copy"
   },
@@ -1619,7 +1703,7 @@
   {
     "dest": "site/strings.json",
     "reason": "docs site",
-    "sha256": "d57636af24793352c9c649c1a8af7be18264d38c0dc797b644ad44f090cf5db3",
+    "sha256": "2235d322c0a13b19d73b074bff79b0706e9fe3ed410cae9344e51bbafdd41a8e",
     "src": "<site>",
     "transform": "copy"
   },
@@ -1661,7 +1745,7 @@
   {
     "dest": "site/test_build.py",
     "reason": "docs site",
-    "sha256": "99170ce36626406e09ea59e8110f3e5109c189027a590452d81d275deefc32e6",
+    "sha256": "b0991a6ed8aa199ba3cd2cb360f6c2e807c532c15cc02c1d9ebdcf54264adb30",
     "src": "<site>",
     "transform": "copy"
   }

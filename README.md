@@ -25,6 +25,7 @@ blink reads each question's prompt in one forward pass and takes the next-token 
 | Serve it for TypeSafe SDKs or HTTP | [Run it](#run-it), then set `TYPESAFE_BASE_URL` to your server. |
 | Call it from Python, no server | Load `blink.py` from a model repo; see the [blink-4b quickstart](https://huggingface.co/thegovind/blink-4b#quickstart). |
 | Run it on a Mac | [Run it on a Mac](#run-it-on-a-mac) with MLX. |
+| Train it on your own decisions | [Customize](#customize): data, fine-tuning, evaluation, RL. |
 | Give it to an agent | [Use it from agents](#use-it-from-agents). |
 
 ## Try it
@@ -57,6 +58,10 @@ python blink_mlx.py --check   # compare with the Space's saved runs
 ```
 
 `blink_mlx.py` uses the model repo's `blink.py` for prompts and answers, and MLX for the forward pass. Text and JSON state only, bf16 weights only, no server. It was checked on Linux, so run `--check` once on your Mac. See [examples/mlx](examples/mlx/README.md) for memory, checks and limits.
+
+## Customize
+
+Fine-tune blink on your own decisions, keep it calibrated, and serve the result: the [customize guide](https://thegovind.github.io/blink/customize/) walks through data, training with PyTorch, on a Mac with MLX or on Foundry, evaluation and RL. The runnable pieces are in [examples/train](examples/train/README.md), [examples/mlx](examples/mlx/README.md) and [examples/rl](examples/rl/README.md).
 
 ## Use it from code
 

@@ -29,9 +29,11 @@ Put the request in a file with the same fields as the API:
 ```sh
 python blink_mlx.py --request request.json
 python blink_mlx.py --model thegovind/blink-mimo-9b --request request.json
+python blink_mlx.py --model ./my-model --request request.json          # a local folder that holds blink.py
+python blink_mlx.py --adapter runs/mine --request request.json         # an adapter from train_mlx.py, on its own base
 ```
 
-From Python, with `blink_mlx.py` next to your code:
+From Python, with `blink_mlx.py` next to your code (`load` also takes `adapter=` and `temperature=`):
 
 ```python
 from blink_mlx import load
@@ -41,6 +43,40 @@ out = blink.decide("My card was charged twice this month.",
                    {"urgent": {"type": "noul", "instructions": "Does this need an answer today?"}})
 print(out["answers"]["urgent"]["noul"])
 ```
+
+## Fine-tune on your Mac
+
+`train_mlx.py` trains a LoRA adapter with the same objective as the PyTorch trainer: blink's prompts, option order
+and letters reshuffled every epoch, cross-entropy over the offered letters against each row's target, rank 16 and
+alpha 32 on the attention, Gated DeltaNet and MLP projections, AdamW with warmup and cosine decay. Run it from a
+clone of the repository, with rows in the [training format](../train/README.md):
+
+```sh
+git clone https://github.com/thegovind/blink && cd blink
+pip install "mlx-lm>=0.31.3"
+python examples/train/prepare.py rows.jsonl --out-dir data --dev-fraction 0.15
+PYTHONPATH=lab python -m jevlab.synth_core_v5 data/general.jsonl 200 general   # about a tenth of your rows
+python examples/mlx/anchor_mlx.py --model thegovind/blink-4b --inp data/general.jsonl --out data/anchors.jsonl
+python examples/mlx/train_mlx.py --model thegovind/blink-4b --data data/train.jsonl,data/anchors.jsonl \
+  --dev data/dev.jsonl --out runs/mine --lr 4e-5
+python examples/mlx/blink_mlx.py --model thegovind/blink-4b --adapter runs/mine --request request.json
+```
+
+- `anchor_mlx.py` labels general decisions with the model's own probabilities, so training on your task does not
+  erase what it already does. Aim for about one anchor row per ten training rows.
+- `train_mlx.py` reads the dev rows before and after training and writes `eval-init.json` and `eval-final.json`:
+  accuracy, log loss, Brier score and calibration error, per `src`. `--eval-only` reads them without training.
+- If the probabilities drifted, `PYTHONPATH=lab python -m jevlab.fit_temp runs/mine/eval-final.json` fits one
+  temperature T; use it with `blink_mlx.py --temperature T`, and confirm on rows you did not fit it on.
+- Gradient checkpointing is on by default. Training needs more memory than answering: start with blink-4b and
+  `--max-len 2048` if memory is tight.
+- Training runs the Gated DeltaNet layers one prompt token at a time (mlx-lm's differentiable path; answering uses
+  a fused kernel), so training time grows with prompt length. Try a few hundred short rows first.
+
+This trainer was checked against the PyTorch trainer on a small random model with blink-4b's architecture and
+tokenizer, on Linux, in float32: the same prompt tokens as serving, per-row loss within 1.2e-5, the same number of
+LoRA parameters, and the LoRA B gradients at initialisation within 5e-5 relative. It has not been timed on a Mac. The adapter runs with
+`blink_mlx.py`; to serve it with `serve.py`, train with the [PyTorch trainer](../train/README.md) instead.
 
 ## Memory
 

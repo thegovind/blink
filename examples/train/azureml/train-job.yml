@@ -1,0 +1,40 @@
+$schema: https://azuremlschemas.azureedge.net/latest/commandJob.schema.json
+# Fine-tune blink on your data as an Azure Machine Learning command job (Azure AI Foundry).
+# A template the maintainers have not run: the schema is checked, the job is not. From the repository root:
+#
+#   az ml job create -f examples/train/azureml/train-job.yml --set compute=azureml:<your-gpu-cluster> \
+#     --resource-group <group> --workspace-name <workspace>
+#
+# `data` is the repository's data/ folder (the path below is relative to this file) with train.jsonl and
+# dev.jsonl from examples/train/prepare.py and anchors.jsonl from jevlab.anchor (the customize guide). The job trains
+# a LoRA adapter, merges it, and writes a servable folder (weights, tokenizer, serve.py, Dockerfile) to the
+# `model` output. Download it with `az ml job download --name <job> --output-name model`.
+type: command
+display_name: blink-lora
+experiment_name: blink-customize
+code: ../../..
+environment:
+  image: pytorch/pytorch:2.13.0-cuda12.6-cudnn9-runtime
+compute: azureml:your-gpu-cluster
+inputs:
+  data:
+    type: uri_folder
+    path: ../../../data
+  base: thegovind/blink-4b
+outputs:
+  model:
+    type: uri_folder
+command: >-
+  pip install "transformers==5.17.0" "peft>=0.12" "accelerate>=1.0" "safetensors>=0.4" "huggingface_hub>=1.0"
+  "flash-linear-attention==0.5.2" &&
+  export PYTHONPATH=lab &&
+  python -m torch.distributed.run --standalone --nproc_per_node=1 --module jevlab.train
+  --model ${{inputs.base}} --data ${{inputs.data}}/train.jsonl,${{inputs.data}}/anchors.jsonl
+  --dev ${{inputs.data}}/dev.jsonl
+  --out ${{outputs.model}}/run --rank 16 --alpha 32 --lr 4e-5 --epochs 1 --budget 8192 --max-len 8192
+  --warmup 10 &&
+  python -m jevlab.merge --base ${{inputs.base}} --adapter ${{outputs.model}}/run/final
+  --out ${{outputs.model}}/merged &&
+  cp serve.py space/blink.py space/graft_keys.py ${{outputs.model}}/merged/ &&
+  cp docker/Dockerfile.model ${{outputs.model}}/merged/Dockerfile &&
+  cp docker/.dockerignore ${{outputs.model}}/merged/.dockerignore

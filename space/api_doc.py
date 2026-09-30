@@ -99,6 +99,8 @@ COPY = {
         "It was checked on Linux. Run --check once on your Mac: it compares your answers with this Space's "
         "saved runs for blink-4b and blink-mimo-9b.",
         "It is not a server. TypeSafe clients need serve.py.",
+        "train_mlx.py in the same folder fine-tunes a LoRA adapter on your own decisions; blink_mlx.py --adapter "
+        "runs it.",
     ),
     "mlx_docs": "MLX guide: memory, checks and limits",
     "space_notes": (
